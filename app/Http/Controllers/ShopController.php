@@ -89,6 +89,8 @@ class ShopController extends Controller
             $shop->user_id = $user->id;
             $shop->name = $request->shop_name;
             $shop->address = $request->address;
+            $shop->latitude  = $request->latitude;
+            $shop->longitude = $request->longitude;
             $shop->registration_approval= 0;
             $shop->slug = preg_replace('/\s+/', '-', str_replace("/", " ", $request->shop_name));
             $shop->save();

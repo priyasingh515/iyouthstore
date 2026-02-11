@@ -1,3 +1,4 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- New Address Modal -->
 <div class="modal fade" id="new-address-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md" role="document">
@@ -134,6 +135,10 @@
                             </div>
                         </div>
 
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
+                        <button type="button" onclick="getLocation()">Use My Location</button>
+
                         <!-- Save button -->
                         <div class="form-group text-right">
                             <button type="submit" class="btn btn-primary rounded-0 w-150px">{{translate('Save')}}</button>
@@ -162,3 +167,51 @@
         </div>
     </div>
 </div>
+
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Location Captured!',
+                        text: 'Your location has been successfully detected.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                },
+                function (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Location Access Denied',
+                        text: 'Please allow location access to continue.',
+                    });
+                }
+            );
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Not Supported',
+                text: 'Your browser does not support location detection.',
+            });
+        }
+    }
+
+    document.getElementById('addressForm').addEventListener('submit', function (e) {
+        const lat = document.getElementById('latitude').value;
+        const lon = document.getElementById('longitude').value;
+
+        if (lat === "" || lon === "") {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Location Required!',
+                text: 'Please click "Use My Location" before submitting.',
+            });
+        }
+    });
+</script>
