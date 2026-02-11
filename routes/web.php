@@ -75,6 +75,7 @@ Route::controller(DemoController::class)->group(function () {
     Route::get('/migrate_attribute_values', 'migrate_attribute_values');
 });
 
+
 Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
@@ -510,3 +511,6 @@ Route::controller(PageController::class)->group(function () {
 Route::controller(ContactController::class)->group(function () {
     Route::post('/contact', 'contact')->name('contact');
 });
+
+Route::post('/store-location', [HomeController::class, 'store'])->name('store-location');
+

@@ -25,7 +25,7 @@
             </div>
         @endif
 
-        <div class="col-md-4 mx-auto mb-3" >
+        {{-- <div class="col-md-4 mx-auto mb-3" >
             <a href="{{ route('seller.products.create')}}">
               <div class="p-3 rounded mb-3 c-pointer text-center bg-white shadow-sm hov-shadow-lg has-transition">
                   <span class="size-60px rounded-circle mx-auto bg-secondary d-flex align-items-center justify-content-center mb-3">
@@ -34,7 +34,7 @@
                   <div class="fs-18 text-primary">{{ translate('Add New Product') }}</div>
               </div>
             </a>
-        </div>
+        </div> --}}
 
         @if (addon_is_activated('seller_subscription'))
         @php
