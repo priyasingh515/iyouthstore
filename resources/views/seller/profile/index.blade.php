@@ -73,7 +73,7 @@
     </div>
 
     <!-- Payment System -->
-    <div class="card">
+    {{-- <div class="card">
         <div class="card-header">
             <h5 class="mb-0 h6">{{ translate('Payment Setting')}}</h5>
         </div>
@@ -133,7 +133,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="form-group mb-0 text-right">
         <button type="submit" class="btn btn-primary">{{translate('Update Profile')}}</button>

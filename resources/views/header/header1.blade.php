@@ -66,6 +66,16 @@
             <div class="col-6 text-right d-none d-lg-block top-text-color-visibility"
                 style="color: {{ $topHeaderTextColor }}">
                 <ul class="list-inline mb-0 h-100 d-flex justify-content-end align-items-center">
+                        <li class="list-inline-item ml-3">
+
+                            <button id="langToggleBtn" class="translate-btn" onclick="toggleTranslate()">
+                                🌐 हिंदी
+                            </button>
+
+                            <!-- Hidden Google Translate -->
+                            <div id="google_translate_element" style="display:none;"></div>
+
+                        </li>
                     @if (get_setting('vendor_system_activation') == 1)
                         <!-- Seller Dropdown and Helpline -->
                         <li class="list-inline-item d-flex">

@@ -1085,6 +1085,14 @@
                             </a>
                         </li>
                         @endcan
+                        @can('product_cart_report')
+                        <li class="aiz-side-nav-item">
+                            <a href="{{ route('cart_report.index') }}"
+                                class="aiz-side-nav-link {{ areActiveRoutes(['cart_report.index'])}}">
+                                <span class="aiz-side-nav-text">{{ translate('Add To Cart Report') }}</span>
+                            </a>
+                        </li>
+                        @endcan
                         @can('user_search_report')
                         <li class="aiz-side-nav-item">
                             <a href="{{ route('user_search_report.index') }}"

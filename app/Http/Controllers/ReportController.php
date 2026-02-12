@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\CommissionHistory;
@@ -10,6 +11,7 @@ use App\Models\User;
 use App\Models\Search;
 use App\Models\Shop;
 use Auth;
+use SebastianBergmann\Environment\Console;
 
 class ReportController extends Controller
 {
@@ -20,6 +22,7 @@ class ReportController extends Controller
         $this->middleware(['permission:seller_products_sale_report'])->only('seller_sale_report');
         $this->middleware(['permission:products_stock_report'])->only('stock_report');
         $this->middleware(['permission:product_wishlist_report'])->only('wish_report');
+        $this->middleware(['permission:product_cart_report'])->only('cart_report');
         $this->middleware(['permission:user_search_report'])->only('user_search_report');
         $this->middleware(['permission:commission_history_report'])->only('commission_history');
         $this->middleware(['permission:wallet_transaction_report'])->only('wallet_transaction_history');
@@ -142,4 +145,29 @@ class ReportController extends Controller
         return view('backend.reports.wallet_history_report', compact('wallets', 'users_with_wallet', 'user_id', 'date_range'));
     }
 
+    public function cart_report(Request $request)
+    {
+           $sort_by = null;
+           
+        $carts = Cart::with([
+            'product',
+            'customer',
+            'address'
+
+        ]);
+
+        if ($request->category_id != null) {
+            $sort_by = $request->category_id;
+
+            $carts = $carts->whereHas('product', function ($query) use ($sort_by) {
+                $query->where('category_id', $sort_by);
+            });
+        }
+
+        $carts = $carts->latest()->paginate(10);
+
+        // dd($carts);
+
+        return view('backend.reports.cart_report', compact('carts','sort_by'));
+    }
 }

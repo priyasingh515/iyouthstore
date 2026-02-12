@@ -540,7 +540,7 @@
         @endif
         
 
-        <div class="col-sm-6 col-md-6 col-lg-3">
+        {{-- <div class="col-sm-6 col-md-6 col-lg-3">
             <a href="{{ route('seller.money_withdraw_requests.index') }}"
                 class="card mb-4 p-4 text-center bg-soft-primary h-180px">
                 <div class="fs-16 fw-600 text-primary">
@@ -562,9 +562,9 @@
                     </svg>
                 </div>
             </a>
-        </div>
+        </div> --}}
        
-        <div class="col-sm-6 col-md-6 col-lg-3">
+        {{-- <div class="col-sm-6 col-md-6 col-lg-3">
             <div class="card mb-4 p-4 text-center bg-soft-primary">
                 <div class="fs-16 fw-600 text-primary">
                     {{ translate('Shop Settings') }}
@@ -592,8 +592,8 @@
                     {{ translate('Go to setting') }}
                 </a>
             </div>
-        </div>
-        <div class="col-sm-6 col-md-6 col-lg-3">
+        </div> --}}
+        {{-- <div class="col-sm-6 col-md-6 col-lg-3">
             <div class="card mb-4 p-4 text-center bg-soft-primary">
                 <div class="fs-16 fw-600 text-primary">
                     {{ translate('Payment Settings') }}
@@ -619,7 +619,7 @@
                     {{ translate('Configure Now') }}
                 </a>
             </div>
-        </div>
+        </div> --}}
       
     </div>
 

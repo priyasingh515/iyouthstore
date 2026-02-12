@@ -172,6 +172,17 @@
         }
 
         .pac-container { z-index: 100000; }
+
+        .translate-btn{
+    height:36px;
+    padding:6px 16px;
+    font-size:13px;
+    border-radius:6px;
+    border:1px solid #ddd;
+    background:#fff;
+    cursor:pointer;
+}
+
     </style>
 
 @if (get_setting('google_analytics') == 1)
@@ -234,7 +245,7 @@
 
     </div>
 
-    @if(get_setting('use_floating_buttons') == 1)
+    @if (get_setting('use_floating_buttons') == 1)
         <!-- Floating Buttons -->
         @include('frontend.inc.floating_buttons')
     @endif
@@ -244,7 +255,7 @@
     </div>
 
 
-    @if (env("DEMO_MODE") == "On")
+    @if (env('DEMO_MODE') == 'On')
         <!-- demo nav -->
         @include('frontend.inc.demo_nav')
     @endif
@@ -258,7 +269,7 @@
 
     <div class="aiz-custom-alert {{ get_setting('custom_alert_location') }}">
         @foreach ($custom_alerts as $custom_alert)
-            @if($custom_alert->id == 1)
+            @if ($custom_alert->id == 1)
                 <div class="aiz-cookie-alert mb-3" style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
                     <div class="p-3 px-lg-2rem rounded-0" style="background: {{ $custom_alert->background_color }};">
                         <div class="text-{{ $custom_alert->text_color }} mb-3">
@@ -312,7 +323,7 @@
         }
         @endphp
 
-        @if($dynamic_popup->id == 1)
+        @if ($dynamic_popup->id == 1)
             <div class="modal website-popup removable-session d-none" data-key="website-popup" data-value="removed">
                 <div class="absolute-full bg-black opacity-60"></div>
                 <div class="modal-dialog modal-dialog-centered modal-dialog-zoom modal-md mx-4 mx-md-auto">
@@ -344,7 +355,7 @@
                 </div>
             </div>
         @else
-            @if($showPopup)
+            @if ($showPopup)
             <div class="modal website-popup removable-session d-none" data-key="website-popup-{{ $dynamic_popup->id }}" data-value="removed">
                 <div class="absolute-full bg-black opacity-60"></div>
                 <div class="modal-dialog modal-dialog-centered modal-dialog-zoom modal-md mx-4 mx-md-auto">
@@ -937,7 +948,41 @@
         }
     </script>
 
-    @if (env("DEMO_MODE") == "On")
+    <script>
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi',
+        autoDisplay: false
+    }, 'google_translate_element');
+}
+</script>
+
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+function toggleTranslate(){
+
+    var select = document.querySelector(".goog-te-combo");
+    var btn = document.getElementById("langToggleBtn");
+
+    if(!select) return;
+
+    if(select.value == "hi"){
+        select.value = "en";
+        btn.innerHTML = "🌐 हिंदी";
+    }else{
+        select.value = "hi";
+        btn.innerHTML = "🌐 English";
+    }
+
+    select.dispatchEvent(new Event('change'));
+}
+</script>
+
+
+
+    @if (env('DEMO_MODE') == 'On')
         <script>
             var demoNav = document.querySelector('.aiz-demo-nav');
             var menuBtn = document.querySelector('.aiz-demo-nav-toggler');
@@ -1009,32 +1054,31 @@
                     location.reload();
                 });
             }
-        </script>
-    @endif
+        </script> @endif
 
     <script>
-function fixSlickVisibility() {
-    $('.slick-slide').css('visibility', 'visible');
-    $('.slick-track').css('opacity', '1');
-}
+        function fixSlickVisibility() {
+            $('.slick-slide').css('visibility', 'visible');
+            $('.slick-track').css('opacity', '1');
+        }
 
-// Call after fullscreen exit
-$(window).on('resize', function() {
-    setTimeout(function() {
-        $('.product-gallery').slick('setPosition');
-        $('.product-gallery-thumb').slick('setPosition');
-        fixSlickVisibility();
-    }, 300);
-});
-</script>
+        // Call after fullscreen exit
+        $(window).on('resize', function() {
+            setTimeout(function() {
+                $('.product-gallery').slick('setPosition');
+                $('.product-gallery-thumb').slick('setPosition');
+                fixSlickVisibility();
+            }, 300);
+        });
+    </script>
 
 <script>
-$(window).on('resize', function() {
-    setTimeout(function() {
-        $('.product-gallery').slick('setPosition');
-        $('.product-gallery-thumb').slick('setPosition');
-    }, 300); // delay gives time for fullscreen exit to finish
-});
+    $(window).on('resize', function() {
+        setTimeout(function() {
+            $('.product-gallery').slick('setPosition');
+            $('.product-gallery-thumb').slick('setPosition');
+        }, 300); // delay gives time for fullscreen exit to finish
+    });
 </script>
 
     @yield('script')
