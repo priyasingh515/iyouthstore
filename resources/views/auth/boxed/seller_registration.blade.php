@@ -111,6 +111,10 @@
                                                     @endif
                                                 </div>
 
+                                                <input type="hidden" name="latitude" id="latitude">
+                                                <input type="hidden" name="longitude" id="longitude">
+
+
                                                 <!-- Recaptcha -->
                                                 @if(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_seller_register') == 1)
                                                     
@@ -146,10 +150,26 @@
                     </div>
                 </div>
         </section>
-    </div>
+    </div> 
 @endsection
 
 @section('script')
+    <script>
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                },
+                function (error) {
+                    alert('Location allow karna zaruri hai seller registration ke liye');
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    </script>
+
     @if(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_seller_register') == 1)
         <script src="https://www.google.com/recaptcha/api.js?render={{ env('CAPTCHA_KEY') }}"></script>
         

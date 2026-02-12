@@ -1,3 +1,23 @@
+{{-- {{ "latitude: " . session(key: 'user_latitude') }}
+{{ "longitude: " . session('user_longitude') }} --}}
+<div>
+    Service Availble - <span id="service_available">
+
+
+        @if (session('is_within_radius'))
+            {{ session('is_within_radius') ? 'Yes' : 'No' }}
+        @else
+            {{-- check your location
+
+            <button onclick="location.reload()" class="btn btn-primary btn-sm">
+           Check Location
+            </button> --}}
+        @endif
+
+    </span>
+</div>
+
+
 <!-- Top Bar Banner -->
 @php
     $topbar_banner = get_setting('topbar_banner');
@@ -24,7 +44,7 @@
         </button>
     </div>
 @endif
-	@include('header.' .get_element_type_by_id(get_setting('header_element')))
+@include('header.' . get_element_type_by_id(get_setting('header_element')))
 <!-- Top Menu Sidebar -->
 <div class="aiz-top-menu-sidebar collapse-sidebar-wrap sidebar-xl sidebar-left d-lg-none z-1035">
     <div class="overlay overlay-fixed dark c-pointer" data-toggle="class-toggle" data-target=".aiz-top-menu-sidebar"
@@ -95,7 +115,8 @@
                 @else
                     <hr>
                     <li class="mr-0">
-                        <a href="{{ route('dashboard') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
+                        <a href="{{ route('dashboard') }}"
+                            class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
                                         {{ areActiveRoutes(['dashboard'], ' active') }}">
                             {{ translate('My Account') }}
                         </a>
@@ -103,19 +124,22 @@
                 @endif
                 @if (isCustomer())
                     <li class="mr-0">
-                        <a href="{{ route('customer.all-notifications') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
+                        <a href="{{ route('customer.all-notifications') }}"
+                            class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
                                         {{ areActiveRoutes(['customer.all-notifications'], ' active') }}">
                             {{ translate('Notifications') }}
                         </a>
                     </li>
                     <li class="mr-0">
-                        <a href="{{ route('wishlists.index') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
+                        <a href="{{ route('wishlists.index') }}"
+                            class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
                                         {{ areActiveRoutes(['wishlists.index'], ' active') }}">
                             {{ translate('Wishlist') }}
                         </a>
                     </li>
                     <li class="mr-0">
-                        <a href="{{ route('compare') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
+                        <a href="{{ route('compare') }}"
+                            class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
                                         {{ areActiveRoutes(['compare'], ' active') }}">
                             {{ translate('Compare') }}
                         </a>
@@ -147,6 +171,53 @@
     </div>
 </div>
 
+{{-- take location --}}
+
+<script>
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+
+            console.log("Geolocation working ✅");
+
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
+
+            console.log(latitude, longitude); // 👈 Check this
+
+            fetch('{{ route('store-location') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+
+                    const serviceAvailableElement = document.getElementById('service_available');
+                    if (data.is_within_radius) {
+                        serviceAvailableElement.textContent = 'Yes';
+                    } else {
+                        serviceAvailableElement.textContent = 'No';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+        }, function(error) {
+            console.error("Geolocation error:", error);
+        });
+    }
+</script>
+
+
+
 @section('script')
     <script type="text/javascript">
         function show_order_details(order_id) {
@@ -159,7 +230,7 @@
             $.post('{{ route('orders.details') }}', {
                 _token: AIZ.data.csrf,
                 order_id: order_id
-            }, function (data) {
+            }, function(data) {
                 $('#order-details-modal-body').html(data);
                 $('#order_details').modal();
                 $('.c-preloader').hide();

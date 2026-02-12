@@ -60,6 +60,48 @@ class HomeController extends Controller
         return view('frontend.' . get_setting('homepage_select') . '.index', compact('featured_categories', 'lang'));
     }
 
+    function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371;
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c;
+
+        return $distance;
+    }
+
+
+
+    public function store(Request $request)
+    {
+        session([
+            'user_latitude' => $request->latitude,
+            'user_longitude' => $request->longitude
+        ]);
+
+
+        // bilaspur center point
+        $targetLat = 22.0808;
+        $targetLng = 82.1406;
+
+        $distance = $this->calculateDistance($request->latitude, $request->longitude, $targetLat, $targetLng);
+
+        if ($distance <= 10) {
+            session(['is_within_radius' => true]);
+        } else {
+            session(['is_within_radius' => false]);
+        }
+        return response()->json(['status' => 'Location stored', 'is_within_radius' => session('is_within_radius')]);
+    }
+
     public function load_todays_deal_section()
     {
         $todays_deal_products = filter_products(Product::where('todays_deal', '1'))->orderBy('id', 'desc')->get();
@@ -107,7 +149,7 @@ class HomeController extends Controller
     {
 
         // $preorder_products = Cache::remember('preorder_products', 3600, function () {
-            $preorder_products = PreorderProduct::where('is_published', 1)->where('is_featured',1)
+        $preorder_products = PreorderProduct::where('is_published', 1)->where('is_featured', 1)
             ->where(function ($query) {
                 $query->whereHas('user', function ($q) {
                     $q->where('user_type', 'admin');
@@ -137,7 +179,8 @@ class HomeController extends Controller
     }
 
 
-    public function verifyRegEmailorPhone(){
+    public function verifyRegEmailorPhone()
+    {
         $type = 'customer';
         if (Auth::check()) {
             if ((Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'seller')) {
@@ -155,7 +198,7 @@ class HomeController extends Controller
 
     public function registration(Request $request)
     {
-        if(get_setting('customer_registration_verify') === '1' ){
+        if (get_setting('customer_registration_verify') === '1') {
             abort(404);
         }
 
@@ -182,7 +225,7 @@ class HomeController extends Controller
         }
         $email = null;
         $phone = null;
-        return view('auth.' . get_setting('authentication_layout_select') . '.user_registration', compact('email','phone'));
+        return view('auth.' . get_setting('authentication_layout_select') . '.user_registration', compact('email', 'phone'));
     }
 
     public function cart_login(Request $request)
@@ -362,7 +405,7 @@ class HomeController extends Controller
                 $affiliateController->processAffiliateStats($referred_by_user->id, 1, 0, 0, 0);
             }
 
-            if(get_setting('last_viewed_product_activation') == 1 && Auth::check() && auth()->user()->user_type == 'customer'){
+            if (get_setting('last_viewed_product_activation') == 1 && Auth::check() && auth()->user()->user_type == 'customer') {
                 lastViewedProducts($detailedProduct->id, auth()->user()->id);
             }
 
@@ -470,7 +513,7 @@ class HomeController extends Controller
                     $conditions = array_merge($conditions, ['brand_id' => $brand_id]);
                 }
 
-                $products = PreorderProduct::where('is_published',1)->where('user_id' , $shop->user->id);
+                $products = PreorderProduct::where('is_published', 1)->where('user_id', $shop->user->id);
 
                 if ($request->has('is_available') && $request->is_available !== null) {
                     $availability = $request->is_available;
@@ -493,7 +536,6 @@ class HomeController extends Controller
                     $is_available = $availability;
                 } else {
                     $is_available = null;
-
                 }
 
 
@@ -531,7 +573,7 @@ class HomeController extends Controller
 
                 $products = $products->paginate(24)->appends(request()->query());
 
-                return view('frontend.seller_shop', compact('shop', 'type', 'products', 'selected_categories', 'min_price', 'max_price', 'brand_id', 'sort_by', 'rating','is_available'));
+                return view('frontend.seller_shop', compact('shop', 'type', 'products', 'selected_categories', 'min_price', 'max_price', 'brand_id', 'sort_by', 'rating', 'is_available'));
             }
 
             return view('frontend.seller_shop', compact('shop', 'type'));
@@ -884,11 +926,11 @@ class HomeController extends Controller
         $sql_path = $request->file('sql_file')->store('uploads', 'local');
 
         $zip = new ZipArchive;
-        $zip->open(base_path('public/'.$upload_path));
+        $zip->open(base_path('public/' . $upload_path));
         $zip->extractTo('public/uploads/all');
 
         $zip1 = new ZipArchive;
-        $zip1->open(base_path('public/'.$sql_path));
+        $zip1->open(base_path('public/' . $sql_path));
         $zip1->extractTo('public/uploads');
 
         Artisan::call('cache:clear');
@@ -898,7 +940,7 @@ class HomeController extends Controller
 
     public function sendRegVerificationCode(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'g-recaptcha-response' => [
                 Rule::when(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_mail_verification') == 1, ['required', new Recaptcha()], ['sometimes'])
             ],
@@ -939,7 +981,6 @@ class HomeController extends Controller
                 $template_id    = $sms_template->template_id;
 
                 (new SendSmsService())->sendSMS($phone, env('APP_NAME'), $sms_body, $template_id);
-
             }
         }
 
@@ -986,7 +1027,7 @@ class HomeController extends Controller
         } else {
             $customerVerification->is_verified = 1;
             $customerVerification->save();
-                return view('auth.' . get_setting('authentication_layout_select') . '.user_registration', compact('customerVerification', 'email', 'phone'));
+            return view('auth.' . get_setting('authentication_layout_select') . '.user_registration', compact('customerVerification', 'email', 'phone'));
         }
     }
 
@@ -1016,9 +1057,5 @@ class HomeController extends Controller
             $response['message'] = $e->getMessage();
         }
         return json_encode($response);
-
-
-
     }
-
 }
