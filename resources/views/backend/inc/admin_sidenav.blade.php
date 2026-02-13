@@ -125,6 +125,13 @@
                                 </a>
                             </li>
                             @endcan
+
+                                   <li class="aiz-side-nav-item">
+                                <a class="aiz-side-nav-link" href="{{route('products.assign')}}">
+                                    <span class="aiz-side-nav-text">{{translate('Assign Product')}}</span>
+                                </a>
+                            </li>
+
                             @can('show_all_products')
                             <li class="aiz-side-nav-item">
                                 <a href="{{route('products.all')}}" class="aiz-side-nav-link">

@@ -12,13 +12,15 @@
                         @csrf
 
                         <div class="form-group row">
-                            <label class="col-md-3 col-form-label">{{ translate('Type') }}</label>
+                            <label class="col-md-3 col-form-label">Subject</label>
                             <div class="col-md-9">
-                                <select name="note_type" class="form-control aiz-selectpicker mb-2 mb-md-0" required>
+
+                                <input type="text" name="note_type" id="" class="form-control" required>
+                                {{-- <select name="note_type" class="form-control aiz-selectpicker mb-2 mb-md-0" required>
                                     @foreach ($types as $type)
                                         <option value="{{ $type->value }}" class="text-uppercase">{{ translate($type->name) }}</option>
                                     @endforeach
-                                </select>
+                                </select> --}}
                             </div>
                         </div>
 

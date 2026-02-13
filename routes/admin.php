@@ -136,6 +136,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/products/seller/{product_type}', 'seller_products')->name('products.seller');
         Route::get('/products/all', 'all_products')->name('products.all');
         Route::get('/products/create', 'create')->name('products.create');
+          Route::get('/products/assign', 'assign')->name('products.assign');
+
+              Route::post('/products/assign/store', 'assignProduct')->name('product.assign.store');
+
         Route::post('/products/store/', 'store')->name('products.store');
         Route::get('/products/admin/{id}/edit', 'admin_product_edit')->name('products.admin.edit');
         Route::get('/products/seller/{id}/edit', 'seller_product_edit')->name('products.seller.edit');

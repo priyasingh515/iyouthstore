@@ -11,7 +11,9 @@ use App\Models\Category;
 use App\Models\AttributeValue;
 use App\Models\Cart;
 use App\Models\ProductCategory;
+use App\Models\SellerProduct;
 use App\Models\Review;
+use App\Models\Shop;
 use App\Models\Wishlist;
 use App\Models\User;
 use App\Notifications\ShopProductNotification;
@@ -187,6 +189,42 @@ class ProductController extends Controller
 
         return view('backend.product.products.create', compact('categories'));
     }
+
+    public function assign(){
+
+    $shops = Shop::with('user')->get();
+
+    $products = Product::where('added_by', 'admin')->where('auction_product', 0)->where('wholesale_product', 0)->where('digital', 0)->orderBy('created_at', 'desc')->get();
+        
+        return view('backend.product.products.assign',compact('shops','products'));
+    }
+
+
+
+    public function assignProduct(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required',
+            'products' => 'required'
+        ]);
+
+        foreach ($request->products as $item) {
+
+            SellerProduct::updateOrCreate(
+                [
+                    'seller_id' => $request->user_id,
+                    'product_id' => $item['product_id']
+                ],
+                [
+                    'stock' => $item['quantity']
+                ]
+            );
+        }
+
+        return redirect()->back()->with('success','Product Assigned Successfully');
+    }
+
+
 
     public function add_more_choice_option(Request $request)
     {

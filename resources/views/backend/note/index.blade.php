@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div class="card">
+    {{-- <div class="card">
         <div class="card-body">
             <div class="form-group mb-0 row">
                 <label class="col-md-2 col-from-label">{{translate('Seller Can Add Note')}}?</label>
@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="card">
         <form class="" id="sort_notes" action="" method="GET">

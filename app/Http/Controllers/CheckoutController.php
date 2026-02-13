@@ -40,6 +40,44 @@ class CheckoutController extends Controller
             return redirect()->route('verification.notice');
         }
 
+
+ $carts = Cart::where('user_id', Auth::id())->active()->get();
+
+    if ($carts->isEmpty()) {
+        flash(translate('Your cart is empty'))->warning();
+        return redirect()->route('home');
+    }
+
+    $address = Address::where('id', $carts[0]['address_id'])->first();
+
+    if (!$address || !$address->latitude || !$address->longitude) {
+        flash(translate('Location not found'))->warning();
+        return redirect()->back();
+    }
+
+    $customerLat = $address->latitude;
+    $customerLng = $address->longitude;
+
+
+    $nearestSeller = \App\Models\Shop::selectRaw("
+        shops.*, (6371 * acos(
+            cos(radians(?)) *
+            cos(radians(latitude)) *
+            cos(radians(longitude) - radians(?)) +
+            sin(radians(?)) *
+            sin(radians(latitude))
+        )) AS distance
+    ", [$customerLat, $customerLng, $customerLat])
+    ->where('registration_approval', 1)
+    ->having('distance', '<=', 20) // 🔥 20 KM Radius
+    ->orderBy('distance')
+    ->first();
+
+    if (!$nearestSeller) {
+        flash(translate('Shop not available in your area'))->warning();
+        return redirect()->back();
+    }
+
         $country_id = 0;
         $city_id = 0;
         $area_id=0;
