@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\SellerProduct;
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Hash;
 use App\Notifications\ShopVerificationNotification;
@@ -22,6 +23,7 @@ use File;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Facades\Notification;
 use Log;
+use DB;
 
 class SellerController extends Controller
 {
@@ -87,6 +89,29 @@ class SellerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function sellerInventory(){
+   
+       
+     $shops = SellerProduct::join('shops', 'seller_products.seller_id', '=', 'shops.user_id')
+    ->select(
+        'shops.name as shop_name',
+        'seller_products.seller_id',
+        DB::raw('SUM(seller_products.stock) as total_stock')
+    )
+    ->groupBy('shops.user_id', 'shops.name')
+    ->get();
+        return view('backend.sellers.inventory', compact('shops'));
+
+    }
+
+    public function sellerInventoryDetail($id){
+
+        $seller = Shop::where('user_id', $id)->first();
+        $sellerProducts = SellerProduct::where('seller_id', $id)->with('product')->get();
+        return view('backend.sellers.inventory_detail', compact('sellerProducts', 'seller' ));
+    }
+
     public function create()
     {
         return view('backend.sellers.create');

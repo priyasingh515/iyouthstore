@@ -126,11 +126,7 @@
                             </li>
                             @endcan
 
-                                   <li class="aiz-side-nav-item">
-                                <a class="aiz-side-nav-link" href="{{route('products.assign')}}">
-                                    <span class="aiz-side-nav-text">{{translate('Assign Product')}}</span>
-                                </a>
-                            </li>
+                            
 
                             @can('show_all_products')
                             <li class="aiz-side-nav-item">
@@ -931,6 +927,20 @@
                             </a>
                         </li>
                         @endcan
+
+                               <li class="aiz-side-nav-item">
+                                <a class="aiz-side-nav-link" href="{{route('products.assign')}}">
+                                    <span class="aiz-side-nav-text">{{translate('Assign Product')}}</span>
+                                </a>
+                            </li>
+
+                                <li class="aiz-side-nav-item">
+                                <a class="aiz-side-nav-link" href="{{route('sellers.stock')}}">
+                                    <span class="aiz-side-nav-text">{{translate('Seller Stock')}}</span>
+                                </a>
+                            </li>
+
+
                         @can('view_pending_seller')
                         <li class="aiz-side-nav-item">
                             <a href="{{ route('sellers.registration_pending') }}"

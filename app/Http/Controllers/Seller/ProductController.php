@@ -11,6 +11,8 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductTranslation;
+use App\Models\Seller;
+use App\Models\SellerProduct;
 use App\Models\Wishlist;
 use App\Models\User;
 use App\Notifications\ShopProductNotification;
@@ -51,12 +53,10 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $search = null;
-        $products = Product::where('user_id', Auth::user()->id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc');
-        if ($request->has('search')) {
-            $search = $request->search;
-            $products = $products->where('name', 'like', '%' . $search . '%');
-        }
-        $products = $products->paginate(10);
+
+      $products = SellerProduct::where('seller_id', Auth::user()->id)->with('product')->get();
+
+        // $products = $products->paginate(10);
         return view('seller.product.products.index', compact('products', 'search'));
     }
 
