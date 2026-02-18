@@ -935,9 +935,7 @@
                             </li>
 
                                 <li class="aiz-side-nav-item">
-                                <a class="aiz-side-nav-link" href="{{route('sellers.stock')}}">
-                                    <span class="aiz-side-nav-text">{{translate('Seller Stock')}}</span>
-                                </a>
+                              
                             </li>
 
 

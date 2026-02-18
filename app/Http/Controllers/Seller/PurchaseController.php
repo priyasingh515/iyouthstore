@@ -15,7 +15,13 @@ class PurchaseController extends Controller
         $categories = \App\Models\Category::where('parent_id', 0)->get();
 
         // Base Query 
-        $query = Product::where('added_by','admin')
+        $query = Product::query()
+            ->leftJoin('seller_products as sp', function ($join) {
+                $join->on('products.id', '=', 'sp.product_id')
+                    ->where('sp.seller_id', auth()->id());
+            })
+            ->where('products.added_by', 'admin')
+            ->select('products.*', 'sp.stock as product_stock')
             ->isApprovedPublished();
 
         // Category Filter
@@ -163,7 +169,7 @@ class PurchaseController extends Controller
             'user_id' => auth()->id(),
             'product_id' => $product->id,
             'owner_id' => $product->user_id,
-            'price' => $product->unit_price,
+            'price' => $product->seller_price,
             'quantity' => $qty,
         ]);
 

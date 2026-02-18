@@ -4,6 +4,7 @@ use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\ProfileUpdateRequestController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\PurchaseController;
+use App\Http\Controllers\ShopController;
 
 //Upload
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user', 'prevent-back-history'], 'as' => 'seller.'], function () {
@@ -182,6 +183,10 @@ Route::post('/cart/delete', [PurchaseController::class, 'deleteCart'])->name('ca
         Route::get('/support_ticket/show/{id}', 'show')->name('support_ticket.show');
         Route::post('/support_ticket/reply', 'ticket_reply_store')->name('support_ticket.reply_store');
     });
+
+//   fetch('/get-cities?district='+district)
+    route::get('get-cities', [ShopController::class, 'getCities'])->name('getCities');
+
 
     // Notifications
     Route::controller(NotificationController::class)->group(function () {

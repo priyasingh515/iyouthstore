@@ -95,6 +95,42 @@
                                 src="{{ uploaded_asset(json_decode($order->manual_payment_data)->photo) }}" alt=""
                                 height="100"></a>
                     @endif
+
+
+                    {{-- upload payment details  --}}
+
+
+                     @if ($delivery_status == 'delivered')
+                    <div>
+
+                        <p>Upload Payment Details</p>
+
+                        <div>
+
+                               <div>
+                                <label for="">Select Payment Method</label>
+                                <select name="" id="">
+                                    <option value="">Select Payment Method</option>
+                                    <option value="">Cash</option>
+                                    <option value="">Online UPI</option>
+                                    <option value="">Rocket</option>
+                            </div>
+
+                            <div>
+                                <label for="">Transaction ID</label>
+                                <input type="text" name="" id="">
+                            </div>
+
+                            <div>
+                                <label for="">Upload File</label>
+                                <input type="file" name="" id="">
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                    @endif
                 </div>
                 <div class="col-md-4">
                     <table class="ml-auto">

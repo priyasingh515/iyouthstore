@@ -137,9 +137,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/products/seller/{product_type}', 'seller_products')->name('products.seller');
         Route::get('/products/all', 'all_products')->name('products.all');
         Route::get('/products/create', 'create')->name('products.create');
-          Route::get('/products/assign', 'assign')->name('products.assign');
+        Route::get('/products/assign', 'assign')->name('products.assign');
 
-              Route::post('/products/assign/store', 'assignProduct')->name('product.assign.store');
+        Route::post('/products/assign/store', 'assignProduct')->name('product.assign.store');
 
         Route::post('/products/store/', 'store')->name('products.store');
         Route::get('/products/admin/{id}/edit', 'admin_product_edit')->name('products.admin.edit');
@@ -199,8 +199,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     Route::controller(SellerController::class)->group(function () {
         Route::get('/seller/rating-followers', 'index')->name('sellers.rating_followers');
 
-          Route::get('/seller/stock', 'sellerInventory')->name('sellers.stock');
-             Route::get('/seller/stock/{id}', 'sellerInventoryDetail')->name('sellers.stock.detail');
+    
 
         Route::get('sellers_ban/{id}', 'ban')->name('sellers.ban');
         Route::get('/sellers/destroy/{id}', 'destroy')->name('sellers.destroy');

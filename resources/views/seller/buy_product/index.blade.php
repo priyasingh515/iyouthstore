@@ -67,11 +67,15 @@
                                     </h6>
 
                                     <strong class="text-primary d-block mb-1">
-                                        ₹ {{ $product->unit_price }}
+                                        ₹ {{ $product->seller_price }}
                                     </strong>
 
                                     <p class="small text-success mb-0">
                                         Available : {{ $stock }}
+                                    </p>
+
+                                      <p class="small text-success mb-0">
+                                        In My Stock : {{ $product->product_stock  ?? 0 }}
                                     </p>
 
                                     @if ($stock > 0)

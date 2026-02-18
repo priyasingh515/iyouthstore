@@ -54,7 +54,14 @@ class ProductController extends Controller
     {
         $search = null;
 
-      $products = SellerProduct::where('seller_id', Auth::user()->id)->with('product')->get();
+        // $products = SellerProduct::where('seller_id', Auth::user()->id)->with('product')->get();
+
+        $products = Product::join('seller_products', 'products.id', '=', 'seller_products.product_id')
+            ->where('seller_products.seller_id', Auth::user()->id)
+            ->select('products.*', 'seller_products.stock')
+            ->with('categories')
+            ->latest()
+            ->get();
 
         // $products = $products->paginate(10);
         return view('seller.product.products.index', compact('products', 'search'));
@@ -85,7 +92,15 @@ class ProductController extends Controller
         }
 
         $product = $this->productService->store($request->except([
-            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            '_token',
+            'sku',
+            'choice',
+            'tax_id',
+            'tax',
+            'tax_type',
+            'flash_deal_id',
+            'flash_discount',
+            'flash_discount_type'
         ]));
         $request->merge(['product_id' => $product->id]);
 
@@ -95,29 +110,45 @@ class ProductController extends Controller
         //VAT & Tax
         if ($request->tax_id) {
             $this->productTaxService->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id'
             ]));
         }
 
         //Product Stock
         $this->productStockService->store($request->only([
-            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
+            'colors_active',
+            'colors',
+            'choice_no',
+            'unit_price',
+            'sku',
+            'current_stock',
+            'product_id'
         ]), $product);
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id'
         ]));
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'unit', 'description', 'product_id'
+            'lang',
+            'name',
+            'unit',
+            'description',
+            'product_id'
         ]));
 
         if (get_setting('product_approve_by_admin') == 1) {
             $users = User::findMany(User::where('user_type', 'admin')->first()->id);
-            
+
             $data = array();
             $data['product_type']   = 'physical';
             $data['status']         = 'pending';
@@ -157,7 +188,15 @@ class ProductController extends Controller
     {
         //Product
         $product = $this->productService->update($request->except([
-            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            '_token',
+            'sku',
+            'choice',
+            'tax_id',
+            'tax',
+            'tax_type',
+            'flash_deal_id',
+            'flash_discount',
+            'flash_discount_type'
         ]), $product);
 
         $request->merge(['product_id' => $product->id]);
@@ -168,7 +207,13 @@ class ProductController extends Controller
         //Product Stock
         $product->stocks()->delete();
         $this->productStockService->store($request->only([
-            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
+            'colors_active',
+            'colors',
+            'choice_no',
+            'unit_price',
+            'sku',
+            'current_stock',
+            'product_id'
         ]), $product);
 
         //VAT & Tax
@@ -176,23 +221,32 @@ class ProductController extends Controller
             $product->taxes()->delete();
             $request->merge(['product_id' => $product->id]);
             $this->productTaxService->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id'
             ]));
         }
 
         // Frequently Bought Products
         $product->frequently_bought_products()->delete();
         $this->frequentlyBoughtProductService->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id'
         ]));
-        
+
         // Product Translations
         ProductTranslation::updateOrCreate(
             $request->only([
-                'lang', 'product_id'
+                'lang',
+                'product_id'
             ]),
             $request->only([
-                'name', 'unit', 'description'
+                'name',
+                'unit',
+                'description'
             ])
         );
 
@@ -327,13 +381,13 @@ class ProductController extends Controller
         $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
 
         // Product Categories
-        foreach($product->product_categories as $product_category){
+        foreach ($product->product_categories as $product_category) {
             ProductCategory::insert([
                 'product_id' => $product_new->id,
                 'category_id' => $product_category->category_id,
             ]);
         }
-        
+
         flash(translate('Product has been duplicated successfully'))->success();
         return redirect()->route('seller.products');
     }
@@ -388,25 +442,27 @@ class ProductController extends Controller
         return view('partials.product.product_search', compact('products'));
     }
 
-    public function get_selected_products(Request $request){
+    public function get_selected_products(Request $request)
+    {
         $products = product::whereIn('id', $request->product_ids)->get();
         return  view('partials.product.frequently_bought_selected_product', compact('products'));
     }
 
-    public function categoriesWiseProductDiscount(Request $request){
-        $sort_search =null;
-         $categories = Category::with('sellerDiscount')
-        ->orderBy('order_level', 'desc');
-        if ($request->has('search')){
+    public function categoriesWiseProductDiscount(Request $request)
+    {
+        $sort_search = null;
+        $categories = Category::with('sellerDiscount')
+            ->orderBy('order_level', 'desc');
+        if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
+            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
         }
         $categories = $categories->paginate(15);
         return view('seller.product.category_wise_discount.set_discount', compact('categories', 'sort_search'));
     }
-    
+
     public function setProductDiscount(Request $request)
-    {   
+    {
         $response = $this->productService->setCategoryWiseDiscount($request->except(['_token']));
         return $response;
     }

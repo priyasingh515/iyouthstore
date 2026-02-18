@@ -118,6 +118,9 @@ Route::controller(ShopController::class)->group(function () {
     
 });
 
+
+  route::get('get-cities', [ShopController::class, 'getCities'])->name('getCities');
+
 Route::controller(HomeController::class)->group(function () {
     Route::get('/registration/verification', 'verifyRegEmailorPhone')->name('registration.verification');
     Route::post('/registration/verification-code-send', 'sendRegVerificationCode')->name('customer-reg.verification_code_send');
@@ -512,5 +515,5 @@ Route::controller(ContactController::class)->group(function () {
     Route::post('/contact', 'contact')->name('contact');
 });
 
-Route::post('/store-location', [HomeController::class, 'store'])->name('store-location');
+Route::post('/store-location', [HomeController::class, 'h'])->name('store-location');
 

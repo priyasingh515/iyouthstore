@@ -81,25 +81,41 @@ class HomeController extends Controller
 
 
     public function store(Request $request)
-    {
-        session([
-            'user_latitude' => $request->latitude,
-            'user_longitude' => $request->longitude
-        ]);
+    { {
+            $request->validate([
+                'latitude'  => 'required|numeric',
+                'longitude' => 'required|numeric',
+            ]);
 
+            $userLat = $request->latitude;
+            $userLng = $request->longitude;
 
-        // bilaspur center point
-        $targetLat = 22.0808;
-        $targetLng = 82.1406;
+            // 📍 Bilaspur center point
+            $targetLat = 22.0808;
+            $targetLng = 82.1406;
 
-        $distance = $this->calculateDistance($request->latitude, $request->longitude, $targetLat, $targetLng);
+            // calculate distance
+            $distance = $this->calculateDistance(
+                $userLat,
+                $userLng,
+                $targetLat,
+                $targetLng
+            );
 
-        if ($distance <= 10) {
-            session(['is_within_radius' => true]);
-        } else {
-            session(['is_within_radius' => false]);
+            $isWithinRadius = $distance <= 10;
+
+            session([
+                'user_latitude'   => $userLat,
+                'user_longitude'  => $userLng,
+                'is_within_radius' => $isWithinRadius
+            ]);
+
+            return response()->json([
+                'status' => 'Location stored',
+                'distance_km' => round($distance, 2),
+                'is_within_radius' => $isWithinRadius
+            ]);
         }
-        return response()->json(['status' => 'Location stored', 'is_within_radius' => session('is_within_radius')]);
     }
 
     public function load_todays_deal_section()

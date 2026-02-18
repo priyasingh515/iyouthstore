@@ -647,6 +647,14 @@
                                     </div>
                                 </div>
 
+                                 <!-- seller price -->
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-from-label">{{translate('Seller Price')}} <span class="text-danger">*</span></label>
+                                    <div class="col-md-6">
+                                        <input type="text" placeholder="{{translate('Seller Price')}}" name="seller_price" class="form-control @error('seller_price') is-invalid @enderror" value="{{$product->seller_price}}">
+                                    </div>
+                                </div>
+
                                 @php
                                     $start_date = date('d-m-Y H:i:s', $product->discount_start_date);
                                     $end_date = date('d-m-Y H:i:s', $product->discount_end_date);

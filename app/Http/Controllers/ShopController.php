@@ -7,6 +7,8 @@ use App\Models\AffiliateConfig;
 use Illuminate\Http\Request;
 use App\Models\Shop;
 use App\Models\User;
+use App\Models\CgCity;
+use App\Models\CgDistrict;
 use App\Models\BusinessSetting;
 use App\Models\RegistrationVerificationCode;
 use App\Models\SmsTemplate;
@@ -50,6 +52,9 @@ class ShopController extends Controller
             abort(404);
         }
 
+        $districts = CgDistrict::all();
+
+
         // default registration page
         $email = null;
         $phone = null;
@@ -64,9 +69,21 @@ class ShopController extends Controller
             }
         } else {
             
-            return view('auth.'.get_setting('authentication_layout_select').'.seller_registration', compact('email','phone'));
+            return view('auth.'.get_setting('authentication_layout_select').'.seller_registration', compact('email','phone','districts'));
         }
     }
+
+ public function getCities(Request $request)
+{
+    $district = $request->district;
+
+    $cities = CgCity::where('district_name', $district)
+                    ->select('city')
+                    ->get();
+
+    return response()->json($cities);
+}
+
 
     /**
      * Store a newly created resource in storage.
@@ -80,6 +97,11 @@ class ShopController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
+
+        $user->state = $request->state;
+        $user->district = $request->district;
+        $user->city = $request->city;
+
         $user->user_type = "seller";
         $user->password = Hash::make($request->password);
         $user->email_verified_at = date('Y-m-d H:m:s');
@@ -92,23 +114,11 @@ class ShopController extends Controller
             $shop->latitude  = $request->latitude;
             $shop->longitude = $request->longitude;
             $shop->registration_approval= 0;
+
+            // create unique shop id pending ....
+
             $shop->slug = preg_replace('/\s+/', '-', str_replace("/", " ", $request->shop_name));
             $shop->save();
-
-            //auth()->login($user, true);
-            // if (BusinessSetting::where('type', 'email_verification')->first()->value == 0) {
-            //     $user->email_verified_at = date('Y-m-d H:m:s');
-            //     $user->save();
-            // } else {
-            //     try {
-            //         EmailUtility::email_verification($user, 'seller');
-            //     } catch (\Throwable $th) {
-            //         $shop->delete();
-            //         $user->delete();
-            //         flash(translate('Seller registration failed. Please try again later.'))->error();
-            //         return back();
-            //     }
-            // }
 
             // Account Opening Email to Seller
             if ((get_email_template_data('registration_email_to_seller', 'status') == 1)) {

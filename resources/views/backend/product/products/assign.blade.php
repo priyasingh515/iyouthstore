@@ -11,6 +11,12 @@
             </div>
         @endif
 
+            @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <h4>Assign Product to Sellers</h4>
 
         <form action="{{ route('product.assign.store') }}" method="POST">

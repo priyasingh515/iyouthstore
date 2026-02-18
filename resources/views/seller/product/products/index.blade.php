@@ -63,14 +63,14 @@
                     <h5 class="mb-md-0 h6">{{ translate('All Products') }}</h5>
                 </div>
 
-                <div class="dropdown mb-2 mb-md-0">
+                {{-- <div class="dropdown mb-2 mb-md-0">
                     <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
                         {{translate('Bulk Action')}}
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal"> {{translate('Delete selection')}}</a>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-md-4">
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" id="search" name="search" @isset($search) value="{{ $search }}" @endisset placeholder="{{ translate('Search product') }}">
@@ -81,24 +81,17 @@
                 <table class="table aiz-table mb-0">
                     <thead>
                         <tr>
-                            <th>
-                                <div class="form-group">
-                                    <div class="aiz-checkbox-inline">
-                                        <label class="aiz-checkbox">
-                                            <input type="checkbox" class="check-all">
-                                            <span class="aiz-square-check"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </th>
-                            <th >{{ translate('Name')}}</th>
+                         <th data-breakpoints="lg">#</th>
+                            <th >
+                              
+                                {{ translate('Name')}}</th>
                             <th>Image</th>
                             <th data-breakpoints="md">{{ translate('Current Qty')}}</th>
                             
                             <th data-breakpoints="md">Category</th>
-                            <th data-breakpoints="md">SKU</th>
+                         
                             <th>{{ translate('Base Price')}}</th>
-                           
+                           <th>View Details</th>
                            
                         </tr>
                     </thead>
@@ -109,11 +102,24 @@
                     
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $product->product->getTranslation('name') }}</td>
                             <td>
-                                <img src="{{ uploaded_asset($product->product->thumbnail_img) }}" height="44" class="mw-100 mx-auto">
+                                
+                                {{ $product->name }}</td>
+                            <td>
+                                <img src="{{ uploaded_asset($product->thumbnail_img) }}" height="44" class="mw-100 mx-auto">
                             </td>
                             <td>{{ $product->stock }}</td>
+
+                            <td>{{ $product->categories->pluck('name')->join(', ') }}</td>
+                         
+                            <td>{{ $product->unit_price }}</td>
+                            <td>
+                               <a class="btn btn-soft-success btn-icon btn-circle btn-sm"  href="{{ route('product', $product->slug) }}" target="_blank" title="{{ translate('View') }}">
+                                <i class="las la-eye"></i>
+                            </a>
+                                </a>
+                            </td>
+
                         </tr>
 
 

@@ -1,20 +1,19 @@
-{{-- {{ "latitude: " . session(key: 'user_latitude') }}
-{{ "longitude: " . session('user_longitude') }} --}}
 <div>
-    Service Availble - <span id="service_available">
+    Service Available -
+    <span id="service_available">
 
-
-        @if (session('is_within_radius'))
+        @if(session()->has('is_within_radius'))
             {{ session('is_within_radius') ? 'Yes' : 'No' }}
         @else
-            {{-- check your location
-
-            <button onclick="location.reload()" class="btn btn-primary btn-sm">
-           Check Location
-            </button> --}}
+            <i class="las la-spinner la-spin"></i> Checking...
         @endif
 
     </span>
+
+    <button onclick="openLocationModal()"
+        class="btn btn-sm btn-outline-primary ml-2">
+        Set Location
+    </button>
 </div>
 
 
@@ -171,51 +170,210 @@
     </div>
 </div>
 
+<!-- Location Modal -->
+<div class="modal fade" id="locationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+
+            <h5 class="mb-2">📍 Delivery Location</h5>
+
+            <p id="location_message">
+                We need your location to check service availability.
+            </p>
+
+            <div id="location_modal_actions">
+
+                <button class="btn btn-primary"
+                    onclick="requestUserLocation()">
+                    Allow Location
+                </button>
+
+                <button class="btn btn-secondary"
+                    data-dismiss="modal">
+                    Not Now
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 {{-- take location --}}
 
+
+
 <script>
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
 
-            console.log("Geolocation working ✅");
+document.addEventListener("DOMContentLoaded", function () {
 
-            let latitude = position.coords.latitude;
-            let longitude = position.coords.longitude;
+    let savedLat = localStorage.getItem("user_lat");
+    let savedLng = localStorage.getItem("user_lng");
+    let verified = localStorage.getItem("location_verified");
+    let cachedStatus = localStorage.getItem("service_status");
 
-            console.log(latitude, longitude); // 👈 Check this
+    // ✅ Already verified → NO API CALL
+    if (savedLat && savedLng && verified === "true") {
 
-            fetch('{{ route('store-location') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        latitude: latitude,
-                        longitude: longitude
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
+        document.getElementById('service_available').textContent =
+            cachedStatus ?? "Yes";
 
-                    const serviceAvailableElement = document.getElementById('service_available');
-                    if (data.is_within_radius) {
-                        serviceAvailableElement.textContent = 'Yes';
-                    } else {
-                        serviceAvailableElement.textContent = 'No';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-
-        }, function(error) {
-            console.error("Geolocation error:", error);
-        });
+        return;
     }
-</script>
 
+    // ✅ Location exists but not verified yet
+    if (savedLat && savedLng) {
+        sendLocation(savedLat, savedLng);
+        return;
+    }
+
+    // ✅ First time user
+    setTimeout(openLocationModal, 800);
+});
+
+
+/* ==========================
+   OPEN MODAL
+==========================*/
+function openLocationModal() {
+    $('#locationModal').modal('show');
+}
+
+
+/* ==========================
+   REQUEST USER LOCATION
+==========================*/
+function requestUserLocation() {
+
+    if (!navigator.geolocation) {
+        updateModalMessage("Geolocation not supported ❌");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
+
+        // save locally
+        localStorage.setItem("user_lat", latitude);
+        localStorage.setItem("user_lng", longitude);
+
+        updateModalMessage("Location Accepted ✅");
+
+        sendLocation(latitude, longitude);
+
+        setTimeout(() => {
+            $('#locationModal').modal('hide');
+        }, 1200);
+
+    }, function(error) {
+
+        let msg = "";
+
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                msg = "Location permission denied ❌<br>Enable from browser settings (🔒 icon near URL)";
+                break;
+
+            case error.POSITION_UNAVAILABLE:
+                msg = "Location unavailable. Please enable GPS.";
+                break;
+
+            case error.TIMEOUT:
+                msg = "Location request timed out. Try again.";
+                break;
+
+            default:
+                msg = "Unknown location error.";
+        }
+
+        updateModalMessage(msg);
+        showRetryButton();
+
+    }, {
+        enableHighAccuracy: true,
+        timeout: 10000
+    });
+}
+
+
+/* ==========================
+   SEND LOCATION TO LARAVEL
+==========================*/
+function sendLocation(latitude, longitude) {
+
+    if(window.locationSending) return;
+    window.locationSending = true;
+
+    fetch('{{ route('store-location') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            latitude: latitude,
+            longitude: longitude
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        const status = data.is_within_radius ? "Yes" : "No";
+
+        // UI update
+        document.getElementById('service_available').textContent = status;
+
+        // ✅ CACHE RESULT (IMPORTANT)
+        localStorage.setItem("location_verified", "true");
+        localStorage.setItem("service_status", status);
+
+        window.locationSending = false;
+    })
+    .catch(error => {
+        console.error(error);
+        window.locationSending = false;
+    });
+}
+
+
+/* ==========================
+   MODAL MESSAGE UPDATE
+==========================*/
+function updateModalMessage(message) {
+    document.getElementById('location_message').innerHTML = message;
+}
+
+
+/* ==========================
+   RETRY BUTTON
+==========================*/
+function showRetryButton() {
+
+    document.getElementById('location_modal_actions').innerHTML = `
+        <button class="btn btn-success"
+            onclick="retryLocation()">
+            Try Again
+        </button>
+    `;
+}
+
+
+/* ==========================
+   RESET LOCATION (CHANGE LOCATION)
+==========================*/
+function retryLocation() {
+
+    localStorage.removeItem("user_lat");
+    localStorage.removeItem("user_lng");
+    localStorage.removeItem("location_verified");
+    localStorage.removeItem("service_status");
+
+    location.reload();
+}
+
+</script>
 
 
 @section('script')
