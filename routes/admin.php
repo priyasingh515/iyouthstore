@@ -59,6 +59,7 @@ use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\Cybersource\CybersourceSettingController;
 use App\Http\Controllers\ElementController;
+use App\Http\Controllers\ProfileUpdateRequestController;
 
 /*
   |--------------------------------------------------------------------------
@@ -86,7 +87,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     Route::controller(CybersourceSettingController::class)->group(function () {
         Route::get('/cybersource-configuration', 'configuration')->name('cybersource_configuration');
     });
-    
+
     // category
     Route::resource('categories', CategoryController::class);
     Route::controller(CategoryController::class)->group(function () {
@@ -94,7 +95,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/categories/destroy/{id}', 'destroy')->name('categories.destroy');
         Route::post('/categories/featured', 'updateFeatured')->name('categories.featured');
         Route::post('/categories/categoriesByType', 'categoriesByType')->name('categories.categories-by-type');
-      
+
         //category-wise commission
         Route::get('/categories-wise-commission', 'categoriesWiseCommission')->name('categories_wise_commission');
         Route::post('/categories-wise-commission', 'categoriesWiseCommissionUpdate')->name('categories_wise_commission.update');
@@ -326,7 +327,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
 
         // Header Selection
         Route::post('/select-header', 'select_header')->name('settings.select-header');
-
     });
 
 
@@ -367,7 +367,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     });
 
 
-     // website setting
+    // website setting
     Route::group(['prefix' => 'website'], function () {
         Route::controller(WebsiteController::class)->group(function () {
             Route::post('/get-upload-file-name', 'getFileName');
@@ -483,6 +483,46 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/wallet-history', 'wallet_transaction_history')->name('wallet-history.index');
         Route::get('/cart_report', 'cart_report')->name('cart_report.index');
     });
+
+    // Route::get(
+    //     '/admin/profile-requests',
+    //     [ProfileUpdateRequestController::class, 'index']
+    // )->name('admin.profile.update.requests');
+
+    // Route::get(
+    //     '/admin/profile-request-details/{id}',
+    //     [ProfileUpdateRequestController::class, 'details']
+    // )->name('admin.profile.requests.details');
+    // Route::post(
+    //     '/admin/profile-update/approve/{id}',
+    //     [ProfileUpdateRequestController::class, 'approve']
+    // )->name('admin.profile.requests.approve');
+    // Route::post(
+    //     '/admin/profile-update/reject/{id}',
+    //     [ProfileUpdateRequestController::class, 'reject']
+    // )->name('admin.profile.requests.reject');
+    // Route::delete(
+    //     '/profile-requests/{id}/delete',
+    //     [ProfileUpdateRequestController::class, 'delete']
+    // )
+    //     ->name('admin.profile.requests.delete');
+
+
+    //Profile Update Request
+
+    Route::prefix('admin')->name('admin.')->controller(ProfileUpdateRequestController::class)->group(function () {
+
+        Route::get('/profile-requests', 'index')->name('profile.update.requests');
+
+        Route::get('/profile-request-details/{id}', 'details')->name('profile.requests.details');
+
+        Route::post('/profile-update/approve/{id}', 'approve')->name('profile.requests.approve');
+
+        Route::post('/profile-update/reject/{id}', 'reject')->name('profile.requests.reject');
+
+        Route::delete('/profile-requests/{id}/delete', 'delete')->name('profile.requests.delete');
+    });
+
 
     // Earning Report
     Route::group(['prefix' => 'reports'], function () {

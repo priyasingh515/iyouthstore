@@ -106,7 +106,7 @@
         </div>
     </form>
 
-    <script>
+    {{-- <script>
         document.addEventListener("DOMContentLoaded", function() {
 
             if (navigator.geolocation) {
@@ -134,6 +134,62 @@
                         if (labelText.includes("longitude")) {
                             input.value = lng;
                             input.setAttribute("readonly", true); 
+                        }
+
+                    });
+
+                });
+
+            }
+
+        });
+    </script> --}}
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // First make all Lat/Long fields readonly (prevent manual typing)
+            document.querySelectorAll("label").forEach(function(label) {
+
+                let labelText = label.innerText.trim().toLowerCase();
+
+                let row = label.closest(".row");
+                if (!row) return;
+
+                let input = row.querySelector("input[type='text']");
+                if (!input) return;
+
+                if (labelText.includes("latitude") || labelText.includes("longitude")) {
+                    input.setAttribute("readonly", true);
+                }
+
+            });
+
+            // Then try auto fill location
+            if (navigator.geolocation) {
+
+                navigator.geolocation.getCurrentPosition(function(position) {
+
+                    let lat = position.coords.latitude;
+                    let lng = position.coords.longitude;
+
+                    document.querySelectorAll("label").forEach(function(label) {
+
+                        let labelText = label.innerText.trim().toLowerCase();
+
+                        let row = label.closest(".row");
+                        if (!row) return;
+
+                        let input = row.querySelector("input[type='text']");
+                        if (!input) return;
+
+                        if (labelText.includes("latitude")) {
+                            input.value = lat;
+                        }
+
+                        if (labelText.includes("longitude")) {
+                            input.value = lng;
                         }
 
                     });

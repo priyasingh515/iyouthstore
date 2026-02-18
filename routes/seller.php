@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AizUploadController;
+use App\Http\Controllers\ProfileUpdateRequestController;
 use App\Http\Controllers\Seller\DashboardController;
+use App\Http\Controllers\Seller\PurchaseController;
 
 //Upload
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user', 'prevent-back-history'], 'as' => 'seller.'], function () {
@@ -48,7 +50,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::controller(ProductBulkUploadController::class)->group(function () {
         Route::get('/product-bulk-upload/index', 'index')->name('product_bulk_upload.index');
         Route::post('/product-bulk-upload/store', 'bulk_upload')->name('bulk_product_upload');
-        Route::group(['prefix' => 'bulk-upload/download'], function() {
+        Route::group(['prefix' => 'bulk-upload/download'], function () {
             Route::get('/category', 'pdf_download_category')->name('pdf.download_category');
             Route::get('/brand', 'pdf_download_brand')->name('pdf.download_brand');
         });
@@ -93,12 +95,11 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::controller(InvoiceController::class)->group(function () {
         Route::get('/invoice/{order_id}', 'invoice_download')->name('invoice.download');
     });
-    
+
     //Review
     Route::controller(ReviewController::class)->group(function () {
         Route::get('/product-reviews', 'index')->name('product-reviews');
         Route::get('/product/detail-reviews/{id}', 'detailReviews')->name('detail-reviews');
-        
     });
 
     //Shop
@@ -119,6 +120,24 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/profile', 'index')->name('profile.index');
         Route::post('/profile/update/{id}', 'update')->name('profile.update');
     });
+
+    //Profile Update Request
+    Route::post(
+        '/profile/request',
+        [\App\Http\Controllers\ProfileUpdateRequestController::class, 'store']
+    )->name('profile.request.store');
+
+   //Buy Products
+
+   Route::get('/buy/products',[PurchaseController::class,'index'])->name('buy.products');
+   Route::post('/cart/add', [PurchaseController::class,'sellerAddToCart'])
+    ->name('cart.add');
+    Route::get('/cart/show',[PurchaseController::class,'cart'])->name('cart.index');
+    Route::post('/cart/update', [PurchaseController::class, 'updateCart'])->name('cart.update');
+Route::post('/cart/delete', [PurchaseController::class, 'deleteCart'])->name('cart.delete');
+
+
+
 
     // Address
     Route::resource('addresses', AddressController::class);
@@ -169,8 +188,5 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/all-notification', 'index')->name('all-notification');
         Route::post('/notifications/bulk-delete', 'bulkDelete')->name('notifications.bulk_delete');
         Route::get('/notification/read-and-redirect/{id}', 'readAndRedirect')->name('notification.read-and-redirect');
-
     });
-
 });
-

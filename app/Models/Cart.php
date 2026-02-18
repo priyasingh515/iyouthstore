@@ -31,12 +31,7 @@ class Cart extends Model
     {
         return $query->where('status', 1);
     }
-
-
-    // public function customer()
-    // {
-    //     return $this->belongsTo(Customer::class);
-    // }
+    
     public function customer()
     {
         return $this->belongsTo(User::class, 'user_id');

@@ -949,6 +949,14 @@
                             </a>
                         </li>
                         @endcan
+                        @can('view_profile_update_request')
+                        <li class="aiz-side-nav-item">
+                            <a href="{{ route('admin.profile.update.requests') }}"
+                                class="aiz-side-nav-link">
+                                <span class="aiz-side-nav-text">{{ translate('Profile Update Request') }}</span>
+                            </a>
+                        </li>
+                        @endcan
 
                         @can('view_all_seller_rating_and_followers')
                         <li class="aiz-side-nav-item">
