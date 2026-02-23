@@ -34,8 +34,8 @@ class SellerRegistrationRequest extends FormRequest
         $rules['email']         = 'required|email|unique:users|max:255';
         $rules['phone']         = 'required|string|max:20';
         $rules['password' ]     = 'required|string|min:6|confirmed';
-        $rules['shop_name' ]    = 'required|max:255';
-        $rules['address']       = 'required';
+        // $rules['shop_name' ]    = 'required|max:255';
+        // $rules['address']       = 'required';
         $rules['g-recaptcha-response'] = [
                 Rule::when(get_setting('google_recaptcha') == 1 && 
                 get_setting('recaptcha_seller_register') == 1 , 

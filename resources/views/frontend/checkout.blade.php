@@ -145,7 +145,11 @@
                     if(isOkShipping && isOkDelivery && isOkPayment) {
                         allIsOk = true;
                     }else{
-                        AIZ.plugins.notify('danger', '{{ translate("Please fill in all mandatory fields!") }}');
+                        if(isOkShipping == false){
+                              AIZ.plugins.notify('danger', '{{ translate("Please fill in all shipping information!") }}');
+                        }else{
+                            AIZ.plugins.notify('danger', '{{ translate("Please fill in all mandatory fields!") }}');
+                        }
                         $('#checkout-form [required]').each(function (i, el) {
                             if ($(el).val() == '' || $(el).val() == undefined) {
                                 var is_trx_id = $('.d-none #trx_id').length;

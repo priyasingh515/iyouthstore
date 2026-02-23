@@ -1,5 +1,18 @@
 @extends('auth.layouts.authentication')
 
+
+@section('css')
+
+<!-- CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+@endsection
+
 @section('content')
     <!-- aiz-main-wrapper -->
     <div class="aiz-main-wrapper d-flex flex-column justify-content-md-center bg-white">
@@ -27,6 +40,11 @@
                                 <div class="text-center text-lg-left">
                                     <h1 class="fs-20 fs-md-24 fw-700 text-primary" style="text-transform: uppercase;">
                                         {{ translate('Register your shop') }}</h1>
+
+                                    <p>
+                                        <span class="text-danger">*</span> Fields are required. Please fill all the required
+                                        fields to register your shop. <br>
+                                    </p>
                                 </div>
                                 <!-- Register form -->
                                 <div class="pt-3 pt-lg-4">
@@ -39,7 +57,7 @@
                                             <!-- Name -->
                                             <div class="form-group">
                                                 <label for="name"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Your Name') }}</label>
+                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Your Name') }} <span class="text-danger">*</span> </label>
                                                 <input type="text"
                                                     class="form-control rounded-0{{ $errors->has('name') ? ' is-invalid' : '' }}"
                                                     value="{{ old('name') }}" placeholder="{{ translate('Full Name') }}"
@@ -52,7 +70,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label>{{ translate('Your Email') }}</label>
+                                                <label>{{ translate('Your Email') }} <span class="text-danger">*</span></label>
                                                 <input type="email"
                                                     class="form-control rounded-0{{ $errors->has('email') ? ' is-invalid' : '' }}"
                                                     value="{{ $email ?? old('email') }}"
@@ -66,7 +84,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label>{{ translate('Your Phone') }}</label>
+                                                <label>{{ translate('Your Phone') }} <span class="text-danger">*</span></label>
                                                 <input type="tel"
                                                     class="form-control rounded-0{{ $errors->has('phone') ? ' is-invalid' : '' }}"
                                                     value="{{ $phone ?? old('phone') }}"
@@ -80,9 +98,9 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="form-label">Select State</label>
+                                                <label class="form-label">Select State <span class="text-danger">*</span></label>
 
-                                                <select required class="form-control" name="state" id="">
+                                                <select required class="form-control state" name="state" id="">
                                                     <option selected value="chhattisgarh">Chhattisgarh</option>
                                                 </select>
                                                 @if ($errors->has('state'))
@@ -93,12 +111,14 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="form-label">Select District</label>
+                                                <label class="form-label">Select District <span class="text-danger">*</span></label>
 
-                                                <select required class="form-control" name="district" onchange="getCities()"
-                                                    id="">
+                                                <select required class="form-control district" name="district"
+                                                    onchange="selectBilaspurArea()" id="">
+                                                    <option disabled selected>Select District</option>
                                                     @foreach ($districts as $district)
-                                                        <option value="{{ $district->value }}">{{ $district->name }}</option>
+                                                        <option value="{{ $district->name }}">{{ $district->name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                                 @if ($errors->has('district'))
@@ -108,12 +128,44 @@
                                                 @endif
                                             </div>
 
+
+                                            {{-- block --}}
                                             <div class="form-group">
-                                                <label class="form-label">Select City/Village</label>
-                                                <select required class="form-control" name="city" id="">
-                                                    <option value="area 1">Select city/village</option>
+                                                <label class="form-label">Select Block <span class="text-danger">*</span></label>
+
+                                                <select required class="form-control block" name="block" id="">
+
+                                                    <option selected disabled>Select Block</option>
 
                                                 </select>
+                                                @if ($errors->has('block'))
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $errors->first('block') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+
+
+                                            {{-- sub district  --}}
+                                            <div class="form-group">
+                                                <label class="form-label">Select Sub District <span class="text-danger">*</span></label>
+
+                                                <select required class="form-control sub_district" name="sub_district" id="">
+                                                    <option selected disabled>Select Sub District</option>
+
+                                                </select>
+                                                @if ($errors->has('sub_district'))
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $errors->first('sub_district') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+
+                                            {{-- enter village/city name optional --}}
+                                            <div class="form-group">
+                                                <label class="form-label">Enter City/Village</label>
+                                                <input type="text" class="form-control" name="city"
+                                                    value="{{ old('city') }}" placeholder="Enter City/Village">
                                                 @if ($errors->has('city'))
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $errors->first('city') }}</strong>
@@ -124,11 +176,12 @@
                                             <!-- password -->
                                             <div class="form-group mb-0">
                                                 <label for="password"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Password') }}</label>
+                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Password') }} <span class="text-danger">*</span></label>
                                                 <div class="position-relative">
                                                     <input type="password"
                                                         class="form-control rounded-0{{ $errors->has('password') ? ' is-invalid' : '' }}"
-                                                        placeholder="{{ translate('Password') }}" name="password" required>
+                                                        placeholder="{{ translate('Password') }}" name="password"
+                                                        required>
                                                     <i class="password-toggle las la-2x la-eye"></i>
                                                 </div>
                                                 <div class="text-right mt-1">
@@ -145,7 +198,7 @@
                                             <!-- password Confirm -->
                                             <div class="form-group">
                                                 <label for="password_confirmation"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Confirm Password') }}</label>
+                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Confirm Password') }} <span class="text-danger">*</span></label>
                                                 <div class="position-relative">
                                                     <input type="password" class="form-control rounded-0"
                                                         placeholder="{{ translate('Confirm Password') }}"
@@ -155,35 +208,9 @@
                                             </div>
 
 
-                                            <div class="fs-15 fw-600 py-2">{{ translate('Basic Info') }}</div>
+                                            {{-- <div class="fs-15 fw-600 py-2">{{ translate('Basic Info') }}</div> --}}
 
-                                            <div class="form-group">
-                                                <label for="shop_name"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Shop Name') }}</label>
-                                                <input type="text"
-                                                    class="form-control rounded-0{{ $errors->has('shop_name') ? ' is-invalid' : '' }}"
-                                                    value="{{ old('shop_name') }}"
-                                                    placeholder="{{ translate('Shop Name') }}" name="shop_name" required>
-                                                @if ($errors->has('shop_name'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('shop_name') }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>
 
-                                            <div class="form-group">
-                                                <label for="address"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Address') }}</label>
-                                                <input type="text"
-                                                    class="form-control rounded-0{{ $errors->has('address') ? ' is-invalid' : '' }}"
-                                                    value="{{ old('address') }}"
-                                                    placeholder="{{ translate('Address') }}" name="address" required>
-                                                @if ($errors->has('address'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('address') }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>
 
                                             <input type="hidden" name="latitude" id="latitude">
                                             <input type="hidden" name="longitude" id="longitude">
@@ -233,6 +260,30 @@
 @endsection
 
 @section('script')
+
+<script>
+$(document).ready(function() {
+    $('.state').select2({
+        placeholder: "Search State...",
+        allowClear: true
+    });
+
+       $('.district').select2({
+        placeholder: "Search District...",
+        allowClear: true
+    });
+
+       $('.block').select2({
+        placeholder: "Search Block...",
+        allowClear: true
+    });
+    
+       $('.sub_district').select2({
+        placeholder: "Search Sub District...",
+        allowClear: true
+    });
+});
+</script>
     <script>
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -249,6 +300,50 @@
         }
 
 
+        function selectBilaspurArea() {
+            var districtSelect = document.querySelector('select[name="district"]');
+            var blockSelect = document.querySelector('select[name="block"]');
+            var subDistrictSelect = document.querySelector('select[name="sub_district"]');
+            console.log('working')
+
+            if (districtSelect.value === 'Bilaspur') {
+                blockSelect.innerHTML = `
+                    <option value="">Select Block</option>
+                      <option value="बिल्हा">बिल्हा (Bilha)</option>
+                                                    <option value="कोटा">कोटा (Kota)</option>
+                                                    <option value="तखतपुर">तखतपुर (Takhatpur)</option>
+                                                    <option value="मस्तूरी">मस्तूरी (Masturi) </option>
+
+                `;
+
+                subDistrictSelect.innerHTML = `
+                   <option value="">Select Sub District</option>
+     <option value="बिलासपुर">बिलासपुर (Bilaspur)</option>
+                                                    <option value="बिल्हा">बिल्हा (Bilha)</option>
+                                                    <option value="मस्तूरी">मस्तूरी (Masturi)</option>
+                                                    <option value="तखतपुर">तखतपुर (Takhatpur)</option>
+                                                    <option value="कोटा">कोटा (Kota)</option>
+                                                    <option value="बेलगहना">बेलगहना (Belgahna)</option>
+                                                    <option value="रतनपुर">रतनपुर (Ratanpur)</option>
+                                                    <option value="सकरी">सकरी (Sakari)</option>
+                                                    <option value="सीपत">सीपत (Sipat)</option>
+                                                    <option value="बोदरी">बोदरी (Bodri)</option>
+                                                    <option value="बेल्टारा">बेल्टारा (Beltara)</option>
+
+                `;
+            } else {
+                blockSelect.innerHTML = `
+                    <option value="">Select Block</option>
+                `;
+                subDistrictSelect.innerHTML = `
+                    <option value="">Select Sub District</option>
+                `;
+
+            }
+
+
+
+        }
 
         function getCities() {
 

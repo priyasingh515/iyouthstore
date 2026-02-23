@@ -35,7 +35,7 @@ class OrderController extends Controller
         // Staff Permission Check
         $this->middleware(['permission:view_all_orders|view_inhouse_orders|view_seller_orders|view_pickup_point_orders|view_all_offline_payment_orders'])->only('all_orders');
         $this->middleware(['permission:view_order_details'])->only('show');
-        $this->middleware(['permission:delete_order'])->only('destroy','bulk_order_delete');
+        $this->middleware(['permission:delete_order'])->only('destroy', 'bulk_order_delete');
     }
 
     // All Orders
@@ -54,11 +54,9 @@ class OrderController extends Controller
 
         if (Route::currentRouteName() == 'inhouse_orders.index' && Auth::user()->can('view_inhouse_orders')) {
             $orders = $orders->where('orders.seller_id', '=', $admin_user_id);
-        }
-        elseif (Route::currentRouteName() == 'seller_orders.index' && Auth::user()->can('view_seller_orders')) {
+        } elseif (Route::currentRouteName() == 'seller_orders.index' && Auth::user()->can('view_seller_orders')) {
             $orders = $orders->where('orders.seller_id', '!=', $admin_user_id);
-        }
-        elseif (Route::currentRouteName() == 'pick_up_point.index' && Auth::user()->can('view_pickup_point_orders')) {
+        } elseif (Route::currentRouteName() == 'pick_up_point.index' && Auth::user()->can('view_pickup_point_orders')) {
             if (get_setting('vendor_system_activation') != 1) {
                 $orders = $orders->where('orders.seller_id', '=', $admin_user_id);
             }
@@ -70,25 +68,21 @@ class OrderController extends Controller
                 $orders->where('shipping_type', 'pickup_point')
                     ->where('pickup_point_id', Auth::user()->staff->pick_up_point->id);
             }
-        }
-        elseif (Route::currentRouteName() == 'all_orders.index' && Auth::user()->can('view_all_orders')) {
+        } elseif (Route::currentRouteName() == 'all_orders.index' && Auth::user()->can('view_all_orders')) {
             if (get_setting('vendor_system_activation') != 1) {
                 $orders = $orders->where('orders.seller_id', '=', $admin_user_id);
             }
-        }
-        elseif (Route::currentRouteName() == 'offline_payment_orders.index' && Auth::user()->can('view_all_offline_payment_orders')) {
+        } elseif (Route::currentRouteName() == 'offline_payment_orders.index' && Auth::user()->can('view_all_offline_payment_orders')) {
             $orders = $orders->where('orders.manual_payment', 1);
-            if($request->order_type != null){
+            if ($request->order_type != null) {
                 $order_type = $request->order_type;
-                $orders = $order_type =='inhouse_orders' ? 
-                            $orders->where('orders.seller_id', '=', $admin_user_id) : 
-                            $orders->where('orders.seller_id', '!=', $admin_user_id);
+                $orders = $order_type == 'inhouse_orders' ?
+                    $orders->where('orders.seller_id', '=', $admin_user_id) :
+                    $orders->where('orders.seller_id', '!=', $admin_user_id);
             }
-        }
-        elseif (Route::currentRouteName() == 'unpaid_orders.index' && Auth::user()->can('view_all_unpaid_orders')) {
+        } elseif (Route::currentRouteName() == 'unpaid_orders.index' && Auth::user()->can('view_all_unpaid_orders')) {
             $orders = $orders->where('orders.payment_status', 'unpaid');
-        }
-        else {
+        } else {
             abort(403);
         }
 
@@ -116,13 +110,13 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::findOrFail(decrypt($id));
-        
+
         $order_shipping_address = json_decode($order->shipping_address);
         $delivery_boys = User::where('city', $order_shipping_address->city)
-                ->where('user_type', 'delivery_boy')
-                ->get();
-                
-        if(env('DEMO_MODE') != 'On') {
+            ->where('user_type', 'delivery_boy')
+            ->get();
+
+        if (env('DEMO_MODE') != 'On') {
             $order->viewed = 1;
             $order->save();
         }
@@ -149,7 +143,7 @@ class OrderController extends Controller
 
     // public function store(Request $request)
     // {
-       
+
     //     $carts = Cart::where('user_id', Auth::user()->id)->active()->get();
 
     //     if ($carts->isEmpty()) {
@@ -270,7 +264,7 @@ class OrderController extends Controller
     //             $order_detail->product_referral_code = $cartItem['product_referral_code'];
     //             $order_detail->shipping_cost = $cartItem['shipping_cost'];
 
-                
+
     //             if (addon_is_activated('refund_request')) {
 
     //                 $refund_type = get_setting('refund_type');
@@ -287,7 +281,7 @@ class OrderController extends Controller
 
     //                 }
     //             }
-                
+
     //             $shipping += $order_detail->shipping_cost;
     //             //End of storing shipping cost
 
@@ -303,7 +297,7 @@ class OrderController extends Controller
     //             $product->save();
 
     //             $order->seller_id = $product->user_id;
-                
+
     //             $order->shipping_type = $cartItem['shipping_type'];
 
     //             if ($cartItem['shipping_type'] == 'pickup_point') {
@@ -351,28 +345,46 @@ class OrderController extends Controller
     //     $request->session()->put('combined_order_id', $combined_order->id);
     // }
 
-   
+
     public function store(Request $request)
-{
-    $carts = Cart::where('user_id', Auth::id())->active()->get();
+    {
+        $carts = Cart::where('user_id', Auth::id())->active()->get();
 
-    if ($carts->isEmpty()) {
-        flash(translate('Your cart is empty'))->warning();
-        return redirect()->route('home');
-    }
+        if ($carts->isEmpty()) {
+            flash(translate('Your cart is empty'))->warning();
+            return redirect()->route('home');
+        }
 
-    $address = Address::where('id', $carts[0]['address_id'])->first();
-
-    if (!$address || !$address->latitude || !$address->longitude) {
-        flash(translate('Location not found'))->warning();
-        return redirect()->back();
-    }
-
-    $customerLat = $address->latitude;
-    $customerLng = $address->longitude;
+        $address = Address::where('id', $carts[0]['address_id'])->first();
 
 
-    $nearestSeller = \App\Models\Shop::selectRaw("
+        $customerLat = null;
+        $customerLng = null;
+
+        if ($address && $address->latitude && $address->longitude) {
+
+            $customerLat = $address->latitude;
+            $customerLng = $address->longitude;
+        } elseif (session()->has('user_latitude') && session()->has('user_longitude')) {
+
+            $customerLat = session('user_latitude');
+            $customerLng = session('user_longitude');
+        } else {
+            flash(translate('Please set your delivery location'))->warning();
+            return redirect()->back();
+        }
+
+
+        if (!$address || !$address->latitude || !$address->longitude) {
+            flash(translate('Location not found'))->warning();
+            return redirect()->back();
+        }
+
+        $customerLat = $address->latitude;
+        $customerLng = $address->longitude;
+
+
+        $nearestSeller = \App\Models\Shop::selectRaw("
         shops.*, (6371 * acos(
             cos(radians(?)) *
             cos(radians(latitude)) *
@@ -381,105 +393,105 @@ class OrderController extends Controller
             sin(radians(latitude))
         )) AS distance
     ", [$customerLat, $customerLng, $customerLat])
-    ->where('registration_approval', 1)
-    ->having('distance', '<=', 20) // 🔥 20 KM Radius
-    ->orderBy('distance')
-    ->first();
+            ->where('registration_approval', 1)
+            ->having('distance', '<=', 20) // 
+            ->orderBy('distance')
+            ->first();
 
-    if (!$nearestSeller) {
-        flash(translate('Shop not available in your area'))->warning();
-    }
-
-
-    $shippingAddress = [
-        'name'        => Auth::user()->name,
-        'email'       => Auth::user()->email,
-        'address'     => $address->address,
-        'country'     => $address->country->name ?? '',
-        'state'       => $address->state->name ?? '',
-        'city'        => $address->city->name ?? '',
-        'postal_code' => $address->postal_code,
-        'phone'       => $address->phone,
-        'lat_lang'    => $customerLat . ',' . $customerLng,
-    ];
-
-
-
-    $combined_order = new CombinedOrder;
-    $combined_order->user_id = Auth::id();
-    $combined_order->shipping_address = json_encode($shippingAddress);
-    $combined_order->grand_total = 0;
-    $combined_order->save();
-
-
-    $order = new Order;
-    $order->combined_order_id = $combined_order->id;
-    $order->user_id = Auth::id();
-    $order->seller_id = $nearestSeller->user_id; // ✅ Nearest Shop Assign
-    $order->shipping_address = $combined_order->shipping_address;
-    $order->additional_info = $request->additional_info;
-    $order->payment_type = $request->payment_option;
-    $order->delivery_viewed = 0;
-    $order->payment_status_viewed = 0;
-    $order->code = date('Ymd-His') . rand(10, 99);
-    $order->date = strtotime('now');
-    $order->save();
-
-    $subtotal = 0;
-    $tax = 0;
-    $shipping = 0;
-    $coupon_discount = 0;
-
-
-
-    foreach ($carts as $cartItem) {
-
-        $product = Product::find($cartItem['product_id']);
-
-        $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
-        $tax += cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
-        $coupon_discount += $cartItem['discount'];
-
-        $order_detail = new OrderDetail;
-        $order_detail->order_id = $order->id;
-        $order_detail->seller_id = $order->seller_id;
-        $order_detail->product_id = $product->id;
-        $order_detail->variation = $cartItem['variation'];
-        $order_detail->price = cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
-        $order_detail->tax = cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
-        $order_detail->shipping_type = $cartItem['shipping_type'];
-        $order_detail->shipping_cost = $cartItem['shipping_cost'];
-        $order_detail->quantity = $cartItem['quantity'];
-        $order_detail->save();
-
-        $shipping += $order_detail->shipping_cost;
-
-        // Stock update
-        if ($product->digital != 1) {
-            $stock = $product->stocks->where('variant', $cartItem['variation'])->first();
-            if ($stock && $stock->qty >= $cartItem['quantity']) {
-                $stock->qty -= $cartItem['quantity'];
-                $stock->save();
-            }
+        if (!$nearestSeller) {
+            flash(translate('Shop not available in your area'))->warning();
         }
 
-        $product->num_of_sale += $cartItem['quantity'];
-        $product->save();
+
+        $shippingAddress = [
+            'name'        => Auth::user()->name,
+            'email'       => Auth::user()->email,
+            'address'     => $address->address,
+            'country'     => $address->country->name ?? '',
+            'state'       => $address->state->name ?? '',
+            'city'        => $address->city->name ?? '',
+            'postal_code' => $address->postal_code,
+            'phone'       => $address->phone,
+            'lat_lang'    => $customerLat . ',' . $customerLng,
+        ];
+
+
+
+        $combined_order = new CombinedOrder;
+        $combined_order->user_id = Auth::id();
+        $combined_order->shipping_address = json_encode($shippingAddress);
+        $combined_order->grand_total = 0;
+        $combined_order->save();
+
+
+        $order = new Order;
+        $order->combined_order_id = $combined_order->id;
+        $order->user_id = Auth::id();
+        $order->seller_id = $nearestSeller->user_id; 
+        $order->shipping_address = $combined_order->shipping_address;
+        $order->additional_info = $request->additional_info;
+        $order->payment_type = $request->payment_option;
+        $order->delivery_viewed = 0;
+        $order->payment_status_viewed = 0;
+        $order->code = date('Ymd-His') . rand(10, 99);
+        $order->date = strtotime('now');
+        $order->save();
+
+        $subtotal = 0;
+        $tax = 0;
+        $shipping = 0;
+        $coupon_discount = 0;
+
+
+
+        foreach ($carts as $cartItem) {
+
+            $product = Product::find($cartItem['product_id']);
+
+            $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
+            $tax += cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
+            $coupon_discount += $cartItem['discount'];
+
+            $order_detail = new OrderDetail;
+            $order_detail->order_id = $order->id;
+            $order_detail->seller_id = $order->seller_id;
+            $order_detail->product_id = $product->id;
+            $order_detail->variation = $cartItem['variation'];
+            $order_detail->price = cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
+            $order_detail->tax = cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
+            $order_detail->shipping_type = $cartItem['shipping_type'];
+            $order_detail->shipping_cost = $cartItem['shipping_cost'];
+            $order_detail->quantity = $cartItem['quantity'];
+            $order_detail->save();
+
+            $shipping += $order_detail->shipping_cost;
+
+            // Stock update
+            if ($product->digital != 1) {
+                $stock = $product->stocks->where('variant', $cartItem['variation'])->first();
+                if ($stock && $stock->qty >= $cartItem['quantity']) {
+                    $stock->qty -= $cartItem['quantity'];
+                    $stock->save();
+                }
+            }
+
+            $product->num_of_sale += $cartItem['quantity'];
+            $product->save();
+        }
+
+
+        $order->grand_total = $subtotal + $tax + $shipping - $coupon_discount;
+        $order->save();
+
+        $combined_order->grand_total = $order->grand_total;
+        $combined_order->save();
+
+        $request->session()->put('combined_order_id', $combined_order->id);
+
+        flash(translate('Order placed successfully'))->success();
+
+        return redirect()->route('order_confirmed');
     }
-
-
-    $order->grand_total = $subtotal + $tax + $shipping - $coupon_discount;
-    $order->save();
-
-    $combined_order->grand_total = $order->grand_total;
-    $combined_order->save();
-
-    $request->session()->put('combined_order_id', $combined_order->id);
-
-    flash(translate('Order placed successfully'))->success();
-
-    return redirect()->route('order_confirmed');
-}
 
 
 
@@ -560,7 +572,7 @@ class OrderController extends Controller
         }
 
         return 1;
-    } 
+    }
 
     public function order_details(Request $request)
     {
@@ -576,11 +588,11 @@ class OrderController extends Controller
         $order->delivery_status = $request->status;
         $order->save();
 
-        if($request->status == 'delivered'){
+        if ($request->status == 'delivered') {
             $order->delivered_date = date("Y-m-d H:i:s");
             $order->save();
         }
-        
+
         if ($request->status == 'cancelled' && $order->payment_type == 'wallet') {
             $user = User::where('id', $order->user_id)->first();
             $user->balance += $order->grand_total;
@@ -588,7 +600,7 @@ class OrderController extends Controller
         }
 
         // If the order is cancelled and the seller commission is calculated, deduct seller earning
-        if($request->status == 'cancelled' && $order->user->user_type == 'seller' && $order->payment_status == 'paid' && $order->commission_calculated == 1){
+        if ($request->status == 'cancelled' && $order->user->user_type == 'seller' && $order->payment_status == 'paid' && $order->commission_calculated == 1) {
             $sellerEarning = $order->commissionHistory->seller_earning;
             $shop = $order->shop;
             $shop->admin_to_pay -= $sellerEarning;
@@ -638,13 +650,14 @@ class OrderController extends Controller
             }
         }
         // Delivery Status change email notification to Admin, seller, Customer
-        EmailUtility::order_email($order, $request->status);  
+        EmailUtility::order_email($order, $request->status);
 
         // Delivery Status change SMS notification
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'delivery_status_change')->first()->status == 1) {
             try {
                 SmsUtility::delivery_status_change(json_decode($order->shipping_address)->phone, $order);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
         //Send web Notifications to user
@@ -720,8 +733,8 @@ class OrderController extends Controller
         }
 
         // Payment Status change email notification to Admin, seller, Customer
-        if($request->status == 'paid'){
-            EmailUtility::order_email($order, $request->status);  
+        if ($request->status == 'paid') {
+            EmailUtility::order_email($order, $request->status);
         }
 
         //Sends Web Notifications to Admin, seller, Customer
@@ -800,19 +813,20 @@ class OrderController extends Controller
 
     public function orderBulkExport(Request $request)
     {
-        if($request->id){
-          return Excel::download(new OrdersExport($request->id), 'orders.xlsx');
+        if ($request->id) {
+            return Excel::download(new OrdersExport($request->id), 'orders.xlsx');
         }
         return back();
     }
 
-    public function unpaid_order_payment_notification_send(Request $request){
-        if($request->order_ids != null){
+    public function unpaid_order_payment_notification_send(Request $request)
+    {
+        if ($request->order_ids != null) {
             $notificationType = get_notification_type('complete_unpaid_order_payment', 'type');
-            foreach (explode(",",$request->order_ids) as $order_id) {
+            foreach (explode(",", $request->order_ids) as $order_id) {
                 $order = Order::where('id', $order_id)->first();
                 $user = $order->user;
-                if($notificationType->status == 1 && $order->payment_status == 'unpaid'){
+                if ($notificationType->status == 1 && $order->payment_status == 'unpaid') {
                     $order_notification['order_id']     = $order->id;
                     $order_notification['order_code']   = $order->code;
                     $order_notification['user_id']      = $order->user_id;
@@ -823,8 +837,7 @@ class OrderController extends Controller
                 }
             }
             flash(translate('Notification Sent Successfully.'))->success();
-        }
-        else{
+        } else {
             flash(translate('Something went wrong!.'))->warning();
         }
         return back();

@@ -217,7 +217,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/sellers/edit-custom-followers', 'editSellerCustomFollowers')->name('edit_Seller_custom_followers');
         Route::get('/sellers/registration/pending', 'pendingSellers')->name('sellers.registration_pending');
         Route::post('/sellers/registration/approve', 'UpdateSellerRegistration')->name('sellers.registration.approved');
-        Route::get('/sellers/profile/{id}', 'sellerProfile')->name('sellers.profile');
+        Route::get('/sellers/profile/{id}', 's')->name('sellers.profile');
         Route::get('/sellers/profile/tab/data/{shop}',  'getSellerProfileTab')->name('sellers.profile.tab');
         Route::get('seller-suspicious/{seller}', 'suspicious')->name('seller.suspicious');
         Route::get('/seller/verification-file/delete', 'deleteVerificationFile')->name('seller.verification.file.delete');

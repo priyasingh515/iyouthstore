@@ -69,10 +69,10 @@
                                     <strong class="text-primary d-block mb-1">
                                         ₹ {{ $product->seller_price }}
                                     </strong>
-
+{{-- 
                                     <p class="small text-success mb-0">
                                         Available : {{ $stock }}
-                                    </p>
+                                    </p> --}}
 
                                       <p class="small text-success mb-0">
                                         In My Stock : {{ $product->product_stock  ?? 0 }}
