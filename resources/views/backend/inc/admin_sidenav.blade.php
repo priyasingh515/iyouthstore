@@ -2105,6 +2105,22 @@
                                     </a>
                                 </li>
                                 @endcan
+                                {{-- @can('manage_shipping_cities') --}}
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('blocks.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['blocks.index','blocks.edit','blocks.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Blocks')}}</span>
+                                    </a>
+                                </li>
+                                {{-- @endcan --}}
+                                {{-- @can('manage_shipping_cities') --}}
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('subdistricts.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['subdistricts.index','subdistricts.edit','subdistricts.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Sub Districts')}}</span>
+                                    </a>
+                                </li>
+                                {{-- @endcan --}}
                                 @can('manage_shipping_areas')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('areas.index')}}"
@@ -2282,3 +2298,291 @@
     </div><!-- .aiz-sidebar -->
     <div class="aiz-sidebar-overlay"></div>
 </div><!-- .aiz-sidebar -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Setup & Configurations -->
+                @canany(['general_settings', 'features_activation', 'language_setup', 'currency_setup',
+                    'vat_&_tax_setup', 'pickup_point_setup', 'smtp_settings', 'payment_methods_configurations',
+                    'order_configuration', 'file_system_&_cache_configuration', 'social_media_logins', 'facebook_chat',
+                    'facebook_comment', 'analytics_tools_configuration', 'google_recaptcha_configuration',
+                    'google_map_setting', 'google_firebase_setting', 'shipping_configuration', 'shipping_country_setting',
+                    'manage_shipping_states', 'manage_shipping_cities', 'manage_zones', 'manage_carriers',
+                    'select_shipping_methods'])
+                    <li class="aiz-side-nav-item">
+                        <a href="#" class="aiz-side-nav-link">
+                            <div class="aiz-side-nav-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                    <path id="Path_40779" data-name="Path 40779"
+                                        d="M7.688,16h.625a1.877,1.877,0,0,0,1.875-1.875V13.81a.209.209,0,0,1,.133-.191l.011,0a.209.209,0,0,1,.23.041l.223.223a1.875,1.875,0,0,0,2.652,0l.442-.442a1.875,1.875,0,0,0,0-2.652l-.223-.223a.209.209,0,0,1-.041-.23l0-.012a.209.209,0,0,1,.191-.133h.315A1.877,1.877,0,0,0,16,8.313V7.688a1.877,1.877,0,0,0-1.875-1.875H13.81a.209.209,0,0,1-.191-.133l0-.011a.209.209,0,0,1,.041-.23l.223-.223a1.875,1.875,0,0,0,0-2.652l-.442-.442a1.875,1.875,0,0,0-2.652,0l-.223.223a.21.21,0,0,1-.23.041l-.012,0a.209.209,0,0,1-.133-.191V1.875A1.877,1.877,0,0,0,8.312,0H7.687A1.877,1.877,0,0,0,5.812,1.875V2.19a.209.209,0,0,1-.133.191l-.012,0a.209.209,0,0,1-.23-.041l-.223-.223a1.875,1.875,0,0,0-2.652,0l-.442.442a1.875,1.875,0,0,0,0,2.652l.223.223a.209.209,0,0,1,.041.23l0,.011a.209.209,0,0,1-.191.133H1.875A1.877,1.877,0,0,0,0,7.687v.625a1.874,1.874,0,0,0,1.407,1.816.625.625,0,1,0,.312-1.211.624.624,0,0,1-.468-.605V7.688a.626.626,0,0,1,.625-.625H2.19a1.455,1.455,0,0,0,1.347-.906l0-.011a1.455,1.455,0,0,0-.312-1.591l-.223-.223a.625.625,0,0,1,0-.884l.442-.442a.625.625,0,0,1,.884,0l.223.223a1.456,1.456,0,0,0,1.593.311l.009,0A1.455,1.455,0,0,0,7.063,2.19V1.875a.626.626,0,0,1,.625-.625h.625a.626.626,0,0,1,.625.625V2.19a1.455,1.455,0,0,0,.906,1.347l.009,0a1.455,1.455,0,0,0,1.593-.311l.223-.223a.625.625,0,0,1,.884,0l.442.442a.625.625,0,0,1,0,.884l-.223.223a1.455,1.455,0,0,0-.311,1.593l0,.009a1.455,1.455,0,0,0,1.347.906h.315a.626.626,0,0,1,.625.625v.625a.626.626,0,0,1-.625.625H13.81a1.455,1.455,0,0,0-1.347.906l0,.009a1.455,1.455,0,0,0,.311,1.593l.223.223a.625.625,0,0,1,0,.884l-.442.442a.625.625,0,0,1-.884,0l-.223-.223a1.456,1.456,0,0,0-1.593-.311l-.009,0a1.455,1.455,0,0,0-.906,1.347v.315a.626.626,0,0,1-.625.625H7.688a.622.622,0,0,1-.6-.437.625.625,0,1,0-1.193.375A1.867,1.867,0,0,0,7.688,16ZM.536,15.433a1.829,1.829,0,0,1,0-2.586h0L4.589,8.811a3.234,3.234,0,0,1-.308-1.259,2.97,2.97,0,0,1,.9-2.141A4.228,4.228,0,0,1,8.13,4.255h.007a3.322,3.322,0,0,1,1.086.188A.625.625,0,0,1,9.47,5.473L7.964,7.01l.188.811L8.95,8,10.479,6.47a.625.625,0,0,1,1.034.24,3.472,3.472,0,0,1,.2,1.121,4.373,4.373,0,0,1-.8,2.556,3.047,3.047,0,0,1-2.49,1.3H8.417A3.414,3.414,0,0,1,7.159,11.4L3.122,15.433a1.829,1.829,0,0,1-2.586,0Zm6.876-5.311a2.1,2.1,0,0,0,1.007.316,1.818,1.818,0,0,0,1.487-.792,2.988,2.988,0,0,0,.528-1.361l-.843.845A.625.625,0,0,1,9.01,9.3L7.494,8.953a.625.625,0,0,1-.471-.468L6.669,6.959a.625.625,0,0,1,.162-.579l.823-.84A2.844,2.844,0,0,0,6.067,6.3,1.723,1.723,0,0,0,5.531,7.55a2.123,2.123,0,0,0,.342,1,.625.625,0,0,1-.065.809L1.419,13.731a.579.579,0,1,0,.819.818l4.368-4.361a.625.625,0,0,1,.806-.066Z"
+                                        fill="#575b6a" />
+                                </svg>
+                            </div>
+                            <span class="aiz-side-nav-text">{{ translate('Setup & Configurations') }}</span>
+                            <span class="aiz-side-nav-arrow"></span>
+                        </a>
+                    <!--    <ul class="aiz-side-nav-list level-2">-->
+                    <!--        @can('features_activation')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('activation.index') }}" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Features activation') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @can('language_setup')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('languages.index') }}"-->
+                        <!--                class="aiz-side-nav-link {{ areActiveRoutes(['languages.index', 'languages.create', 'languages.store', 'languages.show', 'languages.edit']) }}">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Languages') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @can('currency_setup')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('currency.index') }}" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Currency') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @can('vat_&_tax_setup')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('tax.index') }}"-->
+                        <!--                class="aiz-side-nav-link {{ areActiveRoutes(['tax.index', 'tax.create', 'tax.store', 'tax.show', 'tax.edit']) }}">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Vat & TAX') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @can('pickup_point_setup')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('pick_up_points.index') }}"-->
+                        <!--                class="aiz-side-nav-link {{ areActiveRoutes(['pick_up_points.index', 'pick_up_points.create', 'pick_up_points.edit']) }}">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Pickup point') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @can('smtp_settings')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('smtp_settings.index') }}" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('SMTP Settings') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+
+                    <!--        @can('order_configuration')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('order_configuration.index') }}" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Order Configuration') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @can('file_system_&_cache_configuration')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('file_system.index') }}" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('File System & Cache--><!--                    Configuration') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @can('social_media_logins')-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="{{ route('social_login.index') }}" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Social media Logins') }}</span>-->
+                        <!--            </a>-->
+                        <!--        </li>-->
+                    <!--        @endcan-->
+                    <!--        @canany(['facebook_chat', 'facebook_comment'])-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="javascript:void(0);" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Facebook') }}</span>-->
+                        <!--                <span class="aiz-side-nav-arrow"></span>-->
+                        <!--            </a>-->
+                        <!--            <ul class="aiz-side-nav-list level-3">-->
+                        <!--                {{-- @can('facebook_chat')-->
+                <!--                <li class="aiz-side-nav-item">-->
+                <!--                    <a href="{{ route('facebook_chat.index') }}" class="aiz-side-nav-link">-->
+                <!--                        <span class="aiz-side-nav-text">{{translate('Facebook Chat')}}</span>-->
+                <!--                    </a>-->
+                <!--                </li>-->
+                                
+                <!--                @endcan --}}-->
+
+                        <!--                @can('whatsapp_chat')-->
+                            <!--                <li class="aiz-side-nav-item">-->
+                            <!--                    <a href="{{ route('whatsapp_chat.index') }}" class="aiz-side-nav-link">-->
+                            <!--                        <span class="aiz-side-nav-text">{{ translate('WhatsApp Chat') }}</span>-->
+                            <!--                    </a>-->
+                            <!--                </li>-->
+                        <!--                @endcan-->
+
+                        <!--                @can('facebook_comment')-->
+                            <!--                <li class="aiz-side-nav-item">-->
+                            <!--                    <a href="{{ route('facebook-comment') }}" class="aiz-side-nav-link">-->
+                            <!--                        <span class="aiz-side-nav-text">{{ translate('Facebook Comment') }}</span>-->
+                            <!--                    </a>-->
+                            <!--                </li>-->
+                        <!--                @endcan-->
+                        <!--            </ul>-->
+                        <!--        </li>-->
+                    <!--        @endcanany-->
+                    <!--        @canany(['analytics_tools_configuration', 'google_recaptcha_configuration', 'google_map_setting', 'google_firebase_setting'])-->
+                        <!--        <li class="aiz-side-nav-item">-->
+                        <!--            <a href="javascript:void(0);" class="aiz-side-nav-link">-->
+                        <!--                <span class="aiz-side-nav-text">{{ translate('Google') }}</span>-->
+                        <!--                <span class="aiz-side-nav-arrow"></span>-->
+                        <!--            </a>-->
+                        <!--            <ul class="aiz-side-nav-list level-3">-->
+                        <!--                @can('analytics_tools_configuration')-->
+                            <!--                <li class="aiz-side-nav-item">-->
+                            <!--                    <a href="{{ route('google_analytics.index') }}" class="aiz-side-nav-link">-->
+                            <!--                        <span class="aiz-side-nav-text">{{ translate('Analytics Tools') }}</span>-->
+                            <!--                    </a>-->
+                            <!--                </li>-->
+                        <!--                @endcan-->
+                        <!--                @can('google_recaptcha_configuration')-->
+                            <!--                <li class="aiz-side-nav-item">-->
+                            <!--                    <a href="{{ route('google_recaptcha.index') }}" class="aiz-side-nav-link">-->
+                            <!--                        <span class="aiz-side-nav-text">{{ translate('Google reCAPTCHA') }}</span>-->
+                            <!--                    </a>-->
+                            <!--                </li>-->
+                        <!--                @endcan-->
+                        <!--                @can('google_map_setting')-->
+                            <!--                <li class="aiz-side-nav-item">-->
+                            <!--                    <a href="{{ route('google-map.index') }}" class="aiz-side-nav-link">-->
+                            <!--                        <span class="aiz-side-nav-text">{{ translate('Google Map') }}</span>-->
+                            <!--                    </a>-->
+                            <!--                </li>-->
+                        <!--                @endcan-->
+                        <!--                @can('google_firebase_setting')-->
+                            <!--                <li class="aiz-side-nav-item">-->
+                            <!--                    <a href="{{ route('google-firebase.index') }}" class="aiz-side-nav-link">-->
+                            <!--                        <span class="aiz-side-nav-text">{{ translate('Google Firebase') }}</span>-->
+                            <!--                    </a>-->
+                            <!--                </li>-->
+                        <!--                @endcan-->
+                        <!--            </ul>-->
+                        <!--        </li>-->
+                    <!--        @endcanany-->
+                 @canany(['shipping_configuration','select_shipping_methods','shipping_country_setting','manage_shipping_states','manage_shipping_cities','manage_zones','manage_carriers'])
+                        <li class="aiz-side-nav-item">
+                            <a href="javascript:void(0);" class="aiz-side-nav-link">
+                                <span class="aiz-side-nav-text">{{translate('Shipping')}}</span>
+                                <span class="aiz-side-nav-arrow"></span>
+                            </a>
+                            <ul class="aiz-side-nav-list level-3">
+
+
+                                @can('select_shipping_methods')
+                                    <li class="aiz-side-nav-item">
+                                        <a href="{{route('shipping_configuration.shipping_method')}}"
+                                            class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.shipping_method'])}}">
+                                            <span class="aiz-side-nav-text">{{translate('Select Shipping Method')}}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('shipping_configuration')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('shipping_configuration.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.index','shipping_configuration.edit','shipping_configuration.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Configuration')}}</span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('shipping_country_setting')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('countries.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['countries.index','countries.edit','countries.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Countries')}}</span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('manage_shipping_states')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('states.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['states.index','states.edit','states.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping States')}}</span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('manage_shipping_cities')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('cities.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['cities.index','cities.edit','cities.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Cities')}}</span>
+                                    </a>
+                                </li>
+                                @endcan
+                                {{-- @can('manage_shipping_cities') --}}
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('blocks.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['blocks.index','blocks.edit','blocks.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Blocks')}}</span>
+                                    </a>
+                                </li>
+                                {{-- @endcan --}}
+                                {{-- @can('manage_shipping_cities') --}}
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('subdistricts.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['subdistricts.index','subdistricts.edit','subdistricts.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Sub Districts')}}</span>
+                                    </a>
+                                </li>
+                                {{-- @endcan --}}
+                                @can('manage_shipping_areas')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('areas.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['areas.index','areas.edit','areas.update'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Areas')}}</span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('manage_zones')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('zones.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['zones.index','zones.create','zones.edit'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Zones')}}</span>
+                                    </a>
+                                </li>
+                                @endcan
+                                @can('manage_carriers')
+                                <li class="aiz-side-nav-item">
+                                    <a href="{{route('carriers.index')}}"
+                                        class="aiz-side-nav-link {{ areActiveRoutes(['carriers.index','carriers.create','carriers.edit'])}}">
+                                        <span class="aiz-side-nav-text">{{translate('Shipping Carrier')}}</span>
+                                    </a>
+                                </li>
+                                @endcan
+                            </ul>
+                        </li>
+                        @endif
+                    </ul>
+                </li>
+                @endcanany

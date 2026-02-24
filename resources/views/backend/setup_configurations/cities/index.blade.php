@@ -4,7 +4,7 @@
     <div class="aiz-titlebar text-left mt-2 mb-3">
     	<div class="row align-items-center">
     		<div class="col-md-12">
-    			<h1 class="h3">{{translate('All cities')}}</h1>
+    			<h1 class="h3">{{translate('All Districts')}}</h1>
     		</div>
     	</div>
     </div>
@@ -14,10 +14,10 @@
                 <form class="" id="sort_cities" action="" method="GET">
                     <div class="card-header row gutters-5">
                         <div class="col text-center text-md-left">
-                            <h5 class="mb-md-0 h6">{{ translate('Cities') }}</h5>
+                            <h5 class="mb-md-0 h6">{{ translate('Districts') }}</h5>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control" id="sort_city" name="sort_city" @isset($sort_city) value="{{ $sort_city }}" @endisset placeholder="{{ translate('Type city name & Enter') }}">
+                            <input type="text" class="form-control" id="sort_city" name="sort_city" @isset($sort_city) value="{{ $sort_city }}" @endisset placeholder="{{ translate('Type district name & Enter') }}">
                         </div>
                         @if (get_setting('has_state') == 1)
                         <div class="col-md-4">
@@ -100,36 +100,39 @@
         <div class="col-md-5">
     		<div class="card">
     			<div class="card-header">
-    				<h5 class="mb-0 h6">{{ translate('Add New city') }}</h5>
+    				<h5 class="mb-0 h6">{{ translate('Add New District') }}</h5>
     			</div>
     			<div class="card-body">
     				<form action="{{ route('cities.store') }}" method="POST">
     					@csrf
-    					<div class="form-group mb-3">
-    						<label for="name">{{translate('Name')}}</label>
-    						<input type="text" placeholder="{{translate('Name')}}" name="name" class="form-control" required>
-    					</div>
-
-                        @if (get_setting('has_state') == 1)
-                        <div class="form-group">
-                            <label for="country">{{translate('State')}}</label>
-                            <select class="select2 form-control aiz-selectpicker" name="state_id" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" required>
-                                @foreach ($states as $state)
-                                    <option value="{{ $state->id }}">{{ $state->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @else
+                        
                         <div class="form-group">
                             <label for="country">{{translate('Country')}}</label>
                             <select class="select2 form-control aiz-selectpicker" name="country_id" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" required>
                                 @foreach ($countries as $country)
-                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                <option value="{{ $country->id }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        @endif
+                        <div class="form-group">
+                            <label for="country">{{translate('State')}}</label>
+                            <select class="select2 form-control aiz-selectpicker" name="state_id" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" required>
+                                @foreach ($states as $state)
+                                <option value="{{ $state->id }}">{{ $state->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="name">{{translate('Name')}}</label>
+                            <input type="text" placeholder="{{translate('Name')}}" name="name" class="form-control" required>
+                        </div>
 
+                        <div class="form-group mb-3">
+                            <label for="name">{{translate('District Code')}}</label>
+                            <input type="text" placeholder="{{translate('District Code')}}" name="district_code" class="form-control" required>
+                        </div>
+                        
 
                         <div class="form-group mb-3">
     						<label for="name">{{translate('Cost')}}</label>

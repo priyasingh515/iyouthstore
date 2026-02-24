@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\BlocksController;
 use App\Http\Controllers\BlogCategoryController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandBulkUploadController;
@@ -24,8 +25,10 @@ use App\Http\Controllers\CustomAlertController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\CustomerProductController;
+use App\Http\Controllers\Cybersource\CybersourceSettingController;
 use App\Http\Controllers\DigitalProductController;
 use App\Http\Controllers\DynamicPopupController;
+use App\Http\Controllers\ElementController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\FlashDealController;
 use App\Http\Controllers\LanguageController;
@@ -42,6 +45,7 @@ use App\Http\Controllers\ProductBulkUploadController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductQueryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileUpdateRequestController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoleController;
@@ -50,6 +54,7 @@ use App\Http\Controllers\SellerWithdrawRequestController;
 use App\Http\Controllers\SizeChartController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StateController;
+use App\Http\Controllers\SubDistrictsController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\TaxController;
@@ -57,9 +62,6 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
-use App\Http\Controllers\Cybersource\CybersourceSettingController;
-use App\Http\Controllers\ElementController;
-use App\Http\Controllers\ProfileUpdateRequestController;
 
 /*
   |--------------------------------------------------------------------------
@@ -199,7 +201,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     Route::controller(SellerController::class)->group(function () {
         Route::get('/seller/rating-followers', 'index')->name('sellers.rating_followers');
 
-    
 
         Route::get('sellers_ban/{id}', 'ban')->name('sellers.ban');
         Route::get('/sellers/destroy/{id}', 'destroy')->name('sellers.destroy');
@@ -677,6 +678,23 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/get-cities-by-state', 'getCities')->name('get-cities-by-state');
         Route::get('/get-cities-by-country', 'getCitiesByCountry')->name('get-cities-by-country');
     });
+
+    //blocks
+    Route::get('/blocks', [BlocksController::class, 'index'])->name('blocks.index');
+    Route::post('/blocks/update', [BlocksController::class, 'store'])->name('blocks.store');
+    Route::get('/blocks/edit/{id}', [BlocksController::class, 'edit'])->name('blocks.edit');
+    Route::post('/blocks/update/{id}', [BlocksController::class, 'update'])->name('blocks.update');
+    Route::get('/blocks/destroy/{id}', [BlocksController::class, 'destroy'])->name('blocks.destroy');
+    Route::post('/blocks/status', [BlocksController::class,'updateStatus'])->name('blocks.status');
+
+    //subdisctricts
+    Route::get('/subdistricts', [SubDistrictsController::class, 'index'])->name('subdistricts.index');
+    Route::post('/subdistricts/store', [SubDistrictsController::class, 'store'])->name('subdistricts.store');
+    Route::get('/subdistricts/edit/{id}', [SubDistrictsController::class, 'edit'])->name('subdistricts.edit');
+    Route::post('/subdistricts/update/{id}', [SubDistrictsController::class, 'update'])->name('subdistricts.update');
+    Route::get('/subdistricts/destroy/{id}', [SubDistrictsController::class, 'destroy'])->name('subdistricts.destroy');
+    Route::post('/subdistricts/status',[SubDistrictsController::class, 'updateStatus'])->name('subdistricts.status');
+    Route::get('/get-blocks',[SubDistrictsController::class, 'getBlocks'])->name('subdistricts.getBlocks');
 
     //Areas
     Route::resource('areas', AreaController::class);

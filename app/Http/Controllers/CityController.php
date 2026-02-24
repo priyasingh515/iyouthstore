@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\City;
 use App\Models\CityTranslation;
 use App\Models\Country;
 use App\Models\State;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class CityController extends Controller
@@ -32,10 +32,10 @@ class CityController extends Controller
         //         $q->where('status', 1);
         //     });
         // } else {
-            $cities_queries->whereHas('country', function ($q) {
-                $q->where('status', 1);
-            });
-        
+        $cities_queries->whereHas('country', function ($q) {
+            $q->where('status', 1);
+        });
+
         if ($request->sort_city) {
             $cities_queries->where('name', 'like', "%$sort_city%");
         }
@@ -66,9 +66,11 @@ class CityController extends Controller
      */
     public function store(Request $request)
     {
+
         $city = new City;
 
         $city->name = $request->name;
+        $city->district_code = $request->district_code;
         $city->cost = $request->cost;
         $city->status = 0;
         $city->state_id = $request->state_id ?? null;
@@ -76,7 +78,7 @@ class CityController extends Controller
         $city->save();
 
         flash(translate('City has been inserted successfully'))->success();
-
+        // }
         return back();
     }
 

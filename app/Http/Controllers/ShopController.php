@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\OTPVerificationController;
 use App\Http\Requests\SellerRegistrationRequest;
 use App\Models\AffiliateConfig;
-use Illuminate\Http\Request;
-use App\Models\Shop;
-use App\Models\User;
-use App\Models\CgCity;
-use App\Models\CgDistrict;
+use App\Models\Block;
 use App\Models\BusinessSetting;
+use App\Models\CgCity;
+use App\Models\City;
 use App\Models\RegistrationVerificationCode;
+use App\Models\Shop;
 use App\Models\SmsTemplate;
+use App\Models\SubDistrict;
+use App\Models\User;
 use App\Services\SendSmsService;
-use Auth;
-use Hash;
 use App\Utility\EmailUtility;
-use Illuminate\Support\Facades\Notification;
-use App\Http\Controllers\OTPVerificationController;
+use Auth;
 use Cookie;
+use Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
 class ShopController extends Controller
@@ -52,7 +54,9 @@ class ShopController extends Controller
             abort(404);
         }
 
-        $districts = CgDistrict::all();
+        $districts = City::all();
+        $subDistricts = SubDistrict::where('status', 1)->get();
+        $blocks    = Block::where('status',1)->get();
 
 
         // default registration page
@@ -69,7 +73,7 @@ class ShopController extends Controller
             }
         } else {
 
-            return view('auth.' . get_setting('authentication_layout_select') . '.seller_registration', compact('email', 'phone', 'districts'));
+            return view('auth.' . get_setting('authentication_layout_select') . '.seller_registration', compact('email', 'phone', 'districts','subDistricts','blocks'));
         }
     }
 
@@ -136,7 +140,7 @@ class ShopController extends Controller
             $shop->longitude = $request->longitude;
             $shop->registration_approval = 0;
 
-            $district = CgDistrict::where('district_name', $request->district)
+            $district = City::where('name', $request->district)
                 ->value('id');
 
             $shop->shop_id = $this->generateLocationUniqueId($district, $request->city);

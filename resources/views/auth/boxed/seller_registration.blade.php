@@ -2,19 +2,16 @@
 
 
 @section('css')
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<!-- CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-<!-- JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @endsection
 
 @section('content')
-    <!-- aiz-main-wrapper -->
+   
     <div class="aiz-main-wrapper d-flex flex-column justify-content-md-center bg-white">
         <section class="bg-white overflow-hidden">
             <div class="row">
@@ -57,7 +54,8 @@
                                             <!-- Name -->
                                             <div class="form-group">
                                                 <label for="name"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Your Name') }} <span class="text-danger">*</span> </label>
+                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Your Name') }} <span
+                                                        class="text-danger">*</span> </label>
                                                 <input type="text"
                                                     class="form-control rounded-0{{ $errors->has('name') ? ' is-invalid' : '' }}"
                                                     value="{{ old('name') }}" placeholder="{{ translate('Full Name') }}"
@@ -70,7 +68,8 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label>{{ translate('Your Email') }} <span class="text-danger">*</span></label>
+                                                <label>{{ translate('Your Email') }} <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="email"
                                                     class="form-control rounded-0{{ $errors->has('email') ? ' is-invalid' : '' }}"
                                                     value="{{ $email ?? old('email') }}"
@@ -84,7 +83,8 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label>{{ translate('Your Phone') }} <span class="text-danger">*</span></label>
+                                                <label>{{ translate('Your Phone') }} <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="tel"
                                                     class="form-control rounded-0{{ $errors->has('phone') ? ' is-invalid' : '' }}"
                                                     value="{{ $phone ?? old('phone') }}"
@@ -98,7 +98,8 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="form-label">Select State <span class="text-danger">*</span></label>
+                                                <label class="form-label">Select State <span
+                                                        class="text-danger">*</span></label>
 
                                                 <select required class="form-control state" name="state" id="">
                                                     <option selected value="chhattisgarh">Chhattisgarh</option>
@@ -111,57 +112,47 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="form-label">Select District <span class="text-danger">*</span></label>
-
-                                                <select required class="form-control district" name="district"
-                                                    onchange="selectBilaspurArea()" id="">
-                                                    <option disabled selected>Select District</option>
+                                                <label>Select District <span class="text-danger">*</span></label>
+                                                <select class="form-control district-select" name="district" required>
+                                                    <option value="">Select District</option>
                                                     @foreach ($districts as $district)
-                                                        <option value="{{ $district->name }}">{{ $district->name }}
+                                                        <option value="{{ $district->id }}">
+                                                            {{ $district->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                @if ($errors->has('district'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('district') }}</strong>
-                                                    </span>
-                                                @endif
                                             </div>
 
 
-                                            {{-- block --}}
                                             <div class="form-group">
-                                                <label class="form-label">Select Block <span class="text-danger">*</span></label>
+                                                <label>Select Block <span class="text-danger">*</span></label>
+                                                <select class="form-control block-select" name="block" required>
+                                                    <option value="">Select Block</option>
 
-                                                <select required class="form-control block" name="block" id="">
-
-                                                    <option selected disabled>Select Block</option>
-
+                                                    @foreach ($blocks as $block)
+                                                        <option value="{{ $block->id }}"
+                                                            data-district="{{ $block->district_id }}">
+                                                            {{ $block->name }}
+                                                        </option>
+                                                    @endforeach
                                                 </select>
-                                                @if ($errors->has('block'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('block') }}</strong>
-                                                    </span>
-                                                @endif
                                             </div>
 
-
-                                            {{-- sub district  --}}
                                             <div class="form-group">
-                                                <label class="form-label">Select Sub District <span class="text-danger">*</span></label>
+                                                <label>Select Sub District <span class="text-danger">*</span></label>
+                                                <select class="form-control subdistrict-select" name="sub_district"
+                                                    required>
+                                                    <option value="">Select Sub District</option>
 
-                                                <select required class="form-control sub_district" name="sub_district" id="">
-                                                    <option selected disabled>Select Sub District</option>
-
+                                                    @foreach ($subDistricts as $sub)
+                                                        <option value="{{ $sub->id }}"
+                                                            data-block="{{ $sub->block_id }}">
+                                                            {{ $sub->name }}
+                                                        </option>
+                                                    @endforeach
                                                 </select>
-                                                @if ($errors->has('sub_district'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('sub_district') }}</strong>
-                                                    </span>
-                                                @endif
                                             </div>
 
-                                            {{-- enter village/city name optional --}}
                                             <div class="form-group">
                                                 <label class="form-label">Enter City/Village</label>
                                                 <input type="text" class="form-control" name="city"
@@ -176,7 +167,8 @@
                                             <!-- password -->
                                             <div class="form-group mb-0">
                                                 <label for="password"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Password') }} <span class="text-danger">*</span></label>
+                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Password') }} <span
+                                                        class="text-danger">*</span></label>
                                                 <div class="position-relative">
                                                     <input type="password"
                                                         class="form-control rounded-0{{ $errors->has('password') ? ' is-invalid' : '' }}"
@@ -198,7 +190,8 @@
                                             <!-- password Confirm -->
                                             <div class="form-group">
                                                 <label for="password_confirmation"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Confirm Password') }} <span class="text-danger">*</span></label>
+                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Confirm Password') }}
+                                                    <span class="text-danger">*</span></label>
                                                 <div class="position-relative">
                                                     <input type="password" class="form-control rounded-0"
                                                         placeholder="{{ translate('Confirm Password') }}"
@@ -260,114 +253,51 @@
 @endsection
 
 @section('script')
-
-<script>
-$(document).ready(function() {
-    $('.state').select2({
-        placeholder: "Search State...",
-        allowClear: true
-    });
-
-       $('.district').select2({
-        placeholder: "Search District...",
-        allowClear: true
-    });
-
-       $('.block').select2({
-        placeholder: "Search Block...",
-        allowClear: true
-    });
-    
-       $('.sub_district').select2({
-        placeholder: "Search Sub District...",
-        allowClear: true
-    });
-});
-</script>
     <script>
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
-                },
-                function(error) {
-                    alert('Location allow karna zaruri hai seller registration ke liye');
-                }
-            );
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
+        $(document).ready(function() {
 
+            $('.block-select option').hide();
+            $('.subdistrict-select option').hide();
+            $('.block-select option:first').show();
+            $('.subdistrict-select option:first').show();
 
-        function selectBilaspurArea() {
-            var districtSelect = document.querySelector('select[name="district"]');
-            var blockSelect = document.querySelector('select[name="block"]');
-            var subDistrictSelect = document.querySelector('select[name="sub_district"]');
-            console.log('working')
+            $('.district-select').on('change', function() {
 
-            if (districtSelect.value === 'Bilaspur') {
-                blockSelect.innerHTML = `
-                    <option value="">Select Block</option>
-                      <option value="बिल्हा">बिल्हा (Bilha)</option>
-                                                    <option value="कोटा">कोटा (Kota)</option>
-                                                    <option value="तखतपुर">तखतपुर (Takhatpur)</option>
-                                                    <option value="मस्तूरी">मस्तूरी (Masturi) </option>
+                let district_id = $(this).val();
 
-                `;
+                $('.block-select').val('');
+                $('.subdistrict-select').val('');
 
-                subDistrictSelect.innerHTML = `
-                   <option value="">Select Sub District</option>
-     <option value="बिलासपुर">बिलासपुर (Bilaspur)</option>
-                                                    <option value="बिल्हा">बिल्हा (Bilha)</option>
-                                                    <option value="मस्तूरी">मस्तूरी (Masturi)</option>
-                                                    <option value="तखतपुर">तखतपुर (Takhatpur)</option>
-                                                    <option value="कोटा">कोटा (Kota)</option>
-                                                    <option value="बेलगहना">बेलगहना (Belgahna)</option>
-                                                    <option value="रतनपुर">रतनपुर (Ratanpur)</option>
-                                                    <option value="सकरी">सकरी (Sakari)</option>
-                                                    <option value="सीपत">सीपत (Sipat)</option>
-                                                    <option value="बोदरी">बोदरी (Bodri)</option>
-                                                    <option value="बेल्टारा">बेल्टारा (Beltara)</option>
+                $('.block-select option').hide();
+                $('.block-select option:first').show();
 
-                `;
-            } else {
-                blockSelect.innerHTML = `
-                    <option value="">Select Block</option>
-                `;
-                subDistrictSelect.innerHTML = `
-                    <option value="">Select Sub District</option>
-                `;
+                $('.subdistrict-select option').hide();
+                $('.subdistrict-select option:first').show();
 
-            }
+                $('.block-select option').each(function() {
+                    if ($(this).data('district') == district_id) {
+                        $(this).show();
+                    }
+                });
+            });
 
+            $('.block-select').on('change', function() {
 
+                let block_id = $(this).val();
 
-        }
+                $('.subdistrict-select').val('');
+                $('.subdistrict-select option').hide();
+                $('.subdistrict-select option:first').show();
 
-        function getCities() {
+                $('.subdistrict-select option').each(function() {
+                    if ($(this).data('block') == block_id) {
+                        $(this).show();
+                    }
+                });
+            });
 
-            var district = document.querySelector('select[name="district"]').value;
-
-            fetch("{{ route('getCities') }}?district=" + district)
-                .then(response => response.json())
-                .then(data => {
-
-                    var citySelect = document.querySelector('select[name="city"]');
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-
-                    data.forEach(function(city) {
-                        var option = document.createElement('option');
-                        option.value = city.city;
-                        option.textContent = city.city;
-                        citySelect.appendChild(option);
-                    });
-
-                })
-                .catch(error => console.error(error));
-        }
+        });
     </script>
-
     @if (get_setting('google_recaptcha') == 1 && get_setting('recaptcha_seller_register') == 1)
         <script src="https://www.google.com/recaptcha/api.js?render={{ env('CAPTCHA_KEY') }}"></script>
 
