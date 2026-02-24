@@ -2105,22 +2105,22 @@
                                     </a>
                                 </li>
                                 @endcan
-                                {{-- @can('manage_shipping_cities') --}}
+                                @can('manage_shipping_cities')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('blocks.index')}}"
                                         class="aiz-side-nav-link {{ areActiveRoutes(['blocks.index','blocks.edit','blocks.update'])}}">
                                         <span class="aiz-side-nav-text">{{translate('Shipping Blocks')}}</span>
                                     </a>
                                 </li>
-                                {{-- @endcan --}}
-                                {{-- @can('manage_shipping_cities') --}}
+                                @endcan
+                                @can('manage_shipping_cities')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('subdistricts.index')}}"
                                         class="aiz-side-nav-link {{ areActiveRoutes(['subdistricts.index','subdistricts.edit','subdistricts.update'])}}">
                                         <span class="aiz-side-nav-text">{{translate('Shipping Sub Districts')}}</span>
                                     </a>
                                 </li>
-                                {{-- @endcan --}}
+                                @endcan
                                 @can('manage_shipping_areas')
                                 <li class="aiz-side-nav-item">
                                     <a href="{{route('areas.index')}}"

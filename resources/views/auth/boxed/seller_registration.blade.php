@@ -11,7 +11,7 @@
 @endsection
 
 @section('content')
-   
+
     <div class="aiz-main-wrapper d-flex flex-column justify-content-md-center bg-white">
         <section class="bg-white overflow-hidden">
             <div class="row">
@@ -113,20 +113,27 @@
 
                                             <div class="form-group">
                                                 <label>Select District <span class="text-danger">*</span></label>
-                                                <select class="form-control district-select" name="district" required>
+                                                <select class="form-control district-select" name="district"
+                                                    id="districtSelect" required>
                                                     <option value="">Select District</option>
+
                                                     @foreach ($districts as $district)
                                                         <option value="{{ $district->id }}">
                                                             {{ $district->name }}
                                                         </option>
                                                     @endforeach
-                                                </select>
-                                            </div>
 
+                                                    <option value="other">Other (Type Manually)</option>
+                                                </select>
+
+                                                <input type="text" class="form-control mt-2 d-none" id="districtManual"
+                                                    name="district_manual" placeholder="Enter District Name">
+                                            </div>
 
                                             <div class="form-group">
                                                 <label>Select Block <span class="text-danger">*</span></label>
-                                                <select class="form-control block-select" name="block" required>
+                                                <select class="form-control block-select" name="block" id="blockSelect"
+                                                    required>
                                                     <option value="">Select Block</option>
 
                                                     @foreach ($blocks as $block)
@@ -135,13 +142,18 @@
                                                             {{ $block->name }}
                                                         </option>
                                                     @endforeach
+
+                                                    <option value="other">Other (Type Manually)</option>
                                                 </select>
+
+                                                <input type="text" class="form-control mt-2 d-none" id="blockManual"
+                                                    name="block_manual" placeholder="Enter Block Name">
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Select Sub District <span class="text-danger">*</span></label>
                                                 <select class="form-control subdistrict-select" name="sub_district"
-                                                    required>
+                                                    id="subSelect" required>
                                                     <option value="">Select Sub District</option>
 
                                                     @foreach ($subDistricts as $sub)
@@ -150,9 +162,13 @@
                                                             {{ $sub->name }}
                                                         </option>
                                                     @endforeach
-                                                </select>
-                                            </div>
 
+                                                    <option value="other">Other (Type Manually)</option>
+                                                </select>
+
+                                                <input type="text" class="form-control mt-2 d-none" id="subManual"
+                                                    name="sub_district_manual" placeholder="Enter Sub District Name">
+                                            </div>
                                             <div class="form-group">
                                                 <label class="form-label">Enter City/Village</label>
                                                 <input type="text" class="form-control" name="city"
@@ -257,9 +273,12 @@
         $(document).ready(function() {
 
             $('.block-select option').hide();
-            $('.subdistrict-select option').hide();
             $('.block-select option:first').show();
+            $('.block-select option[value="other"]').show();
+
+            $('.subdistrict-select option').hide();
             $('.subdistrict-select option:first').show();
+            $('.subdistrict-select option[value="other"]').show();
 
             $('.district-select').on('change', function() {
 
@@ -270,15 +289,19 @@
 
                 $('.block-select option').hide();
                 $('.block-select option:first').show();
+                $('.block-select option[value="other"]').show();
 
                 $('.subdistrict-select option').hide();
                 $('.subdistrict-select option:first').show();
+                $('.subdistrict-select option[value="other"]').show();
 
                 $('.block-select option').each(function() {
                     if ($(this).data('district') == district_id) {
                         $(this).show();
                     }
                 });
+
+                toggleManualField(this, '#districtManual');
             });
 
             $('.block-select').on('change', function() {
@@ -286,15 +309,33 @@
                 let block_id = $(this).val();
 
                 $('.subdistrict-select').val('');
+
                 $('.subdistrict-select option').hide();
                 $('.subdistrict-select option:first').show();
+                $('.subdistrict-select option[value="other"]').show();
 
                 $('.subdistrict-select option').each(function() {
                     if ($(this).data('block') == block_id) {
                         $(this).show();
                     }
                 });
+
+                toggleManualField(this, '#blockManual');
             });
+
+            $('.subdistrict-select').on('change', function() {
+                toggleManualField(this, '#subManual');
+            });
+
+            function toggleManualField(selectElement, manualInputId) {
+                if ($(selectElement).val() === 'other') {
+                    $(manualInputId).removeClass('d-none').prop('required', true);
+                } else {
+                    $(manualInputId).addClass('d-none')
+                        .prop('required', false)
+                        .val('');
+                }
+            }
 
         });
     </script>

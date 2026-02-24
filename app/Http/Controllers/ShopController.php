@@ -56,7 +56,7 @@ class ShopController extends Controller
 
         $districts = City::all();
         $subDistricts = SubDistrict::where('status', 1)->get();
-        $blocks    = Block::where('status',1)->get();
+        $blocks    = Block::where('status', 1)->get();
 
 
         // default registration page
@@ -73,7 +73,7 @@ class ShopController extends Controller
             }
         } else {
 
-            return view('auth.' . get_setting('authentication_layout_select') . '.seller_registration', compact('email', 'phone', 'districts','subDistricts','blocks'));
+            return view('auth.' . get_setting('authentication_layout_select') . '.seller_registration', compact('email', 'phone', 'districts', 'subDistricts', 'blocks'));
         }
     }
 
@@ -117,15 +117,32 @@ class ShopController extends Controller
      */
     public function store(SellerRegistrationRequest $request)
     {
+        if ($request->district == 'other') {
+            $district = $request->district_manual;
+        } else {
+            $district = City::where('id', $request->district)->value('name');
+        }
+        if ($request->block == 'other') {
+            $block = $request->block_manual;
+        } else {
+            $block = Block::where('id', $request->block)->value('name');
+        }
+        if ($request->sub_district == 'other') {
+            $subDistrict = $request->sub_district_manual;
+        } else {
+            $subDistrict = SubDistrict::where('id', $request->sub_district)->value('name');
+        }
+
+
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
 
         $user->state = $request->state;
-        $user->district = $request->district;
-        $user->block = $request->block;
-        $user->sub_district = $request->sub_district;
+        $user->district = $district;
+        $user->block = $block;
+        $user->sub_district = $subDistrict;
         $user->city = $request->city;
 
         $user->password = Hash::make($request->password);
