@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\AizUploadController;
-use App\Http\Controllers\ProfileUpdateRequestController;
+// use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Seller\ProfileController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\PurchaseController;
 // use App\Http\Controllers\ShopController;
@@ -129,6 +130,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         '/profile/request',
         [\App\Http\Controllers\ProfileUpdateRequestController::class, 'store']
     )->name('profile.request.store');
+
+    Route::post('location/update',[ProfileController::class,'updateLocation'])->name('location.update');
 
     //Buy Products
 

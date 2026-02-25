@@ -6,6 +6,7 @@ use App\Http\Requests\SellerProfileRequest;
 use App\Models\User;
 use Auth;
 use Hash;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
@@ -17,8 +18,8 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $addresses = $user->addresses; 
-        return view('seller.profile.index', compact('user','addresses'));
+        $addresses = $user->addresses;
+        return view('seller.profile.index', compact('user', 'addresses'));
     }
 
     /**
@@ -28,9 +29,9 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(SellerProfileRequest $request , $id)
+    public function update(SellerProfileRequest $request, $id)
     {
-        if(env('DEMO_MODE') == 'On'){
+        if (env('DEMO_MODE') == 'On') {
             flash(translate('Sorry! the action is not permitted in demo '))->error();
             return back();
         }
@@ -39,15 +40,15 @@ class ProfileController extends Controller
         $user->name = $request->name;
         $user->phone = $request->phone;
 
-        if($request->new_password != null && ($request->new_password == $request->confirm_password)){
+        if ($request->new_password != null && ($request->new_password == $request->confirm_password)) {
             $user->password = Hash::make($request->new_password);
         }
-        
+
         $user->avatar_original = $request->photo;
 
         $shop = $user->shop;
 
-        if($shop){
+        if ($shop) {
             $shop->cash_on_delivery_status = $request->cash_on_delivery_status;
             $shop->bank_payment_status = $request->bank_payment_status;
             $shop->bank_name = $request->bank_name;
@@ -61,6 +62,44 @@ class ProfileController extends Controller
         $user->save();
 
         flash(translate('Your Profile has been updated successfully!'))->success();
+        return back();
+    }
+
+
+    public function updateLocation(Request $request)
+    {
+
+        $user = Auth::user();
+
+        $shop = $user->shop;
+
+
+        if (!$shop) {
+            flash(translate('Shop not found'))->error();
+            return back();
+        }
+
+
+        if ($shop->latitude && $shop->longitude) {
+            flash(translate('Location already saved. Cannot update again.'))->error();
+            return back();
+        }
+
+
+        if (!$request->latitude || !$request->longitude) {
+            flash(translate('Please detect location first'))->error();
+            return back();
+        }
+
+        $shop->latitude = $request->latitude;
+
+        $shop->longitude = $request->longitude;
+
+        $shop->save();
+
+
+        flash(translate('Location saved successfully'))->success();
+
         return back();
     }
 }

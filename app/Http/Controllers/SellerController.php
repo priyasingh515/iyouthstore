@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Addon;
+use App\Models\Block;
 use App\Models\Cart;
+use App\Models\CgCity;
+use App\Models\City;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Shop;
@@ -12,6 +15,7 @@ use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\SellerProduct;
+use App\Models\SubDistrict;
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Hash;
 use App\Notifications\ShopVerificationNotification;
@@ -19,6 +23,7 @@ use App\Services\PreorderService;
 use App\Utility\EmailUtility;
 use Cache;
 use Carbon\Carbon;
+use DateTime;
 use File;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Facades\Notification;
@@ -115,7 +120,21 @@ class SellerController extends Controller
 
     public function create()
     {
-        return view('backend.sellers.create');
+        $districts = City::where('status', 1)->get();
+
+        $blocks = Block::where('status', 1)->get();
+
+        $subDistricts = SubDistrict::where('status', 1)->get();
+        return view('backend.sellers.create', compact('districts', 'blocks', 'subDistricts'));
+    }
+
+    public function getCities(Request $request)
+    {
+
+        $cities = CgCity::where('sub_district_id', $request->sub_district_id)
+            ->get();
+
+        return response()->json($cities);
     }
 
     /**
@@ -218,9 +237,16 @@ class SellerController extends Controller
         $request->validate(
             [
                 'name' => 'required|max:255',
-                'email' => 'required|email|unique:users',
+                'email' => 'required|email|unique:users,email',
                 // 'shop_name' => 'max:200',
                 // 'address' => 'max:500',
+
+                'password' => 'required|min:6|confirmed',
+                'state' => 'required',
+                'district_id' => 'required',
+                'block_id' => 'required',
+                'sub_district_id' => 'required',
+                'city' => 'required|max:255',
             ],
             [
                 'name.required' => translate('Name is required'),
@@ -230,21 +256,50 @@ class SellerController extends Controller
                 'email.unique' => translate('An user exists with this email'),
                 // 'shop_name.max' => translate('Max 200 Character'),
                 // 'address.max' => translate('Max 255 Character'),
+                'password.required' => translate('Password is required'),
+                'password.confirmed' => translate('Password confirmation does not match'),
             ]
         );
 
 
-        if (User::where('email', $request->email)->first() != null) {
-            flash(translate('Email already exists!'))->error();
-            return back();
-        }
-        $password = substr(hash('sha512', rand()), 0, 8);
+        // if (User::where('email', $request->email)->first() != null) {
+        //     flash(translate('Email already exists!'))->error();
+        //     return back();
+        // }
 
         $user           = new User;
         $user->name     = $request->name;
         $user->email    = $request->email;
         $user->user_type = "seller";
-        $user->password = Hash::make($password);
+
+        $district = $request->district_id == 'other'
+            ? $request->district_manual
+            : $request->district_id;
+
+        $block = $request->block_id == 'other'
+            ? $request->block_manual
+            : $request->block_id;
+
+        $subdistrict = $request->sub_district_id == 'other'
+            ? $request->sub_district_manual
+            : $request->sub_district_id;
+
+        $user->state = $request->state;
+        $user->district = $district;
+        $user->block = $block;
+        $user->sub_district = $subdistrict;
+        $user->city = $request->city;
+
+        $user->email_verified_at = now();
+
+
+        $user->password = Hash::make($request->password);
+
+
+
+
+
+
 
         if ($user->save()) {
             $shop           = new Shop;

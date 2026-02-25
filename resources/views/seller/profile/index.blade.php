@@ -28,7 +28,8 @@
     </div>
     {{-- <form action="{{ route('seller.profile.update', $user->id) }}" method="POST" enctype="multipart/form-data">
     <input name="_method" type="hidden" value="POST"> --}}
-    <form id="profileUpdateForm" action="{{ route('seller.profile.request.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="profileUpdateForm" action="{{ route('seller.profile.request.store') }}" method="POST"
+        enctype="multipart/form-data">
         @csrf
         <!-- Basic Info-->
         <div class="card">
@@ -162,8 +163,7 @@
     </div> --}}
 
         <div class="form-group mb-0 text-right">
-            <button type="submit"
-                class="btn btn-primary">{{ translate('Send Update Request') }}</button>
+            <button type="submit" class="btn btn-primary">{{ translate('Send Update Request') }}</button>
         </div>
     </form>
 
@@ -244,6 +244,92 @@
             </div>
         </div>
     </div>
+
+    {{-- Shop Location --}}
+    <form action="{{route('seller.location.update')}}" method="POST">
+        @csrf
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="mb-0 h6">
+                    {{ translate('Shop Location') }}
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    {{-- Latitude --}}
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Latitude
+                        </label>
+
+                        <input type="text" id="latitude" name="latitude" class="form-control"
+                            value="{{ $user->latitude }}" readonly>
+
+                    </div>
+
+
+                    {{-- Longitude --}}
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Longitude
+                        </label>
+
+                        <input type="text" id="longitude" name="longitude" class="form-control"
+                            value="{{ $user->longitude }}" readonly>
+
+                    </div>
+
+                </div>
+
+
+                <br>
+
+
+                {{-- Buttons --}}
+                @if (!$user->location_locked)
+                    <button type="button" onclick="detectLocation()" class="btn btn-primary">
+
+                        Detect My Current Location
+
+                    </button>
+
+
+                    <button type="submit" class="btn btn-success ml-2">
+
+                        Save Location
+
+                    </button>
+
+
+                    <small class="text-muted d-block mt-2">
+
+                        You can set location only once. It cannot be changed later.
+
+                    </small>
+                @else
+                    <div class="alert alert-success">
+
+                        Location already saved and locked.
+
+                    </div>
+                @endif
+
+
+                <div id="locationStatus" class="mt-2 text-success fw-bold">
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
 
     <!-- Change Email -->
     <form action="{{ route('user.change.email') }}" method="POST">
@@ -686,6 +772,41 @@
         });
     </script>
 
+    <script>
+        function detectLocation() {
+
+            if (navigator.geolocation) {
+
+                document.getElementById("locationStatus").innerHTML =
+                    "Detecting location...";
+
+                navigator.geolocation.getCurrentPosition(
+
+                    function(position) {
+
+                        document.getElementById("latitude").value =
+                            position.coords.latitude;
+
+                        document.getElementById("longitude").value =
+                            position.coords.longitude;
+
+                        document.getElementById("locationStatus").innerHTML =
+                            "Location detected. Click Save Location.";
+
+                    },
+
+                    function() {
+
+                        alert("Please allow location access.");
+
+                    }
+
+                );
+
+            }
+
+        }
+    </script>
 
     @if (get_setting('google_map') == 1)
         @include('frontend.partials.google_map')
