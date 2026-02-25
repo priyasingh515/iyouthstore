@@ -26,7 +26,7 @@ class SubDistrict extends Model
 
     public function district()
     {
-        return $this->belongsTo(CgDistrict::class);
+        return $this->belongsTo(City::class);
     }
 
     public function block()
