@@ -362,8 +362,20 @@ class SellerController extends Controller
      */
     public function edit($id)
     {
-        $shop = Shop::findOrFail(decrypt($id));
-        return view('backend.sellers.edit', compact('shop'));
+        // $shop = Shop::findOrFail(decrypt($id));
+        // return view('backend.sellers.edit', compact('shop'));
+        $shop = Shop::with('user')->findOrFail(decrypt($id));
+
+        $districts = City::where('status', 1)->get();
+        $blocks = Block::where('status', 1)->get();
+        $subDistricts = SubDistrict::where('status', 1)->get();
+
+        return view('backend.sellers.edit', compact(
+            'shop',
+            'districts',
+            'blocks',
+            'subDistricts'
+        ));
     }
 
     /**
@@ -373,24 +385,71 @@ class SellerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    // public function update(Request $request, $id)
+    // {
+
+    //     $shop = Shop::findOrFail($id);
+    //     $user = $shop->user;
+    //     $user->name = $request->name;
+    //     $user->email = $request->email;
+    //     if (strlen($request->password) > 0) {
+    //         $user->password = Hash::make($request->password);
+    //     }
+    //     if ($user->save()) {
+    //         if ($shop->save()) {
+    //             flash(translate('Seller has been updated successfully'))->success();
+    //             return redirect()->route('sellers.index');
+    //         }
+    //     }
+
+    //     flash(translate('Something went wrong'))->error();
+    //     return back();
+    // }
+
     public function update(Request $request, $id)
     {
         $shop = Shop::findOrFail($id);
         $user = $shop->user;
+
+        $request->validate([
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'state' => 'required',
+            'district_id' => 'required',
+            'block_id' => 'required',
+            'sub_district_id' => 'required',
+            'city' => 'required|max:255',
+        ]);
+
+        $district = $request->district_id == 'other'
+            ? $request->district_manual
+            : $request->district_id;
+
+        $block = $request->block_id == 'other'
+            ? $request->block_manual
+            : $request->block_id;
+
+        $subdistrict = $request->sub_district_id == 'other'
+            ? $request->sub_district_manual
+            : $request->sub_district_id;
+
         $user->name = $request->name;
         $user->email = $request->email;
-        if (strlen($request->password) > 0) {
+        $user->state = $request->state;
+        $user->district = $district;
+        $user->block = $block;
+        $user->sub_district = $subdistrict;
+        $user->city = $request->city;
+
+        if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
-        if ($user->save()) {
-            if ($shop->save()) {
-                flash(translate('Seller has been updated successfully'))->success();
-                return redirect()->route('sellers.index');
-            }
-        }
 
-        flash(translate('Something went wrong'))->error();
-        return back();
+        $user->save();
+
+        flash(translate('Seller has been updated successfully'))->success();
+
+        return redirect()->route('sellers.index');
     }
 
     /**

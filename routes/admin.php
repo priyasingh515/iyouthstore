@@ -260,6 +260,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/newsletter/test/smtp', 'testEmail')->name('test.smtp');
     });
 
+
+    //seller purchase
     Route::resource('/seller-purchases', SellerPurchaseController::class);
     Route::post('/seller/update-delivery-status', [SellerPurchaseController::class, 'updateDeliveryStatus'])
         ->name('seller.update.delivery.status');

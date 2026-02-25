@@ -299,6 +299,8 @@ class ProductService
             'attributes',
         ))->toArray();
 
+        $data['seller_purchase_limit'] = $collection['seller_purchase_limit'] ?? null;
+
         $product->update($data);
 
         return $product;
