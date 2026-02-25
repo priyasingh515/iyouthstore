@@ -4,7 +4,9 @@ use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\ProfileUpdateRequestController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\PurchaseController;
-use App\Http\Controllers\ShopController;
+// use App\Http\Controllers\ShopController;
+use App\Http\Controllers\Seller\ShopController;
+
 
 //Upload
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user', 'prevent-back-history'], 'as' => 'seller.'], function () {
@@ -128,16 +130,22 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         [\App\Http\Controllers\ProfileUpdateRequestController::class, 'store']
     )->name('profile.request.store');
 
-   //Buy Products
+    //Buy Products
 
-   Route::get('/buy/products',[PurchaseController::class,'index'])->name('buy.products');
-   Route::post('/cart/add', [PurchaseController::class,'sellerAddToCart'])
-    ->name('cart.add');
-    Route::get('/cart/show',[PurchaseController::class,'cart'])->name('cart.index');
+    Route::get('/buy/products', [PurchaseController::class, 'index'])->name('buy.products');
+    Route::post('/cart/add', [PurchaseController::class, 'sellerAddToCart'])
+        ->name('cart.add');
+    Route::get('/cart/show', [PurchaseController::class, 'cart'])->name('cart.index');
     Route::post('/cart/update', [PurchaseController::class, 'updateCart'])->name('cart.update');
-Route::post('/cart/delete', [PurchaseController::class, 'deleteCart'])->name('cart.delete');
+    Route::post('/cart/delete', [PurchaseController::class, 'deleteCart'])->name('cart.delete');
 
 
+    Route::post('/cart/checkout', [PurchaseController::class, 'checkout'])
+    ->name('cart.checkout');
+
+    Route::get('/my-purchases', [PurchaseController::class, 'myPurchases'])
+    ->name('my-purchases');
+    Route::get('/my-purchases/{id}',[PurchaseController::class, 'showPurchase'])->name('my-purchases.show');
 
 
     // Address
@@ -184,7 +192,7 @@ Route::post('/cart/delete', [PurchaseController::class, 'deleteCart'])->name('ca
         Route::post('/support_ticket/reply', 'ticket_reply_store')->name('support_ticket.reply_store');
     });
 
-//   fetch('/get-cities?district='+district)
+    //   fetch('/get-cities?district='+district)
     route::get('get-cities', [ShopController::class, 'getCities'])->name('getCities');
 
 

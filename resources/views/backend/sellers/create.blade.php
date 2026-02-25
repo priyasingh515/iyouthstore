@@ -46,7 +46,7 @@
                         @endif
                     </div>
                 </div>
-                <div class="form-group row">
+                {{-- <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="shop_name">{{ translate('Shop Name') }}</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control rounded-0 @if($errors->has('shop_name')) is-invalid @endif" value="{{ old('shop_name') }}" placeholder="{{  translate('Shop Name') }}" name="shop_name">
@@ -56,8 +56,8 @@
                             </span>
                         @endif
                     </div>
-                </div>
-                <div class="form-group row">
+                </div> --}}
+                {{-- <div class="form-group row">
                     <label class="col-sm-2 col-from-label" for="address">{{ translate('Address') }}</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control rounded-0 @if($errors->has('address')) is-invalid @endif" value="{{ old('address') }}" placeholder="{{  translate('Address') }}" name="address">
@@ -67,7 +67,7 @@
                             </span>
                         @endif
                     </div>
-                </div>
+                </div> --}}
                 <div class="form-group mb-0 text-right">
                     <button type="submit" class="btn btn-primary">{{translate('Save')}}</button>
                 </div>

@@ -70,8 +70,19 @@
                                                     -
                                                 </button>
 
-                                                <input type="number" name="qty" id="cart-qty-{{ $cart->id }}"
+                                                {{-- <input type="number" name="qty" id="cart-qty-{{ $cart->id }}"
                                                     value="{{ $cart->quantity }}" min="1"
+                                                    class="form-control text-center mx-2" style="width:70px;"> --}}
+
+                                                @php
+                                                    $product = $cart->product;
+                                                    $stock = $product->stocks->sum('qty');
+                                                    $limit = $product->seller_purchase_limit;
+                                                    $maxAllowed = $limit ? min($limit, $stock) : $stock;
+                                                @endphp
+
+                                                <input type="number" name="qty" id="cart-qty-{{ $cart->id }}"
+                                                    value="{{ $cart->quantity }}" min="1" max="{{ $maxAllowed }}"
                                                     class="form-control text-center mx-2" style="width:70px;">
 
                                                 <button type="button" class="btn btn-light border qty-plus"
@@ -131,9 +142,10 @@
                 </div>
 
                 <div class="text-right mt-3">
-                    <a href="#" class="btn btn-success">
+                    <button type="button" class="btn btn-success" id="checkout-btn">
                         Proceed To Checkout
-                    </a>
+                    </button>
+
                 </div>
             @endif
 
@@ -142,15 +154,113 @@
 
 @endsection
 
+@section('modal')
+    <div id="cart-confirm-modal" class="modal fade">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title h6">Confirmation</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="mt-1 fs-14" id="cart-confirm-message">Are you sure?</p>
+                    <button type="button" class="btn btn-secondary rounded-0 mt-2" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="cart-confirm-submit" class="btn btn-primary rounded-0 mt-2">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-success-modal" class="modal fade">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title h6">Success</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="mt-1 fs-14" id="cart-success-message">Order placed successfully</p>
+                    <button type="button" id="cart-success-ok" class="btn btn-primary rounded-0 mt-2">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
 
 @section('script')
     <script>
+        let pendingAction = null;
+        let checkoutRedirectUrl = "{{ route('seller.my-purchases') }}";
+        let shouldRedirectAfterSuccessClose = false;
+        let isCheckoutRedirecting = false;
+
+        function openCartConfirmModal(message, actionCallback) {
+            $('#cart-confirm-message').text(message);
+            pendingAction = actionCallback;
+            $('#cart-confirm-modal').modal('show');
+        }
+
+        function openCartSuccessModal(message) {
+            $('#cart-success-message').text(message);
+            shouldRedirectAfterSuccessClose = true;
+            $('#cart-success-modal').modal('show');
+        }
+
+        function redirectToMyPurchases() {
+            if (isCheckoutRedirecting) return;
+            isCheckoutRedirecting = true;
+            window.location.href = checkoutRedirectUrl;
+        }
+
+        $(document).on('click', '#cart-confirm-submit', function() {
+            let action = pendingAction;
+            pendingAction = null;
+            $('#cart-confirm-modal').modal('hide');
+
+            if (typeof action === 'function') {
+                action();
+            }
+        });
+
+        $('#cart-confirm-modal').on('hidden.bs.modal', function() {
+            pendingAction = null;
+        });
+
+        $(document).on('click', '#cart-success-ok', function() {
+            shouldRedirectAfterSuccessClose = false;
+            redirectToMyPurchases();
+        });
+
+        $('#cart-success-modal').on('hidden.bs.modal', function() {
+            if (shouldRedirectAfterSuccessClose) {
+                shouldRedirectAfterSuccessClose = false;
+                redirectToMyPurchases();
+            }
+        });
+
+        // $(document).on('click', '.qty-plus', function() {
+
+        //     let id = $(this).data('id');
+        //     let input = $('#cart-qty-' + id);
+        //     input.val(parseInt(input.val()) + 1);
+
+        // });
+
         $(document).on('click', '.qty-plus', function() {
 
             let id = $(this).data('id');
             let input = $('#cart-qty-' + id);
-            input.val(parseInt(input.val()) + 1);
 
+            let current = parseInt(input.val()) || 1;
+            let max = parseInt(input.attr('max')) || 9999;
+
+            if (current >= max) {
+                AIZ.plugins.notify('warning', 'Maximum purchase limit is ' + max);
+                return;
+            }
+
+            input.val(current + 1);
         });
 
         $(document).on('click', '.qty-minus', function() {
@@ -214,27 +324,70 @@
         /* DELETE CART */
         $(document).on('click', '.delete-cart', function() {
 
-            if (!confirm('Remove this item?')) return;
-
             let cartId = $(this).data('id');
 
-            $.ajax({
-                url: "{{ route('seller.cart.delete') }}",
-                type: "POST",
-                data: {
-                    cart_id: cartId,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(res) {
+            openCartConfirmModal('Remove this item from cart?', function() {
+                $.ajax({
+                    url: "{{ route('seller.cart.delete') }}",
+                    type: "POST",
+                    data: {
+                        cart_id: cartId,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(res) {
 
-                    if (res.status) {
-                        AIZ.plugins.notify('success', res.message);
-                        location.reload();
-                    } else {
-                        AIZ.plugins.notify('danger', res.message);
+                        if (res.status) {
+                            AIZ.plugins.notify('success', res.message);
+                            location.reload();
+                        } else {
+                            AIZ.plugins.notify('danger', res.message);
+                        }
+
+                    }
+                });
+            });
+
+        });
+    </script>
+
+    {{-- chcekout --}}
+
+
+    <script>
+        $(document).on('click', '#checkout-btn', function() {
+
+            openCartConfirmModal('Confirm place order?', function() {
+                $.ajax({
+
+                    url: "{{ route('seller.cart.checkout') }}",
+
+                    type: "POST",
+
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+
+                    success: function(res) {
+
+                        if (res.status) {
+
+                            openCartSuccessModal(res.message || 'Order placed successfully');
+
+                        } else {
+
+                            AIZ.plugins.notify('danger', res.message);
+
+                        }
+
+                    },
+
+                    error: function() {
+
+                        AIZ.plugins.notify('danger', 'Something went wrong');
+
                     }
 
-                }
+                });
             });
 
         });

@@ -681,11 +681,25 @@
                     </div>
                 </div>
                 <!-- Cart -->
-                <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition" data-hover="dropdown">
+                {{-- <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition" data-hover="dropdown">
                     <div class="nav-cart-box dropdown h-100" id="cart_items" style="width: max-content;">
                         @include('frontend.partials.cart.cart')
                     </div>
-                </div>
+                </div> --}}
+                @auth
+                    @if (Auth::user()->user_type != 'seller')
+                        <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition bg-black-10"
+                            data-hover="dropdown">
+
+                            <div class="nav-cart-box dropdown h-100" id="cart_items" style="width: max-content;">
+
+                                @include('frontend.partials.cart.cart')
+
+                            </div>
+
+                        </div>
+                    @endif
+                @endauth
             </div>
         </div>
         <!-- Categoty Menus -->

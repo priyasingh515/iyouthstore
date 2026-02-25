@@ -533,11 +533,25 @@
                 <div class="d-none d-xl-flex align-items-center ml-auto">
 
                     <!-- Cart -->
-                    <div class="align-self-stretch has-transition mr-2" data-hover="dropdown">
+                    {{-- <div class="align-self-stretch has-transition mr-2" data-hover="dropdown">
                         <div class="nav-cart-box dropdown h-100" id="cart_items" style="width: max-content;">
                             @include('frontend.partials.cart.cart')
                         </div>
-                    </div>
+                    </div> --}}
+                    @auth
+                        @if (Auth::user()->user_type != 'seller')
+                            <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition bg-black-10"
+                                data-hover="dropdown">
+
+                                <div class="nav-cart-box dropdown h-100" id="cart_items" style="width: max-content;">
+
+                                    @include('frontend.partials.cart.cart')
+
+                                </div>
+
+                            </div>
+                        @endif
+                    @endauth
 
                     <!-- User section -->
                     <div>

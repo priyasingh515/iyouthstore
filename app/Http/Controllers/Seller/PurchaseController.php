@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
@@ -193,6 +197,39 @@ class PurchaseController extends Controller
         return view('seller.buy_product.cart', compact('carts'));
     }
 
+    // public function updateCart(Request $request)
+    // {
+    //     $cart = Cart::where('user_id', auth()->id())
+    //         ->where('id', $request->cart_id)
+    //         ->first();
+
+    //     if (!$cart) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Cart item not found'
+    //         ]);
+    //     }
+
+    //     $product = $cart->product;
+    //     $stock = $product->stocks->sum('qty');
+
+    //     if ($request->qty > $stock) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Stock not available'
+    //         ]);
+    //     }
+
+    //     $cart->update([
+    //         'quantity' => $request->qty
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Cart updated'
+    //     ]);
+    // }
+
     public function updateCart(Request $request)
     {
         $cart = Cart::where('user_id', auth()->id())
@@ -207,22 +244,40 @@ class PurchaseController extends Controller
         }
 
         $product = $cart->product;
+
+        // Total stock available
         $stock = $product->stocks->sum('qty');
 
-        if ($request->qty > $stock) {
+        // Seller purchase limit
+        $limit = $product->seller_purchase_limit;
+
+        // Final max allowed qty
+        $maxAllowed = $limit ? min($limit, $stock) : $stock;
+
+        // Validate against max allowed
+        if ($request->qty > $maxAllowed) {
             return response()->json([
                 'status' => false,
-                'message' => 'Stock not available'
+                'message' => 'Maximum allowed quantity is ' . $maxAllowed
             ]);
         }
 
+        // Also prevent qty less than 1
+        if ($request->qty < 1) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid quantity'
+            ]);
+        }
+
+        // Update cart
         $cart->update([
             'quantity' => $request->qty
         ]);
 
         return response()->json([
             'status' => true,
-            'message' => 'Cart updated'
+            'message' => 'Cart updated successfully'
         ]);
     }
 
@@ -245,5 +300,107 @@ class PurchaseController extends Controller
             'status' => true,
             'message' => 'Removed from cart'
         ]);
+    }
+
+    public function checkout()
+    {
+
+        try {
+            DB::beginTransaction();
+            $seller = Auth::user();
+            $carts = Cart::where('user_id', $seller->id)->get();
+
+            if ($carts->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Cart is empty'
+                ]);
+            }
+            $total = 0;
+            foreach ($carts as $cart) {
+                $total += $cart->price * $cart->quantity;
+            }
+
+            $combined_order_id = DB::table('combined_orders')->insertGetId([
+
+                'user_id' => $seller->id,
+
+                'shipping_address' => null,   // optional
+
+                'grand_total' => $total,
+
+                'created_at' => now(),
+
+                'updated_at' => now()
+
+            ]);
+
+
+            $order = new Order();
+            $order->user_id = $seller->id;
+            $order->seller_id = $carts->first()->owner_id;
+            $order->combined_order_id = $combined_order_id;
+            $order->shipping_type = "home_delivery";
+            $order->order_from = "seller_panel";
+            $order->pickup_point_id = 0;
+            $order->payment_status = "unpaid";
+            $order->delivery_status = "pending";
+            $order->grand_total = $total;
+            $order->coupon_discount = 0;
+            $order->code = date('YmdHis');
+            $order->date = time();
+            $order->save();
+
+            // ORDER DETAILS
+
+            foreach ($carts as $cart) {
+                $detail = new OrderDetail();
+                $detail->order_id = $order->id;
+                $detail->seller_id = $cart->owner_id;
+                $detail->product_id = $cart->product_id;
+                $detail->variation = $cart->variation;
+                $detail->price = $cart->price;
+                $detail->quantity = $cart->quantity;
+                $detail->tax = 0;
+                $detail->shipping_cost = 0;
+                $detail->payment_status = "unpaid";
+                $detail->delivery_status = "pending";
+                $detail->save();
+            }
+
+            // Clear Cart
+
+            Cart::where('user_id', $seller->id)->delete();
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Order placed successfully'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function myPurchases()
+    {
+        $orders = Order::where('user_id', Auth::id())
+            ->where('order_from', 'seller_panel')
+            ->latest()
+            ->paginate(15);
+
+        return view('seller.buy_product.my_purchases', compact('orders'));
+    }
+    public function showPurchase($id)
+    {
+        $order = Order::with('orderDetails.product')
+            ->where('user_id', auth()->id())
+            ->findOrFail(decrypt($id));
+
+        return view('seller.buy_product.purchase_show', compact('order'));
     }
 }

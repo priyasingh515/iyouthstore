@@ -62,6 +62,8 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\SellerPurchaseController;
+
 
 /*
   |--------------------------------------------------------------------------
@@ -224,6 +226,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/seller/verification-file/delete', 'deleteVerificationFile')->name('seller.verification.file.delete');
     });
 
+
+    Route::post('/get-cities',[SellerController::class,'getCities'])->name('get.cities');
+
     // Seller Payment
     Route::controller(PaymentController::class)->group(function () {
         Route::get('/seller/payments', 'payment_histories')->name('sellers.payment_histories');
@@ -254,6 +259,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/newsletter/send', 'send')->name('newsletters.send');
         Route::post('/newsletter/test/smtp', 'testEmail')->name('test.smtp');
     });
+
+    Route::resource('/seller-purchases', SellerPurchaseController::class);
+    Route::post('/seller/update-delivery-status', [SellerPurchaseController::class, 'updateDeliveryStatus'])
+        ->name('seller.update.delivery.status');
+
+    Route::post('/seller/update-payment-status', [SellerPurchaseController::class, 'updatePaymentStatus'])
+        ->name('seller.update.payment.status');
+
 
     // Dynamic Popup
     Route::resource('dynamic-popups', DynamicPopupController::class);
@@ -454,7 +467,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
         Route::post('/bulk-order-delete', 'bulk_order_delete')->name('bulk-order-delete');
 
-        Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
+        // Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
         Route::post('/orders/details', 'order_details')->name('orders.details');
         Route::post('/orders/update_delivery_status', 'update_delivery_status')->name('orders.update_delivery_status');
         Route::post('/orders/update_payment_status', 'update_payment_status')->name('orders.update_payment_status');
@@ -703,6 +716,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/areas/destroy/{id}', 'destroy')->name('areas.destroy');
         Route::post('/areas/status', 'updateStatus')->name('areas.status');
     });
+
+
+
 
     Route::view('/system/update', 'backend.system.update')->name('system_update');
     Route::view('/system/server-status', 'backend.system.server_status')->name('system_server');

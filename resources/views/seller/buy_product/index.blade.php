@@ -74,8 +74,8 @@
                                         Available : {{ $stock }}
                                     </p> --}}
 
-                                      <p class="small text-success mb-0">
-                                        In My Stock : {{ $product->product_stock  ?? 0 }}
+                                    <p class="small text-success mb-0">
+                                        In My Stock : {{ $product->product_stock ?? 0 }}
                                     </p>
 
                                     @if ($stock > 0)
@@ -104,7 +104,8 @@
                                             </button>
 
                                             <input type="number" name="qty" id="qty-{{ $product->id }}"
-                                                value="1" min="1" max="{{ $stock }}"
+                                                value="1" min="1"
+                                                max="{{ $product->seller_purchase_limit ?? $stock }}"
                                                 class="form-control text-center mx-2" style="max-width:60px;height:32px;"
                                                 {{ $stock == 0 ? 'disabled' : '' }}>
 

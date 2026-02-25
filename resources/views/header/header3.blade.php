@@ -85,47 +85,46 @@
 
 
 
-                            @if (get_setting('vendor_system_activation') == 1)
-                                <!-- Seller Dropdown and Helpline -->
-                                <li class="list-inline-item d-flex">
+                        @if (get_setting('vendor_system_activation') == 1)
+                            <!-- Seller Dropdown and Helpline -->
+                            <li class="list-inline-item d-flex">
 
-                                    <!-- Become a Seller Dropdown -->
-                                    <div class="dropdown">
-                                        <a href="{{ route(get_setting('seller_registration_verify') === '1' ? 'shop-reg.verification' : 'shops.create') }}"
-                                            class="fs-12 dropdown-toggle top-text-color-visibility"
-                                            style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            {{ translate('Become a Seller !') }}
-                                        </a>
-
-                                        <!-- Dropdown Menu -->
-                                        <div class="dropdown-menu fs-12 p-0 mt-1">
-                                            <a class="dropdown-item py-2 px-2 text-dark"
-                                                href="{{ route('seller.login') }}">
-                                                {{ translate('Login to Seller') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </li>
-                            @endif
-                            @if (get_setting('helpline_number'))
-                                <!-- Helpline -->
-                                <li class="list-inline-item ml-3 pl-3 mr-0 pr-0 top-text-color-visibility"
-                                    style="color: {{ $topHeaderTextColor }}">
-                                    <a href="tel:{{ get_setting('helpline_number') }}"
-                                        class="fs-12 d-inline-block py-2 top-text-color-visibility"
-                                        style="color: {{ $topHeaderTextColor }}">
-                                        <span>{{ translate('Helpline') }}</span>
-                                        <span>{{ get_setting('helpline_number') }}</span>
+                                <!-- Become a Seller Dropdown -->
+                                <div class="dropdown">
+                                    <a href="{{ route(get_setting('seller_registration_verify') === '1' ? 'shop-reg.verification' : 'shops.create') }}"
+                                        class="fs-12 dropdown-toggle top-text-color-visibility"
+                                        style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                        {{ translate('Become a Seller !') }}
                                     </a>
-                                </li>
-                            @else
-                                <!-- Helpline Text -->
-                                <div class="fs-12 ml-4 top-text-color-visibility"
-                                    style="color: {{ $topHeaderTextColor }}">
-                                    {{ translate('Helpline') }}: +01 234 567 8900
+
+                                    <!-- Dropdown Menu -->
+                                    <div class="dropdown-menu fs-12 p-0 mt-1">
+                                        <a class="dropdown-item py-2 px-2 text-dark"
+                                            href="{{ route('seller.login') }}">
+                                            {{ translate('Login to Seller') }}
+                                        </a>
+                                    </div>
                                 </div>
-                            @endif
+                            </li>
+                        @endif
+                        @if (get_setting('helpline_number'))
+                            <!-- Helpline -->
+                            <li class="list-inline-item ml-3 pl-3 mr-0 pr-0 top-text-color-visibility"
+                                style="color: {{ $topHeaderTextColor }}">
+                                <a href="tel:{{ get_setting('helpline_number') }}"
+                                    class="fs-12 d-inline-block py-2 top-text-color-visibility"
+                                    style="color: {{ $topHeaderTextColor }}">
+                                    <span>{{ translate('Helpline') }}</span>
+                                    <span>{{ get_setting('helpline_number') }}</span>
+                                </a>
+                            </li>
+                        @else
+                            <!-- Helpline Text -->
+                            <div class="fs-12 ml-4 top-text-color-visibility" style="color: {{ $topHeaderTextColor }}">
+                                {{ translate('Helpline') }}: +01 234 567 8900
+                            </div>
+                        @endif
                     </ul>
             </div>
         </div>
@@ -691,11 +690,25 @@
                     </div>
                 </div>
                 <!-- Cart -->
-                <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition" data-hover="dropdown">
+                {{-- <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition" data-hover="dropdown">
                     <div class="nav-cart-box dropdown h-100" id="cart_items" style="width: max-content;">
                         @include('frontend.partials.cart.cart')
                     </div>
-                </div>
+                </div> --}}
+                @auth
+                    @if (Auth::user()->user_type != 'seller')
+                        <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition bg-black-10"
+                            data-hover="dropdown">
+
+                            <div class="nav-cart-box dropdown h-100" id="cart_items" style="width: max-content;">
+
+                                @include('frontend.partials.cart.cart')
+
+                            </div>
+
+                        </div>
+                    @endif
+                @endauth
             </div>
         </div>
         <!-- Categoty Menus -->

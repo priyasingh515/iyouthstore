@@ -90,26 +90,27 @@ class SellerController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function sellerInventory(){
-   
-       
-     $shops = SellerProduct::join('shops', 'seller_products.seller_id', '=', 'shops.user_id')
-    ->select(
-        'shops.name as shop_name',
-        'seller_products.seller_id',
-        DB::raw('SUM(seller_products.stock) as total_stock')
-    )
-    ->groupBy('shops.user_id', 'shops.name')
-    ->get();
-        return view('backend.sellers.inventory', compact('shops'));
+    public function sellerInventory()
+    {
 
+
+        $shops = SellerProduct::join('shops', 'seller_products.seller_id', '=', 'shops.user_id')
+            ->select(
+                'shops.name as shop_name',
+                'seller_products.seller_id',
+                DB::raw('SUM(seller_products.stock) as total_stock')
+            )
+            ->groupBy('shops.user_id', 'shops.name')
+            ->get();
+        return view('backend.sellers.inventory', compact('shops'));
     }
 
-    public function sellerInventoryDetail($id){
+    public function sellerInventoryDetail($id)
+    {
 
         $seller = Shop::where('user_id', $id)->first();
         $sellerProducts = SellerProduct::where('seller_id', $id)->with('product')->get();
-        return view('backend.sellers.inventory_detail', compact('sellerProducts', 'seller' ));
+        return view('backend.sellers.inventory_detail', compact('sellerProducts', 'seller'));
     }
 
     public function create()
@@ -123,14 +124,103 @@ class SellerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(Request $request)
+    // {
+    //     $request->validate(
+    //         [
+    //             'name' => 'required|max:255',
+    //             'email' => 'required|email|unique:users',
+    //             // 'shop_name' => 'max:200',
+    //             'phone' => 'required|unique:users,phone|max:20',
+    //             'password' => 'required|min:6|confirmed',
+    //             // 'address' => 'max:500',
+    //         ],
+    //         [
+    //             'name.required' => translate('Name is required'),
+    //             'name.max' => translate('Max 255 Character'),
+    //             'email.required' => translate('Email is required'),
+    //             'email.email' => translate('Email must be a valid email address'),
+    //             'email.unique' => translate('An user exists with this email'),
+    //             'shop_name.max' => translate('Max 200 Character'),
+    //             'address.max' => translate('Max 255 Character'),
+    //             'phone.required' => translate('Phone is required'),
+    //             'phone.unique' => translate('Phone already exists'),
+    //             'password.required' => translate('Password is required'),
+    //             'password.confirmed' => translate('Password confirmation does not match'),
+    //         ]
+    //     );
+
+
+    //     if (User::where('email', $request->email)->first() != null) {
+    //         flash(translate('Email already exists!'))->error();
+    //         return back();
+    //     }
+    //     // $password = substr(hash('sha512', rand()), 0, 8);
+
+    //     $user           = new User;
+    //     $user->name     = $request->name;
+    //     $user->email    = $request->email;
+    //     $user->user_type = "seller";
+    //     $user->phone = $request->phone;
+    //     // $user->password = Hash::make($password);
+    //     $user->password = Hash::make($request->password);
+
+    //     if ($user->save()) {
+
+    //         // Create shop automatically
+    //         $shop = new Shop;
+    //         $shop->user_id = $user->id;
+    //         $shop->name = 'Seller-' . $user->id;   // better than N/A
+    //         $shop->slug = 'seller-' . $user->id;
+    //         $shop->registration_approval = 1;      // allow seller login
+    //         $shop->verification_status = 0;        // seller must verify shop later
+    //         $shop->address = 'N/A';
+    //         $shop->save();
+
+
+
+    //         // try {
+    //         //     // EmailUtility::selelr_registration_email('registration_from_system_email_to_seller', $user, $password);
+    //         //     EmailUtility::selelr_registration_email('registration_from_system_email_to_seller', $user, $request->password);
+    //         // } catch (\Exception $e) {
+    //         //     // $shop->delete();
+    //         //     $user->delete();
+    //         //     flash(translate('Registration failed. Please try again later.'))->error();
+    //         //     return back();
+    //         // }
+
+    //         // Verification email send
+    //         if (get_setting('email_verification') != 1) {
+    //             $user->email_verified_at = date('Y-m-d H:m:s');
+    //             $user->save();
+    //         } else {
+    //             EmailUtility::email_verification($user, 'seller');
+    //         }
+
+    //         // Seller Account Opening Email to Admin
+    //         // if ((get_email_template_data('seller_reg_email_to_admin', 'status') == 1)) {
+    //         //     try {
+    //         //         EmailUtility::selelr_registration_email('seller_reg_email_to_admin', $user, null);
+    //         //     } catch (\Exception $e) {
+    //         //     }
+    //         // }
+
+    //         flash(translate('Seller has been added successfully'))->success();
+    //         return back();
+    //     }
+    //     flash(translate('Something went wrong'))->error();
+    //     return back();
+    // }
+
+
     public function store(Request $request)
     {
         $request->validate(
             [
                 'name' => 'required|max:255',
                 'email' => 'required|email|unique:users',
-                'shop_name' => 'max:200',
-                'address' => 'max:500',
+                // 'shop_name' => 'max:200',
+                // 'address' => 'max:500',
             ],
             [
                 'name.required' => translate('Name is required'),
@@ -138,8 +228,8 @@ class SellerController extends Controller
                 'email.required' => translate('Email is required'),
                 'email.email' => translate('Email must be a valid email address'),
                 'email.unique' => translate('An user exists with this email'),
-                'shop_name.max' => translate('Max 200 Character'),
-                'address.max' => translate('Max 255 Character'),
+                // 'shop_name.max' => translate('Max 200 Character'),
+                // 'address.max' => translate('Max 255 Character'),
             ]
         );
 
@@ -159,35 +249,37 @@ class SellerController extends Controller
         if ($user->save()) {
             $shop           = new Shop;
             $shop->user_id  = $user->id;
-            $shop->name     = $request->shop_name;
-            $shop->address  = $request->address;
-            $shop->slug     = 'demo-shop-' . $user->id;
+            // $shop->name     = $request->shop_name;
+            // $shop->address  = $request->address;
+            // $shop->slug     = 'demo-shop-' . $user->id;
+
+            $shop->registration_approval = 1;
             $shop->save();
 
-            try {
-                EmailUtility::selelr_registration_email('registration_from_system_email_to_seller', $user, $password);
-            } catch (\Exception $e) {
-                $shop->delete();
-                $user->delete();
-                flash(translate('Registration failed. Please try again later.'))->error();
-                return back();
-            }
+            // try {
+            //     EmailUtility::selelr_registration_email('registration_from_system_email_to_seller', $user, $password);
+            // } catch (\Exception $e) {
+            //     $shop->delete();
+            //     $user->delete();
+            //     flash(translate('Registration failed. Please try again later.'))->error();
+            //     return back();
+            // }
 
             // Verification email send
-            if (get_setting('email_verification') != 1) {
-                $user->email_verified_at = date('Y-m-d H:m:s');
-                $user->save();
-            } else {
-                EmailUtility::email_verification($user, 'seller');
-            }
+            // if (get_setting('email_verification') != 1) {
+            //     $user->email_verified_at = date('Y-m-d H:m:s');
+            //     $user->save();
+            // } else {
+            //     EmailUtility::email_verification($user, 'seller');
+            // }
 
             // Seller Account Opening Email to Admin
-            if ((get_email_template_data('seller_reg_email_to_admin', 'status') == 1)) {
-                try {
-                    EmailUtility::selelr_registration_email('seller_reg_email_to_admin', $user, null);
-                } catch (\Exception $e) {
-                }
-            }
+            // if ((get_email_template_data('seller_reg_email_to_admin', 'status') == 1)) {
+            //     try {
+            //         EmailUtility::selelr_registration_email('seller_reg_email_to_admin', $user, null);
+            //     } catch (\Exception $e) {
+            //     }
+            // }
 
             flash(translate('Seller has been added successfully'))->success();
             return back();

@@ -189,6 +189,12 @@
                                 <span class="aiz-side-nav-text">{{ translate('Buy Products') }}</span>
                             </a>
                         </li>
+                        <li class="aiz-side-nav-item">
+                            <a href="{{ route('seller.my-purchases') }}"
+                                class="aiz-side-nav-link {{ areActiveRoutes(['seller.my-purchases']) }}">
+                                <span class="aiz-side-nav-text">{{ translate('My Purchases') }}</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

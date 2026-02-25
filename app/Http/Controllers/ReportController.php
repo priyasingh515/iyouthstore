@@ -10,6 +10,7 @@ use App\Models\Wallet;
 use App\Models\User;
 use App\Models\Search;
 use App\Models\Shop;
+use App\Models\Wishlist;
 use Auth;
 use SebastianBergmann\Environment\Console;
 
@@ -65,17 +66,41 @@ class ReportController extends Controller
         return view('backend.reports.seller_sale_report', compact('sellers', 'sort_by'));
     }
 
+    // public function wish_report(Request $request)
+    // {
+    //     $sort_by = null;
+    //     $products = Product::orderBy('created_at', 'desc');
+    //     if ($request->has('category_id')) {
+    //         $sort_by = $request->category_id;
+    //         $products = $products->where('category_id', $sort_by);
+    //     }
+    //     $products = $products->paginate(10);
+    //     return view('backend.reports.wish_report', compact('products', 'sort_by'));
+    // }
+
     public function wish_report(Request $request)
     {
         $sort_by = null;
-        $products = Product::orderBy('created_at', 'desc');
-        if ($request->has('category_id')) {
+
+        $wishlists = Wishlist::with([
+            'product',
+            'user'
+        ])->latest();
+
+        if ($request->filled('category_id')) {
+
             $sort_by = $request->category_id;
-            $products = $products->where('category_id', $sort_by);
+
+            $wishlists->whereHas('product', function ($query) use ($sort_by) {
+                $query->where('category_id', $sort_by);
+            });
         }
-        $products = $products->paginate(10);
-        return view('backend.reports.wish_report', compact('products', 'sort_by'));
+
+        $wishlists = $wishlists->paginate(10);
+
+        return view('backend.reports.wish_report', compact('wishlists', 'sort_by'));
     }
+
 
     public function user_search_report(Request $request)
     {
@@ -147,8 +172,8 @@ class ReportController extends Controller
 
     public function cart_report(Request $request)
     {
-           $sort_by = null;
-           
+        $sort_by = null;
+
         $carts = Cart::with([
             'product',
             'customer',
@@ -168,6 +193,6 @@ class ReportController extends Controller
 
         // dd($carts);
 
-        return view('backend.reports.cart_report', compact('carts','sort_by'));
+        return view('backend.reports.cart_report', compact('carts', 'sort_by'));
     }
 }

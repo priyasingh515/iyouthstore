@@ -692,6 +692,15 @@
                         @endcan
                         @endif
 
+                           <li class="aiz-side-nav-item">
+                            <a href="{{ route('seller-purchases.index') }}"
+                                class="aiz-side-nav-link {{ areActiveRoutes(['seller-purchases.index', 'seller-purchases.show'])}}">
+                                <span class="aiz-side-nav-text">{{translate('Seller Purchases')}}</span>
+                            </a>
+                        </li>
+
+                        
+
                         @can('view_pickup_point_orders')
                         <li class="aiz-side-nav-item">
                             <a href="{{ route('pick_up_point.index') }}"
