@@ -20,6 +20,7 @@ use Auth;
 use Cookie;
 use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
@@ -89,25 +90,40 @@ class ShopController extends Controller
     }
 
 
-
-    function generateLocationUniqueId($district, $city)
+    function generateLocationUniqueId($districtId, $blockId, $subDistrictId)
     {
+        return DB::transaction(function () use ($districtId, $blockId, $subDistrictId) {
 
-        $stateCode = 'CG';
+            $district = City::find($districtId);
+            if (!$district) {
+                return null;
+            }
 
-        // District code (assumed numeric or id)
-        $districtCode = str_pad($district, 2, '0', STR_PAD_LEFT);
+            $districtCode = $district->district_code;
 
-        // City name (remove spaces + lowercase)
-        $cityName = strtolower(preg_replace('/\s+/', '', $city));
+            $blockName = Block::where('id', $blockId)->value('name');
+            $subDistrictName = SubDistrict::where('id', $subDistrictId)->value('name');
 
-        // 4 digit random number
-        $randomNumber = rand(1000, 9999);
+            $prefix = $districtCode . '-' . $blockName . '-' . $subDistrictName;
 
-        return $stateCode . $districtCode . $cityName . $randomNumber;
+            $lastShop = Shop::where('shop_id', 'like', $prefix . '-%')
+                ->lockForUpdate()
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($lastShop) {
+                $lastNumber = (int) substr(
+                    $lastShop->shop_id,
+                    strrpos($lastShop->shop_id, '-') + 1
+                );
+                $newNumber = $lastNumber + 1;
+            } else {
+                $newNumber = 1;
+            }
+
+            return $prefix . '-' . $newNumber;
+        });
     }
-
-
 
     /**
      * Store a newly created resource in storage.
@@ -117,22 +133,10 @@ class ShopController extends Controller
      */
     public function store(SellerRegistrationRequest $request)
     {
-        if ($request->district == 'other') {
-            $district = $request->district_manual;
-        } else {
-            $district = City::where('id', $request->district)->value('name');
-        }
-        if ($request->block == 'other') {
-            $block = $request->block_manual;
-        } else {
-            $block = Block::where('id', $request->block)->value('name');
-        }
-        if ($request->sub_district == 'other') {
-            $subDistrict = $request->sub_district_manual;
-        } else {
-            $subDistrict = SubDistrict::where('id', $request->sub_district)->value('name');
-        }
 
+        $district = City::where('id', $request->district)->value('name');
+        $block = Block::where('id', $request->block)->value('name');
+        $subDistrict = SubDistrict::where('id', $request->sub_district)->value('name');
 
         $user = new User;
         $user->name = $request->name;
@@ -157,10 +161,10 @@ class ShopController extends Controller
             $shop->longitude = $request->longitude;
             $shop->registration_approval = 0;
 
-            $district = City::where('name', $request->district)
-                ->value('id');
+            // $district = City::where('name', $request->district)
+            //     ->value('id');
 
-            $shop->shop_id = $this->generateLocationUniqueId($district, $request->city);
+            $shop->shop_id = $this->generateLocationUniqueId($request->district, $request->block, $request->sub_district);
 
             $shop->slug = preg_replace('/\s+/', '-', str_replace("/", " ", $request->shop_name));
             $shop->save();

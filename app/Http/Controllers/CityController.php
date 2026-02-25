@@ -71,7 +71,7 @@ class CityController extends Controller
 
         $city->name = $request->name;
         $city->district_code = $request->district_code;
-        $city->cost = $request->cost;
+        // $city->cost = $request->cost;
         $city->status = 0;
         $city->state_id = $request->state_id ?? null;
         $city->country_id = $request->country_id ? $request->country_id : State::findOrFail($request->state_id)->country_id;
@@ -118,7 +118,7 @@ class CityController extends Controller
             $city->state_id = $request->state_id ?? $city->state_id;
         }
         $city->country_id = $request->country_id ? $request->country_id  : State::findOrFail($city->state_id)->country_id;
-        $city->cost = $request->cost;
+        // $city->cost = $request->cost;
 
         $city->save();
 
