@@ -46,7 +46,10 @@
                                             action="{{ route('shops.store') }}" method="POST">
                                             @csrf
 
+
                                             <div class="fs-15 fw-600 pb-2">{{ translate('Personal Info') }}</div>
+
+                                            <input type="hidden" name="user_type" value="seller">
                                             <!-- Name -->
                                             <div class="form-group">
                                                 <label for="name"
@@ -161,6 +164,20 @@
                                                 @endif
                                             </div>
 
+                                            <div class="form-group">
+                                                <label for="shop_name"
+                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Shop Name') }}</label>
+                                                <input type="text"
+                                                    class="form-control rounded-0{{ $errors->has('shop_name') ? ' is-invalid' : '' }}"
+                                                    value="{{ old('shop_name') }}"
+                                                    placeholder="{{ translate('Shop Name') }}" name="shop_name" required>
+                                                @if ($errors->has('shop_name'))
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $errors->first('shop_name') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+
                                             <!-- password -->
                                             <div class="form-group mb-0">
                                                 <label for="password"
@@ -199,8 +216,6 @@
 
 
                                             {{-- <div class="fs-15 fw-600 py-2">{{ translate('Basic Info') }}</div> --}}
-
-
 
                                             <input type="hidden" name="latitude" id="latitude">
                                             <input type="hidden" name="longitude" id="longitude">
@@ -258,45 +273,40 @@
                 allowClear: true,
                 width: '100%'
             });
-            
-            $('.block-select option').hide();
-            $('.subdistrict-select option').hide();
-            $('.block-select option:first').show();
-            $('.subdistrict-select option:first').show();
 
+            // Store original options
+            var allBlocks = $('.block-select option').clone();
+            var allSubs = $('.subdistrict-select option').clone();
+
+            // When district changes
             $('.district-select').on('change', function() {
 
-                let district_id = $(this).val();
+                var district_id = $(this).val();
 
-                $('.block-select').val('');
-                $('.subdistrict-select').val('');
+                // Reset block & subdistrict
+                $('.block-select').html('<option value="">Select Block</option>');
+                $('.subdistrict-select').html('<option value="">Select Sub District</option>');
 
-                $('.block-select option').hide();
-                $('.block-select option:first').show();
-
-                $('.subdistrict-select option').hide();
-                $('.subdistrict-select option:first').show();
-
-                $('.block-select option').each(function() {
-                    if ($(this).data('district') == district_id) {
-                        $(this).show();
-                    }
+                // Filter blocks
+                var filteredBlocks = allBlocks.filter(function() {
+                    return $(this).data('district') == district_id;
                 });
+
+                $('.block-select').append(filteredBlocks).trigger('change.select2');
             });
 
+            // When block changes
             $('.block-select').on('change', function() {
 
-                let block_id = $(this).val();
+                var block_id = $(this).val();
 
-                $('.subdistrict-select').val('');
-                $('.subdistrict-select option').hide();
-                $('.subdistrict-select option:first').show();
+                $('.subdistrict-select').html('<option value="">Select Sub District</option>');
 
-                $('.subdistrict-select option').each(function() {
-                    if ($(this).data('block') == block_id) {
-                        $(this).show();
-                    }
+                var filteredSubs = allSubs.filter(function() {
+                    return $(this).data('block') == block_id;
                 });
+
+                $('.subdistrict-select').append(filteredSubs).trigger('change.select2');
             });
 
         });

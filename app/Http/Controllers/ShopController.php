@@ -139,6 +139,7 @@ class ShopController extends Controller
         $subDistrict = SubDistrict::where('id', $request->sub_district)->value('name');
 
         $user = new User;
+        $user->user_type = $request->user_type;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
