@@ -82,6 +82,7 @@
                         @endif
                     </th>
                     <th>{{translate('Name')}}</th>
+                    <th>{{translate('Shop Id')}}</th>
                     <th data-breakpoints="lg">{{translate('Contact')}}</th>
                     @if($route == 'all_seller_route')
                         <th data-breakpoints="lg">{{ translate('Status') }}</th>
@@ -132,6 +133,7 @@
                                 </div>
                             </div>
                         </td>
+                        <td>{{ $shop->shop_id }}</td>
                         <td>{{$shop->user->phone}} 
                             <span class="d-block text-truncate-2">{{ $shop->user->email }}</span>
                         </td>

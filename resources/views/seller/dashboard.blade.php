@@ -2,12 +2,30 @@
 
 @section('panel_content')
     <div class="aiz-titlebar mt-2 mb-4">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h1 class="h3 text-primary">{{ translate('Dashboard') }}</h1>
-            </div>
+
+    @php
+        $shop = \App\Models\Shop::where('user_id', auth()->user()->id)->first();
+    @endphp
+
+    <div class="row align-items-center">
+        
+        <div class="col-md-6">
+            <h1 class="h3 text-primary">
+                {{ translate('Dashboard') }}
+            </h1>
         </div>
+
+        <div class="col-md-6 text-md-right">
+            @if($shop)
+                <h5 class="text-muted mb-0">
+                    {{ translate('Shop ID') }} : {{ $shop->shop_id }}
+                </h5>
+            @endif
+        </div>
+
     </div>
+
+</div>
     @php $authUser = auth()->user(); @endphp
     <div class="row">
         <div class="col-sm-6 col-md-6 col-xxl-3">
