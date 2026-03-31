@@ -13,12 +13,16 @@
                 </div>
                 @php
                     $delivery_status = $order->delivery_status;
-                    $payment_status = $order->orderDetails->where('seller_id', Auth::user()->id)->first()->payment_status;
+                    $payment_status = $order->orderDetails->where('seller_id', Auth::user()->id)->first()
+                        ->payment_status;
                 @endphp
                 @if (get_setting('product_manage_by_admin') == 0)
                     <div class="col-md-3 ml-auto">
                         <label for="update_payment_status">{{ translate('Payment Status') }}</label>
-                        @if (($order->payment_type == 'cash_on_delivery' || (addon_is_activated('offline_payment') == 1 && $order->manual_payment == 1)) && $payment_status == 'unpaid')
+                        @if (
+                            ($order->payment_type == 'cash_on_delivery' ||
+                                (addon_is_activated('offline_payment') == 1 && $order->manual_payment == 1)) &&
+                                $payment_status == 'unpaid')
                             <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity"
                                 id="update_payment_status">
                                 <option value="unpaid" @if ($payment_status == 'unpaid') selected @endif>
@@ -49,7 +53,8 @@
                                     {{ translate('Cancel') }}</option>
                             </select>
                         @else
-                            <input type="text" class="form-control" value="{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}" disabled>
+                            <input type="text" class="form-control"
+                                value="{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}" disabled>
                         @endif
                     </div>
                     {{-- <div class="col-md-3 ml-auto">
@@ -63,14 +68,17 @@
             </div>
             <div class="row gutters-5 mt-2">
                 <div class="col text-md-left text-center">
-                    @if(json_decode($order->shipping_address))
+                    @if (json_decode($order->shipping_address))
                         <address>
                             <strong class="text-main">
                                 {{ json_decode($order->shipping_address)->name }}
                             </strong><br>
                             {{ json_decode($order->shipping_address)->email }}<br>
                             {{ json_decode($order->shipping_address)->phone }}<br>
-                            {{ json_decode($order->shipping_address)->address }}, {{ json_decode($order->shipping_address)->city }}, @if(isset(json_decode($order->shipping_address)->state)) {{ json_decode($order->shipping_address)->state }} - @endif {{ json_decode($order->shipping_address)->postal_code }}<br>
+                            {{ json_decode($order->shipping_address)->address }},
+                            {{ json_decode($order->shipping_address)->city }}, @if (isset(json_decode($order->shipping_address)->state))
+                                {{ json_decode($order->shipping_address)->state }} -
+                            @endif {{ json_decode($order->shipping_address)->postal_code }}<br>
                             {{ json_decode($order->shipping_address)->country }}
                         </address>
                     @else
@@ -96,42 +104,133 @@
                                 height="100"></a>
                     @endif
 
+                    {{-- PAYMENT UPLOAD FORM --}}
 
-                    {{-- upload payment details  --}}
+                    @if ($delivery_status == 'delivered' && $order->payment_proof == null)
+                        <div class="card mt-4 border shadow">
 
+                            <div class="card-header bg-primary text-white">
 
-                     @if ($delivery_status == 'delivered')
-                    <div>
+                                <h5 class="mb-0">
+                                    <i class="las la-upload"></i>
+                                    Upload Payment Proof
+                                </h5>
 
-                        <p>Upload Payment Details</p>
-
-                        <div>
-
-                               <div>
-                                <label for="">Select Payment Method</label>
-                                <select name="" id="">
-                                    <option value="">Select Payment Method</option>
-                                    <option value="">Cash</option>
-                                    <option value="">Online UPI</option>
-                                    <option value="">Rocket</option>
                             </div>
 
-                            <div>
-                                <label for="">Transaction ID</label>
-                                <input type="text" name="" id="">
-                            </div>
+                            <div class="card-body">
 
-                            <div>
-                                <label for="">Upload File</label>
-                                <input type="file" name="" id="">
-                            </div>
+                                <form action="{{ route('seller.orders.upload_payment') }}" method="POST"
+                                    enctype="multipart/form-data">
 
+                                    @csrf
+
+                                    <input type="hidden" name="order_id" value="{{ $order->id }}">
+
+                                    <div class="form-group">
+                                        <label>Payment Method</label>
+
+                                        <select name="payment_method" class="form-control" required>
+
+                                            <option value="upi">UPI</option>
+                                            <option value="bank_transfer">Bank Transfer</option>
+                                            <option value="cash">Cash</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Upload Payment Screenshot</label>
+
+                                        <input type="file" name="payment_proof" class="form-control" required>
+
+                                    </div>
+
+                                    <button class="btn btn-success">
+
+                                        <i class="las la-check"></i>
+                                        Upload Payment
+
+                                    </button>
+
+                                </form>
+
+                            </div>
 
                         </div>
-
-                    </div>
                     @endif
+
+
+                    @if ($delivery_status == 'delivered' && $order->payment_proof != null)
+                        <div class="card mt-4 shadow-lg border-0 rounded-lg">
+                            <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center"
+                                style="background: linear-gradient(45deg, #28a745, #20c997);">
+                                <h5 class="mb-0">
+                                    <i class="las la-check-circle"></i> Payment Verified Details
+                                </h5>
+                                <span class="badge badge-light text-success px-3 py-2">
+                                    {{ ucfirst($order->payment_status) }}
+                                </span>
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="p-3 mb-3 bg-light rounded shadow-sm">
+                                            <p class="mb-2">
+                                                <strong><i class="las la-money-bill-wave"></i> Payment Method:</strong><br>
+                                                <span class="text-primary fs-16">
+                                                    {{ strtoupper($order->payment_type) }}
+                                                </span>
+                                            </p>
+
+                                            <p class="mb-2">
+                                                <strong><i class="las la-receipt"></i> Transaction ID:</strong><br>
+                                                <span class="text-dark">
+                                                    {{ $order->transaction_id }}
+                                                </span>
+                                            </p>
+
+                                            <p class="mb-0">
+                                                <strong><i class="las la-calendar"></i> Uploaded On:</strong><br>
+                                                {{ \Carbon\Carbon::parse($order->updated_at)->format('d M Y, h:i A') }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 text-center">
+                                        <div class="border rounded p-3 shadow-sm bg-white">
+                                            <p class="mb-2"><strong>Payment Proof</strong></p>
+
+                                            <a href="{{ asset('uploads/payment_proof/' . $order->payment_proof) }}"
+                                                target="_blank">
+
+                                                <img src="{{ asset('uploads/payment_proof/' . $order->payment_proof) }}"
+                                                    class="img-fluid rounded shadow"
+                                                    style="max-height:220px; object-fit:cover;">
+
+                                            </a>
+
+                                            <div class="mt-2">
+                                                <a href="{{ asset('uploads/payment_proof/' . $order->payment_proof) }}"
+                                                    class="btn btn-sm btn-outline-success" target="_blank">
+                                                    <i class="las la-download"></i> Download
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    @endif
+
                 </div>
+
                 <div class="col-md-4">
                     <table class="ml-auto">
                         <tbody>
@@ -240,7 +339,7 @@
                                             @if ($order->carrier != null)
                                                 {{ $order->carrier->name }} ({{ translate('Carrier') }})
                                                 <br>
-                                                {{ translate('Transit Time').' - '.$order->carrier->transit_time }}
+                                                {{ translate('Transit Time') . ' - ' . $order->carrier->transit_time }}
                                             @else
                                                 {{ translate('Carrier') }}
                                             @endif
