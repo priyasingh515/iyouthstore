@@ -18,8 +18,10 @@ class ProfileUpdateRequestController extends Controller
     public function index()
     {
         $requests = ProfileUpdateRequest::with('user')
-            ->latest()
-            ->paginate(10);
+    ->has('user') 
+    ->latest()
+    ->paginate(10);
+        return view('backend.profile_update.index', compact('requests'));
 
         return view('backend.profile_update.index', compact('requests'));
     }

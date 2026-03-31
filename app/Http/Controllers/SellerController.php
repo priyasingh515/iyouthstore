@@ -295,12 +295,6 @@ class SellerController extends Controller
 
         $user->password = Hash::make($request->password);
 
-
-
-
-
-
-
         if ($user->save()) {
             $shop           = new Shop;
             $shop->user_id  = $user->id;

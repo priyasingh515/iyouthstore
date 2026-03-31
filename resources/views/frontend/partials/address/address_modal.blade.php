@@ -137,7 +137,7 @@
 
                         <input type="hidden" id="latitude" name="latitude">
                         <input type="hidden" id="longitude" name="longitude">
-                        <button type="button" onclick="getLocation()">Use My Location</button>
+                        {{-- <button type="button" onclick="getLocation()">Use My Location</button> --}}
 
                         <!-- Save button -->
                         <div class="form-group text-right">

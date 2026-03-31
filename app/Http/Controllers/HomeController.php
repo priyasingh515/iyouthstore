@@ -102,7 +102,7 @@ class HomeController extends Controller
                 $targetLng
             );
 
-            $isWithinRadius = $distance <= 10;
+            $isWithinRadius = $distance <= 200;
 
             session([
                 'user_latitude'   => $userLat,

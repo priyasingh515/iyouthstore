@@ -515,5 +515,5 @@ Route::controller(ContactController::class)->group(function () {
     Route::post('/contact', 'contact')->name('contact');
 });
 
-Route::post('/store-location', [HomeController::class, 'h'])->name('store-location');
+Route::post('/store-location', [HomeController::class, 'store'])->name('store-location');
 

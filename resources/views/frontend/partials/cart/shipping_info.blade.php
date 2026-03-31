@@ -15,7 +15,7 @@
 
         $has_area_id = !is_null($area_id);
         $city_status = $city->status;
-        $active_area_exists = $city->areas()->where('status', 1)->exists(); // new line
+        $active_area_exists = NULL;
         $area_status = $has_area_id ? optional($address->area)->status : 1;
         $is_disabled = ($city_status === 0) || ($has_area_id && $area_status === 0) || ($active_area_exists && !$has_area_id) ||  ($address->state_id == null && get_setting('has_state') == 1);
     @endphp

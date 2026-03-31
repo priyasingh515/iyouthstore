@@ -18,6 +18,7 @@ use Auth;
 use Mail;
 use App\Mail\InvoiceEmailManager;
 use App\Models\OrdersExport;
+use App\Models\SellerProduct;
 use App\Utility\NotificationUtility;
 use CoreComponentRepository;
 use App\Utility\SmsUtility;
@@ -394,6 +395,7 @@ class OrderController extends Controller
         )) AS distance
     ", [$customerLat, $customerLng, $customerLat])
             ->where('registration_approval', 1)
+            ->where('verification_status', 1)
             ->having('distance', '<=', 20) // 
             ->orderBy('distance')
             ->first();
@@ -402,6 +404,17 @@ class OrderController extends Controller
             flash(translate('Shop not available in your area'))->warning();
         }
 
+
+        foreach ($carts as $cartItem) {
+
+            $sellerProduct = SellerProduct::where('product_id', $cartItem['product_id'])
+                ->where('user_id', $nearestSeller->user_id)->first();
+
+            if ($cartItem['quantity'] > $sellerProduct->stock) {
+                flash(translate('stock not available in the shop'))->warning();
+                return redirect()->back();
+            }
+        }
 
         $shippingAddress = [
             'name'        => Auth::user()->name,
@@ -427,7 +440,7 @@ class OrderController extends Controller
         $order = new Order;
         $order->combined_order_id = $combined_order->id;
         $order->user_id = Auth::id();
-        $order->seller_id = $nearestSeller->user_id; 
+        $order->seller_id = $nearestSeller->user_id;
         $order->shipping_address = $combined_order->shipping_address;
         $order->additional_info = $request->additional_info;
         $order->payment_type = $request->payment_option;
@@ -466,14 +479,14 @@ class OrderController extends Controller
 
             $shipping += $order_detail->shipping_cost;
 
-            // Stock update
-            if ($product->digital != 1) {
-                $stock = $product->stocks->where('variant', $cartItem['variation'])->first();
-                if ($stock && $stock->qty >= $cartItem['quantity']) {
-                    $stock->qty -= $cartItem['quantity'];
-                    $stock->save();
-                }
-            }
+            // Stock update --- commentted 
+            // if ($product->digital != 1) {
+            //     $stock = $product->stocks->where('variant', $cartItem['variation'])->first();
+            //     if ($stock && $stock->qty >= $cartItem['quantity']) {
+            //         $stock->qty -= $cartItem['quantity'];
+            //         $stock->save();
+            //     }
+            // }
 
             $product->num_of_sale += $cartItem['quantity'];
             $product->save();

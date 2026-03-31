@@ -30,6 +30,7 @@ class CheckoutController extends Controller
         //
     }
 
+
     public function index(Request $request)
     {
         if (get_setting('guest_checkout_activation') == 0 && auth()->user() == null) {
@@ -58,15 +59,12 @@ class CheckoutController extends Controller
 
             $customerLat = $address->latitude;
             $customerLng = $address->longitude;
-        }
-
-        elseif (session()->has('user_latitude') && session()->has('user_longitude')) {
+        } else if (session()->has('user_latitude') && session()->has('user_longitude')) {
 
             $customerLat = session('user_latitude');
             $customerLng = session('user_longitude');
-        }
-        else {
-            flash(translate('Please set your delivery location'))->warning();
+        } else {
+            flash(translate('Please allow location access'))->warning();
             return redirect()->back();
         }
 
@@ -216,7 +214,13 @@ class CheckoutController extends Controller
         }
         // Minumum order amount check end
 
-        (new OrderController)->store($request);
+        // (new OrderController)->store($request);
+
+        $response = (new OrderController)->store($request);
+
+        if ($response instanceof \Illuminate\Http\RedirectResponse) {
+            return $response;
+        }
 
         if (count($carts) > 0) {
             $carts->toQuery()->delete();

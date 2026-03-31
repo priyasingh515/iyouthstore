@@ -14,6 +14,7 @@
         class="btn btn-sm btn-outline-primary ml-2">
         Set Location
     </button>
+
 </div>
 
 
@@ -172,6 +173,9 @@
 
 <!-- Location Modal -->
 <div class="modal fade" id="locationModal" tabindex="-1">
+
+
+    {{-- locationModal --}}
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4">
 
@@ -195,12 +199,44 @@
 
             </div>
 
+
+            
+    <button onclick="openAnotherLocationModal()"
+        class="btn btn-sm btn-outline-primary ml-2">
+        use different Location
+    </button>
+
         </div>
     </div>
 </div>
 
 {{-- take location --}}
 
+
+<div class="modal fade" id="AnotherlocationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+
+     <div class="form-group mt-3 position-relative">
+
+                <h5 class="mb-2">Enter Delivery Location</h5>
+            
+    <input type="text"
+        id="address_input"
+        class="form-control"
+        placeholder="Type delivery address">
+
+
+    <div id="address_suggestions"
+        class="list-group position-absolute w-100"
+        style="z-index:9999;"></div>
+
+</div>
+
+
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -212,7 +248,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let verified = localStorage.getItem("location_verified");
     let cachedStatus = localStorage.getItem("service_status");
 
-    // ✅ Already verified → NO API CALL
     if (savedLat && savedLng && verified === "true") {
 
         document.getElementById('service_available').textContent =
@@ -221,28 +256,27 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // ✅ Location exists but not verified yet
     if (savedLat && savedLng) {
         sendLocation(savedLat, savedLng);
         return;
     }
 
-    // ✅ First time user
     setTimeout(openLocationModal, 800);
 });
 
 
-/* ==========================
-   OPEN MODAL
-==========================*/
 function openLocationModal() {
     $('#locationModal').modal('show');
 }
 
+function openAnotherLocationModal() {
+        $('#locationModal').modal('hide');
+    $('#AnotherlocationModal').modal('show');
+}
 
-/* ==========================
-   REQUEST USER LOCATION
-==========================*/
+
+
+
 function requestUserLocation() {
 
     if (!navigator.geolocation) {
@@ -298,9 +332,6 @@ function requestUserLocation() {
 }
 
 
-/* ==========================
-   SEND LOCATION TO LARAVEL
-==========================*/
 function sendLocation(latitude, longitude) {
 
     if(window.locationSending) return;
@@ -322,10 +353,7 @@ function sendLocation(latitude, longitude) {
 
         const status = data.is_within_radius ? "Yes" : "No";
 
-        // UI update
         document.getElementById('service_available').textContent = status;
-
-        // ✅ CACHE RESULT (IMPORTANT)
         localStorage.setItem("location_verified", "true");
         localStorage.setItem("service_status", status);
 
@@ -338,17 +366,11 @@ function sendLocation(latitude, longitude) {
 }
 
 
-/* ==========================
-   MODAL MESSAGE UPDATE
-==========================*/
 function updateModalMessage(message) {
     document.getElementById('location_message').innerHTML = message;
 }
 
 
-/* ==========================
-   RETRY BUTTON
-==========================*/
 function showRetryButton() {
 
     document.getElementById('location_modal_actions').innerHTML = `
@@ -360,9 +382,6 @@ function showRetryButton() {
 }
 
 
-/* ==========================
-   RESET LOCATION (CHANGE LOCATION)
-==========================*/
 function retryLocation() {
 
     localStorage.removeItem("user_lat");
@@ -371,6 +390,75 @@ function retryLocation() {
     localStorage.removeItem("service_status");
 
     location.reload();
+}
+
+</script>
+
+<script>
+
+let debounceTimer;
+
+document.getElementById("address_input")
+.addEventListener("input", function () {
+
+    clearTimeout(debounceTimer);
+
+    let query = this.value;
+
+    if(query.length < 3){
+        document.getElementById("address_suggestions").innerHTML = "";
+        return;
+    }
+
+    // debounce (important)
+    debounceTimer = setTimeout(() => {
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=in&limit=5`)
+        .then(res => res.json())
+        .then(data => showSuggestions(data));
+
+    }, 400);
+});
+
+
+
+function showSuggestions(places) {
+
+    let box = document.getElementById("address_suggestions");
+    box.innerHTML = "";
+
+    places.forEach(place => {
+
+        let item = document.createElement("a");
+        item.className = "list-group-item list-group-item-action";
+        item.innerText = place.display_name;
+
+        item.onclick = function () {
+
+            let lat = place.lat;
+            let lng = place.lon;
+
+            document.getElementById("address_input").value =
+                place.display_name;
+
+            box.innerHTML = "";
+
+            // Save locally
+            localStorage.setItem("user_lat", lat);
+            localStorage.setItem("user_lng", lng);
+            localStorage.setItem("user_address", place.display_name);
+
+            // Your existing function
+            sendLocation(lat, lng);
+
+
+            $('#AnotherlocationModal').modal('hide');
+            $('#showSuggestions').modal('hide');
+            $('#locationModal').modal('hide');
+        };
+
+        box.appendChild(item);
+    });
 }
 
 </script>
