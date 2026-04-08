@@ -1,13 +1,10 @@
 <?php
 
 use App\Http\Controllers\AizUploadController;
-// use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Seller\ProfileController;
 use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\PurchaseController;
-// use App\Http\Controllers\ShopController;
-use App\Http\Controllers\Seller\ShopController;
-
+use App\Http\Controllers\ProfileUpdateRequestController;
+use App\Http\Controllers\Seller\ProfileController;
 
 //Upload
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user', 'prevent-back-history'], 'as' => 'seller.'], function () {
@@ -131,7 +128,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         [\App\Http\Controllers\ProfileUpdateRequestController::class, 'store']
     )->name('profile.request.store');
 
-    Route::post('location/update',[ProfileController::class,'updateLocation'])->name('location.update');
+
+      Route::post('location/update',[ProfileController::class,'updateLocation'])->name('location.update');
 
     //Buy Products
 
@@ -142,13 +140,12 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::post('/cart/update', [PurchaseController::class, 'updateCart'])->name('cart.update');
     Route::post('/cart/delete', [PurchaseController::class, 'deleteCart'])->name('cart.delete');
 
-
     Route::post('/cart/checkout', [PurchaseController::class, 'checkout'])
-    ->name('cart.checkout');
+        ->name('cart.checkout');
 
     Route::get('/my-purchases', [PurchaseController::class, 'myPurchases'])
-    ->name('my-purchases');
-    Route::get('/my-purchases/{id}',[PurchaseController::class, 'showPurchase'])->name('my-purchases.show');
+        ->name('my-purchases');
+    Route::get('/my-purchases/{id}', [PurchaseController::class, 'showPurchase'])->name('my-purchases.show');
 
 
     // Address
@@ -195,7 +192,6 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::post('/support_ticket/reply', 'ticket_reply_store')->name('support_ticket.reply_store');
     });
 
-    //   fetch('/get-cities?district='+district)
     route::get('get-cities', [ShopController::class, 'getCities'])->name('getCities');
 
 

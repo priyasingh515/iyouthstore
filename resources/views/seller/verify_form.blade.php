@@ -5,8 +5,8 @@
         <div class="row align-items-center">
             <div class="col-md-6">
                 <h1 class="h3">{{ translate('Shop Verification') }}
-                    {{-- <a href="{{ route('shop.visit', $shop->slug) }}" class="btn btn-link btn-sm"
-                        target="_blank">({{ translate('Visit Shop') }})<i class="la la-external-link"></i>)</a> --}}
+                    {{-- <!--<a href="{{ route('shop.visit', $shop->slug) }}" class="btn btn-link btn-sm"-->
+                    <!--    target="_blank">({{ translate('Visit Shop') }})<i class="la la-external-link"></i>)</a>--> --}}
                 </h1>
             </div>
         </div>
@@ -35,7 +35,7 @@
                     @elseif($element->type == 'file')
                         <div class="row">
                             <div class="col-md-2">
-                                <label>{{ $element->label }}</label>
+                                <label>{{ $element->label }} <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-md-10">
                                 <div class="custom-file">
@@ -106,50 +106,34 @@
         </div>
     </form>
 
-    {{-- <script>
-        document.addEventListener("DOMContentLoaded", function() {
+   <script>
+document.addEventListener("DOMContentLoaded", function() {
 
-            if (navigator.geolocation) {
+  
+    document.querySelectorAll("label").forEach(function(label) {
 
-                navigator.geolocation.getCurrentPosition(function(position) {
+        let labelText = label.innerText.trim().toLowerCase();
 
-                    let lat = position.coords.latitude;
-                    let lng = position.coords.longitude;
+        let row = label.closest(".row");
+        if (!row) return;
 
-                    document.querySelectorAll("label").forEach(function(label) {
+        let input = row.querySelector("input[type='text']");
+        if (!input) return;
 
-                        let labelText = label.innerText.trim().toLowerCase();
+        if (labelText.includes("latitude") || labelText.includes("longitude")) {
+            input.setAttribute("readonly", true);
+        }
 
-                        let row = label.closest(".row");
-                        if (!row) return;
+    });
 
-                        let input = row.querySelector("input[type='text']");
-                        if (!input) return;
+ 
+    if (navigator.geolocation) {
 
-                        if (labelText.includes("latitude")) {
-                            input.value = lat;
-                            input.setAttribute("readonly", true); 
-                        }
+        navigator.geolocation.getCurrentPosition(function(position) {
 
-                        if (labelText.includes("longitude")) {
-                            input.value = lng;
-                            input.setAttribute("readonly", true); 
-                        }
+            let lat = position.coords.latitude;
+            let lng = position.coords.longitude;
 
-                    });
-
-                });
-
-            }
-
-        });
-    </script> --}}
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-
-            // First make all Lat/Long fields readonly (prevent manual typing)
             document.querySelectorAll("label").forEach(function(label) {
 
                 let labelText = label.innerText.trim().toLowerCase();
@@ -160,44 +144,21 @@
                 let input = row.querySelector("input[type='text']");
                 if (!input) return;
 
-                if (labelText.includes("latitude") || labelText.includes("longitude")) {
-                    input.setAttribute("readonly", true);
+                if (labelText.includes("latitude")) {
+                    input.value = lat;
+                }
+
+                if (labelText.includes("longitude")) {
+                    input.value = lng;
                 }
 
             });
 
-            // Then try auto fill location
-            if (navigator.geolocation) {
-
-                navigator.geolocation.getCurrentPosition(function(position) {
-
-                    let lat = position.coords.latitude;
-                    let lng = position.coords.longitude;
-
-                    document.querySelectorAll("label").forEach(function(label) {
-
-                        let labelText = label.innerText.trim().toLowerCase();
-
-                        let row = label.closest(".row");
-                        if (!row) return;
-
-                        let input = row.querySelector("input[type='text']");
-                        if (!input) return;
-
-                        if (labelText.includes("latitude")) {
-                            input.value = lat;
-                        }
-
-                        if (labelText.includes("longitude")) {
-                            input.value = lng;
-                        }
-
-                    });
-
-                });
-
-            }
-
         });
-    </script>
+
+    }
+
+});
+</script>
+
 @endsection

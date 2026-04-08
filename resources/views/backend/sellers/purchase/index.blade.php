@@ -109,10 +109,10 @@
                                         <i class="las la-eye"></i>
                                     </a>
 
-                                    <a class="btn btn-soft-info btn-icon btn-circle btn-sm"
+                                    <!-- <a class="btn btn-soft-info btn-icon btn-circle btn-sm"
                                         href="{{ route('invoice.download', $order->id) }}" title="Download Invoice">
                                         <i class="las la-download"></i>
-                                    </a>
+                                    </a> -->
 
                                     <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm"
                                         onclick="confirmDelete(event, {{ $order->id }})" title="Delete">

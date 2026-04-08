@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -141,18 +142,28 @@ class PurchaseController extends Controller
 
     public function sellerAddToCart(Request $request)
     {
+
+        $shop = Shop::where('user_id', auth()->id())->firstOrFail();
+        if ($shop->verification_status != 1 or $shop->registration_approval != 1) {
+
+            return response()->json([
+                'status' => false,
+                'message' => 'your account is not authorized to buy products now. Please contact admin.',
+            ]);
+        }
+
         $product = Product::findOrFail($request->product_id);
 
         $qty = $request->qty ?? 1;
 
         $stock = $product->stocks->sum('qty');
 
-        if ($qty > $stock) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Quantity exceeds available stock'
-            ]);
-        }
+        // if ($qty > $stock) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Quantity exceeds available stock'
+        //     ]);
+        // }
 
         $cart = Cart::where('user_id', auth()->id())
             ->where('product_id', $product->id)
@@ -304,6 +315,14 @@ class PurchaseController extends Controller
 
     public function checkout()
     {
+        $shop = Shop::where('user_id', auth()->id())->firstOrFail();
+        if ($shop->verification_status != 1 or $shop->registration_approval != 1) {
+
+            return response()->json([
+                'status' => false,
+                'message' => 'your account is not authorized to buy products now. Please contact admin.',
+            ]);
+        }
 
         try {
             DB::beginTransaction();

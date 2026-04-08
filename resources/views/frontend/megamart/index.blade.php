@@ -35,7 +35,8 @@
             }
         }
     </style>
-
+    
+    
     @php $lang = get_system_language()->code;  @endphp
 
     <!-- Featured Categories -->
@@ -206,6 +207,54 @@
             </div>
         </section>
     @endif
+    
+    <div class="container">
+        
+           <div class="col-lg-12">
+                    <div>
+        
+    <button onclick="openstoreFormModal()"
+        class="btn btn-outline-primary ml-2">
+        Click here to start your iYouth Store
+        
+    </button>
+                    </div>
+                </div>
+    </div>
+    
+
+<div class="modal fade" id="storeForm" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+
+
+<div class="modal-body">
+        If you want to start your own business and are interested in getting an iYouth Store franchise, please download the files from the link below, study them, and then apply to open a franchise store.
+Fill out the application completely and send it to iYouth Pvt. Ltd. .
+      </div>
+      
+      <div>
+
+          <a class="btn btn-small btn-primary mx-2" href="{{ asset('public/uploads/all/files/image1.jpeg') }}">
+              <!--About iYouth Store-->
+                            Brochure 1
+          </a>
+                    <a class="btn btn-small btn-primary mx-2" href="{{ asset('public/uploads/all/files/image2.jpeg') }}">
+              <!--About iYouth Store-->
+                            Brochure 2
+          </a>
+          <a class="btn btn-small btn-info mx-2 mt-2 mt-md-0" href="{{ asset('public/uploads/all/files/application_form2.pdf') }}">
+              Application Form
+          </a>
+          
+      </div>
+
+        </div>
+    </div>
+</div>
+
+    
+
 
     <!-- Today's deal -->
     @php
@@ -364,93 +413,93 @@
             }
         @endphp
         @if (count($best_selers) > 0)
-        <section class="">
-            <div class="container">
-                <div class="row">
+        <!--<section class="">-->
+        <!--    <div class="container">-->
+        <!--        <div class="row">-->
                     <!-- Banner section 4 -->
-                    @if ($homeBanner4Images != null)
-                        <div class="col-xl-8 col-lg-6 mb-2 mb-md-3 mt-2 mt-md-3 d-none d-lg-block">
-                            @php
-                                $banner_4_imags = json_decode($homeBanner4Images);
-                                $home_banner4_links = get_setting('home_banner4_links', null, $lang);
-                            @endphp
-                            <div class="aiz-carousel overflow-hidden arrow-inactive-none arrow-dark arrow-x-0"
-                                data-items="1" data-arrows="true" data-dots="false" data-autoplay="true">
-                                @foreach ($banner_4_imags as $key => $value)
-                                    <div class="carousel-box overflow-hidden hov-scale-img">
-                                        <a href="{{ isset(json_decode($home_banner4_links, true)[$key]) ? json_decode($home_banner4_links, true)[$key] : '' }}"
-                                            class="d-block text-reset overflow-hidden" style="height: 650px;">
-                                            <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                                data-src="{{ uploaded_asset($value) }}" alt="{{ env('APP_NAME') }} promo"
-                                                class="img-fit h-100 lazyload has-transition"
-                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+        <!--            @if ($homeBanner4Images != null)-->
+        <!--                <div class="col-xl-8 col-lg-6 mb-2 mb-md-3 mt-2 mt-md-3 d-none d-lg-block">-->
+        <!--                    @php-->
+        <!--                        $banner_4_imags = json_decode($homeBanner4Images);-->
+        <!--                        $home_banner4_links = get_setting('home_banner4_links', null, $lang);-->
+        <!--                    @endphp-->
+        <!--                    <div class="aiz-carousel overflow-hidden arrow-inactive-none arrow-dark arrow-x-0"-->
+        <!--                        data-items="1" data-arrows="true" data-dots="false" data-autoplay="true">-->
+        <!--                        @foreach ($banner_4_imags as $key => $value)-->
+        <!--                            <div class="carousel-box overflow-hidden hov-scale-img">-->
+        <!--                                <a href="{{ isset(json_decode($home_banner4_links, true)[$key]) ? json_decode($home_banner4_links, true)[$key] : '' }}"-->
+        <!--                                    class="d-block text-reset overflow-hidden" style="height: 650px;">-->
+        <!--                                    <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"-->
+        <!--                                        data-src="{{ uploaded_asset($value) }}" alt="{{ env('APP_NAME') }} promo"-->
+        <!--                                        class="img-fit h-100 lazyload has-transition"-->
+        <!--                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">-->
+        <!--                                </a>-->
+        <!--                            </div>-->
+        <!--                        @endforeach-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            @endif-->
 
                     <!-- Top Sellers -->
-                    <div class="col mb-2 mb-md-3 mt-2 mt-md-3">
-                        <div class="h-100" id="section_top_sellers">
-                            <div class="border px-3 py-2rem">
+        <!--            <div class="col mb-2 mb-md-3 mt-2 mt-md-3">-->
+        <!--                <div class="h-100" id="section_top_sellers">-->
+        <!--                    <div class="border px-3 py-2rem">-->
                                 <!-- Top Section -->
-                                <div class="d-flex mb-3 mb-md-4 align-items-baseline justify-content-between">
+        <!--                        <div class="d-flex mb-3 mb-md-4 align-items-baseline justify-content-between">-->
                                     <!-- Title -->
-                                    <h3 class="fs-16 fs-md-20 fw-700 mb-2 mb-sm-0">
-                                        <span class="pb-3">{{ translate('Top Sellers') }}</span>
-                                    </h3>
+        <!--                            <h3 class="fs-16 fs-md-20 fw-700 mb-2 mb-sm-0">-->
+        <!--                                <span class="pb-3">{{ translate('Top Sellers') }}</span>-->
+        <!--                            </h3>-->
                                     <!-- Links -->
-                                    <div class="d-flex">
-                                        <a class="text-blue fs-10 fs-md-12 fw-700 hov-text-primary animate-underline-primary"
-                                            href="{{ route('sellers') }}">{{ translate('View All Sellers') }}</a>
-                                    </div>
-                                </div>
+        <!--                            <div class="d-flex">-->
+        <!--                                <a class="text-blue fs-10 fs-md-12 fw-700 hov-text-primary animate-underline-primary"-->
+        <!--                                    href="{{ route('sellers') }}">{{ translate('View All Sellers') }}</a>-->
+        <!--                            </div>-->
+        <!--                        </div>-->
                                 <!-- Sellers Section -->
-                                <div class="aiz-carousel arrow-x-0 arrow-inactive-none" data-rows="{{ $data_rows }}" data-items="{{ $xxl_items }}" data-xxl-items="{{ $xxl_items }}"
-                                    data-xl-items="{{ $xl_items }}" data-lg-items="{{ $lg_items }}" data-md-items="{{ $md_items }}" data-sm-items="2" data-xs-items="1.4"
-                                    data-arrows="true" data-dots="false">
-                                    @foreach ($best_selers as $key => $seller)
-                                        @if ($seller->user != null)
-                                            <div
-                                                class="carousel-box h-100 position-relative text-center has-transition hov-animate-outline">
-                                                <div class="position-relative px-3 px-xl-2 py-3">
+        <!--                        <div class="aiz-carousel arrow-x-0 arrow-inactive-none" data-rows="{{ $data_rows }}" data-items="{{ $xxl_items }}" data-xxl-items="{{ $xxl_items }}"-->
+        <!--                            data-xl-items="{{ $xl_items }}" data-lg-items="{{ $lg_items }}" data-md-items="{{ $md_items }}" data-sm-items="2" data-xs-items="1.4"-->
+        <!--                            data-arrows="true" data-dots="false">-->
+        <!--                            @foreach ($best_selers as $key => $seller)-->
+        <!--                                @if ($seller->user != null)-->
+        <!--                                    <div-->
+        <!--                                        class="carousel-box h-100 position-relative text-center has-transition hov-animate-outline">-->
+        <!--                                        <div class="position-relative px-3 px-xl-2 py-3">-->
                                                     <!-- Shop logo & Verification Status -->
-                                                    <div class="mx-auto size-100px">
-                                                        <a href="{{ route('shop.visit', $seller->slug) }}"
-                                                            class="d-flex mx-auto justify-content-center align-item-center size-100px border overflow-hidden hov-scale-img"
-                                                            tabindex="0"
-                                                            style="border: 1px solid #e5e5e5; border-radius: 50%; box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);">
-                                                            <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                                                data-src="{{ uploaded_asset($seller->logo) }}" alt="{{ $seller->name }}"
-                                                                class="img-fit lazyload has-transition"
-                                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
-                                                        </a>
-                                                    </div>
+        <!--                                            <div class="mx-auto size-100px">-->
+        <!--                                                <a href="{{ route('shop.visit', $seller->slug) }}"-->
+        <!--                                                    class="d-flex mx-auto justify-content-center align-item-center size-100px border overflow-hidden hov-scale-img"-->
+        <!--                                                    tabindex="0"-->
+        <!--                                                    style="border: 1px solid #e5e5e5; border-radius: 50%; box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);">-->
+        <!--                                                    <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"-->
+        <!--                                                        data-src="{{ uploaded_asset($seller->logo) }}" alt="{{ $seller->name }}"-->
+        <!--                                                        class="img-fit lazyload has-transition"-->
+        <!--                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">-->
+        <!--                                                </a>-->
+        <!--                                            </div>-->
                                                     <!-- Shop name -->
-                                                    <h2 class="fs-14 fw-700 text-dark text-truncate-2 h-40px mt-3 mt-md-4 mb-0 mb-md-3">
-                                                        <a href="{{ route('shop.visit', $seller->slug) }}"
-                                                            class="text-reset hov-text-primary" tabindex="0">{{ $seller->name }}</a>
-                                                    </h2>
+        <!--                                            <h2 class="fs-14 fw-700 text-dark text-truncate-2 h-40px mt-3 mt-md-4 mb-0 mb-md-3">-->
+        <!--                                                <a href="{{ route('shop.visit', $seller->slug) }}"-->
+        <!--                                                    class="text-reset hov-text-primary" tabindex="0">{{ $seller->name }}</a>-->
+        <!--                                            </h2>-->
                                                     <!-- Shop Rating -->
-                                                    <div class="rating rating-mr-2 text-dark mb-3">
-                                                        {{ renderStarRating($seller->rating) }} <br>
-                                                        <span class="opacity-60 fs-14">({{ $seller->num_of_reviews }}
-                                                            {{ translate('Reviews') }})</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <!--                                            <div class="rating rating-mr-2 text-dark mb-3">-->
+        <!--                                                {{ renderStarRating($seller->rating) }} <br>-->
+        <!--                                                <span class="opacity-60 fs-14">({{ $seller->num_of_reviews }}-->
+        <!--                                                    {{ translate('Reviews') }})</span>-->
+        <!--                                            </div>-->
+        <!--                                        </div>-->
+        <!--                                    </div>-->
+        <!--                                @endif-->
+        <!--                            @endforeach-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
 
-                </div>
-            </div>
-        </section>
+        <!--        </div>-->
+        <!--    </div>-->
+        <!--</section>-->
         @endif
     @endif
 

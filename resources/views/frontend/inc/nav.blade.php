@@ -1,22 +1,3 @@
-<div>
-    Service Available -
-    <span id="service_available">
-
-        @if(session()->has('is_within_radius'))
-            {{ session('is_within_radius') ? 'Yes' : 'No' }}
-        @else
-            <i class="las la-spinner la-spin"></i> Checking...
-        @endif
-
-    </span>
-
-    <button onclick="openLocationModal()"
-        class="btn btn-sm btn-outline-primary ml-2">
-        Set Location
-    </button>
-
-</div>
-
 
 <!-- Top Bar Banner -->
 @php
@@ -159,6 +140,27 @@
     </div>
 </div>
 
+<!--show only in home page-->
+@if(request()->routeIs('home') or request()->routeIs('cart'))
+    <div class="p-2">
+        Service Available -
+        <span id="service_available">
+
+            @if(session()->has('is_within_radius'))
+                {{ session('is_within_radius') ? 'Yes' : 'No' }}
+            @else
+                <i class="las la-spinner la-spin"></i> Checking...
+            @endif
+
+        </span>
+
+        <button onclick="openLocationModal()"
+            class="btn btn-sm btn-outline-primary ml-2">
+            Set Location
+        </button>
+    </div>
+@endif
+
 <!-- Modal -->
 <div class="modal fade" id="order_details" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
@@ -173,9 +175,6 @@
 
 <!-- Location Modal -->
 <div class="modal fade" id="locationModal" tabindex="-1">
-
-
-    {{-- locationModal --}}
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4">
 
@@ -196,21 +195,20 @@
                     data-dismiss="modal">
                     Not Now
                 </button>
-
-            </div>
-
-
-            
-    <button onclick="openAnotherLocationModal()"
-        class="btn btn-sm btn-outline-primary ml-2">
+                
+                    <button onclick="openAnotherLocationModal()"
+        class="btn btn-sm btn-outline-primary ml-2 mt-2 mt-md-0">
         use different Location
     </button>
+
+            </div>
 
         </div>
     </div>
 </div>
 
 {{-- take location --}}
+
 
 
 <div class="modal fade" id="AnotherlocationModal" tabindex="-1">
@@ -239,6 +237,7 @@
 </div>
 
 
+
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -248,6 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let verified = localStorage.getItem("location_verified");
     let cachedStatus = localStorage.getItem("service_status");
 
+
     if (savedLat && savedLng && verified === "true") {
 
         document.getElementById('service_available').textContent =
@@ -256,18 +256,27 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+
     if (savedLat && savedLng) {
         sendLocation(savedLat, savedLng);
         return;
     }
-
+    
     setTimeout(openLocationModal, 800);
 });
 
 
+/* ==========================
+   OPEN MODAL
+==========================*/
 function openLocationModal() {
     $('#locationModal').modal('show');
 }
+
+function openstoreFormModal() {
+    $('#storeForm').modal('show');
+}
+
 
 function openAnotherLocationModal() {
         $('#locationModal').modal('hide');
@@ -276,7 +285,13 @@ function openAnotherLocationModal() {
 
 
 
+function openLocationModal() {
+    $('#locationModal').modal('show');
+}
 
+/* ==========================
+   REQUEST USER LOCATION
+==========================*/
 function requestUserLocation() {
 
     if (!navigator.geolocation) {
@@ -332,6 +347,7 @@ function requestUserLocation() {
 }
 
 
+
 function sendLocation(latitude, longitude) {
 
     if(window.locationSending) return;
@@ -358,6 +374,7 @@ function sendLocation(latitude, longitude) {
         localStorage.setItem("service_status", status);
 
         window.locationSending = false;
+        document.reload();
     })
     .catch(error => {
         console.error(error);
@@ -451,10 +468,8 @@ function showSuggestions(places) {
             // Your existing function
             sendLocation(lat, lng);
 
-
-            $('#AnotherlocationModal').modal('hide');
-            $('#showSuggestions').modal('hide');
             $('#locationModal').modal('hide');
+              $('#AnotherlocationModal').modal('hide');
         };
 
         box.appendChild(item);

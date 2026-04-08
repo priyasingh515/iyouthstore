@@ -322,57 +322,57 @@
                 </div>
 
 				<!-- Download App Link -->
-				@if ((get_setting('vendor_system_activation') == 1) || addon_is_activated('delivery_boy'))
-					<div class="card shadow-none bg-light">
-						<div class="card-header">
-							<h6 class="mb-0">{{ translate('Download App Link') }}</h6>
-						</div>
-						<div class="card-body">
+				<!--@if ((get_setting('vendor_system_activation') == 1) || addon_is_activated('delivery_boy'))-->
+				<!--	<div class="card shadow-none bg-light">-->
+				<!--		<div class="card-header">-->
+				<!--			<h6 class="mb-0">{{ translate('Download App Link') }}</h6>-->
+				<!--		</div>-->
+				<!--		<div class="card-body">-->
 							<!-- Seller App Link -->
-							@if (get_setting('vendor_system_activation') == 1)
-								<div class="form-group">
-									<label>{{ translate('Seller App Link') }}</label>
-									<div class="input-group form-group">
-										<input type="hidden" name="types[]" value="seller_app_link">
-										<input type="text" class="form-control" placeholder="http://" name="seller_app_link" value="{{ get_setting('seller_app_link')}}">
-									</div>
-								</div>
-							@endif
+				<!--			@if (get_setting('vendor_system_activation') == 1)-->
+				<!--				<div class="form-group">-->
+				<!--					<label>{{ translate('Seller App Link') }}</label>-->
+				<!--					<div class="input-group form-group">-->
+				<!--						<input type="hidden" name="types[]" value="seller_app_link">-->
+				<!--						<input type="text" class="form-control" placeholder="http://" name="seller_app_link" value="{{ get_setting('seller_app_link')}}">-->
+				<!--					</div>-->
+				<!--				</div>-->
+				<!--			@endif-->
 							<!-- Delivery Boy App Link -->
-							@if (addon_is_activated('delivery_boy'))
-								<div class="form-group">
-									<label>{{ translate('Delivery Boy App Link') }}</label>
-									<div class="input-group form-group">
-										<input type="hidden" name="types[]" value="delivery_boy_app_link">
-										<input type="text" class="form-control" placeholder="http://" name="delivery_boy_app_link" value="{{ get_setting('delivery_boy_app_link')}}">
-									</div>
-								</div>
-							@endif
-						</div>
-					</div>
-				@endif
+				<!--			@if (addon_is_activated('delivery_boy'))-->
+				<!--				<div class="form-group">-->
+				<!--					<label>{{ translate('Delivery Boy App Link') }}</label>-->
+				<!--					<div class="input-group form-group">-->
+				<!--						<input type="hidden" name="types[]" value="delivery_boy_app_link">-->
+				<!--						<input type="text" class="form-control" placeholder="http://" name="delivery_boy_app_link" value="{{ get_setting('delivery_boy_app_link')}}">-->
+				<!--					</div>-->
+				<!--				</div>-->
+				<!--			@endif-->
+				<!--		</div>-->
+				<!--	</div>-->
+				<!--@endif-->
 
 				<!-- Payment Methods Widget -->
-                <div class="card shadow-none bg-light">
-                  	<div class="card-header">
-						<h6 class="mb-0">{{ translate('Payment Methods Widget ') }}</h6>
-					</div>
-					<div class="card-body">
-						<div class="form-group">
-							<label>{{ translate('Payment Methods') }}</label>
-							<div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
-								<div class="input-group-prepend">
-									<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
-								</div>
-								<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-								<input type="hidden" name="types[]" value="payment_method_images">
-								<input type="hidden" name="payment_method_images" class="selected-files" value="{{ get_setting('payment_method_images')}}">
-							</div>
-							<div class="file-preview box sm"></div>
-                            <small class="text-muted">{{ translate("Minimum dimensions required: 144px width X 20px height.") }}</small>
-						</div>
-					</div>
-                </div>
+     <!--           <div class="card shadow-none bg-light">-->
+     <!--             	<div class="card-header">-->
+					<!--	<h6 class="mb-0">{{ translate('Payment Methods Widget ') }}</h6>-->
+					<!--</div>-->
+					<!--<div class="card-body">-->
+					<!--	<div class="form-group">-->
+					<!--		<label>{{ translate('Payment Methods') }}</label>-->
+					<!--		<div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">-->
+					<!--			<div class="input-group-prepend">-->
+					<!--				<div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>-->
+					<!--			</div>-->
+					<!--			<div class="form-control file-amount">{{ translate('Choose File') }}</div>-->
+					<!--			<input type="hidden" name="types[]" value="payment_method_images">-->
+					<!--			<input type="hidden" name="payment_method_images" class="selected-files" value="{{ get_setting('payment_method_images')}}">-->
+					<!--		</div>-->
+					<!--		<div class="file-preview box sm"></div>-->
+     <!--                       <small class="text-muted">{{ translate("Minimum dimensions required: 144px width X 20px height.") }}</small>-->
+					<!--	</div>-->
+					<!--</div>-->
+     <!--           </div>-->
 
 				<!-- Update Button -->
 				<div class="mt-4 text-right">

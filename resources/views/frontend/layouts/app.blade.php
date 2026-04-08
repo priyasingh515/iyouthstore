@@ -74,6 +74,10 @@
     <link rel="stylesheet" href="{{ static_asset('assets/css/custom-style.css') }}">
 
 
+   <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">-->
+
+
+
     <script>
         var AIZ = AIZ || {};
         AIZ.local = {
@@ -173,7 +177,7 @@
 
         .pac-container { z-index: 100000; }
 
-        .translate-btn{
+            .translate-btn{
     height:36px;
     padding:6px 16px;
     font-size:13px;
@@ -182,7 +186,6 @@
     background:#fff;
     cursor:pointer;
 }
-
     </style>
 
 @if (get_setting('google_analytics') == 1)
@@ -710,17 +713,22 @@
                         $('#option-choice-form #chosen_price_div').removeClass('d-none');
                         $('#option-choice-form #chosen_price_div #chosen_price').html(data.price);
                         $('#available-quantity').html(data.quantity);
-                        $('.input-number').prop('max', data.max_limit);
-                        if(parseInt(data.in_stock) == 0 && data.digital  == 0){
-                           $('.buy-now').addClass('d-none');
-                           $('.add-to-cart').addClass('d-none');
-                           $('.out-of-stock').removeClass('d-none');
-                        }
-                        else{
-                           $('.buy-now').removeClass('d-none');
-                           $('.add-to-cart').removeClass('d-none');
-                           $('.out-of-stock').addClass('d-none');
-                        }
+                        // $('.input-number').prop('max', data.max_limit);
+                        $('.input-number').prop('max', 9999);
+                        // if(parseInt(data.in_stock) == 0 && data.digital  == 0){
+                        //    $('.buy-now').addClass('d-none');
+                        //    $('.add-to-cart').addClass('d-none');
+                        //    $('.out-of-stock').removeClass('d-none');
+                        // }
+                        // else{
+                        //    $('.buy-now').removeClass('d-none');
+                        //    $('.add-to-cart').removeClass('d-none');
+                        //    $('.out-of-stock').addClass('d-none');
+                        // }
+
+                        $('.buy-now').removeClass('d-none');
+$('.add-to-cart').removeClass('d-none');
+$('.out-of-stock').addClass('d-none');
 
                         AIZ.extra.plusMinus();
                     }
@@ -948,7 +956,9 @@
         }
     </script>
 
-    <script>
+
+
+<script>
 function googleTranslateElementInit() {
     new google.translate.TranslateElement({
         pageLanguage: 'en',
@@ -979,6 +989,8 @@ function toggleTranslate(){
     select.dispatchEvent(new Event('change'));
 }
 </script>
+
+
 
 
 
@@ -1056,6 +1068,10 @@ function toggleTranslate(){
             }
         </script> @endif
 
+ <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" -->
+     <!--    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+     -->
+ <!--</script>-->
     <script>
         function fixSlickVisibility() {
             $('.slick-slide').css('visibility', 'visible');

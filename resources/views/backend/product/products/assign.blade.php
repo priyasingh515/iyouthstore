@@ -10,8 +10,8 @@
                 {{ session('success') }}
             </div>
         @endif
-
-            @if(session('error'))
+        
+                @if(session('error'))
             <div class="alert alert-danger">
                 {{ session('error') }}
             </div>
@@ -27,8 +27,8 @@
                 <select name="user_id" class="form-control" required>
                     <option value="">Select Seller</option>
                     @foreach ($shops as $shop)
-                        <option value="{{ $shop->user->id }}">
-                            {{ $shop->user->name }}
+                        <option value="{{ $shop->user_id }}">
+                            {{ $shop->name }}
                         </option>
                     @endforeach
                 </select>

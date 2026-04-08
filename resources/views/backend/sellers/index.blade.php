@@ -87,7 +87,7 @@
                     @if($route == 'all_seller_route')
                         <th data-breakpoints="lg">{{ translate('Status') }}</th>
                         <th data-breakpoints="lg">{{ translate('Num. of Products') }}</th>
-                        <th data-breakpoints="lg">{{ translate('Due to seller') }}</th>
+                        <!--<th data-breakpoints="lg">{{ translate('Due to seller') }}</th>-->
                         @if(get_setting('seller_commission_type') == 'seller_based')
                             <th data-breakpoints="lg">{{ translate('Commission') }}</th>
                         @endif
@@ -129,7 +129,12 @@
                                         @if($shop->user->is_suspicious == 1) 
                                             <i class="las la-exclamation-circle" aria-hidden="true"></i> 
                                         @endif
-                                    <a class="text-primary" href="{{route('sellers.profile', encrypt($shop->id))}}" target="_blank">{{ $shop->name }}</a></span>
+                                        
+                                    <a class="text-primary" href="{{route('sellers.profile', encrypt($shop->id))}}" target="_blank">
+                                        
+                                        {{ $shop->name }}
+                                    </a>
+                                    </span>
                                 </div>
                             </div>
                         </td>
@@ -148,13 +153,13 @@
                                 @endif
                             </td>
                             <td>{{ $shop->user->products->count() }}</td>
-                            <td>
-                                @if ($shop->admin_to_pay >= 0)
-                                    {{ single_price($shop->admin_to_pay) }}
-                                @else
-                                    {{ single_price(abs($shop->admin_to_pay)) }} ({{ translate('Due to Admin') }})
-                                @endif
-                            </td>
+                            <!--<td>-->
+                            <!--    @if ($shop->admin_to_pay >= 0)-->
+                            <!--        {{ single_price($shop->admin_to_pay) }}-->
+                            <!--    @else-->
+                            <!--        {{ single_price(abs($shop->admin_to_pay)) }} ({{ translate('Due to Admin') }})-->
+                            <!--    @endif-->
+                            <!--</td>-->
                            
                          
                             @if(get_setting('seller_commission_type') == 'seller_based')
@@ -206,54 +211,55 @@
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-xs">
                                         @can('view_seller_profile')
-                                            <a href="{{route('sellers.profile', encrypt($shop->id))}}" class="dropdown-item">
-                                                {{translate('Profile')}}
-                                            </a>
+                                            <!--<a href="{{route('sellers.profile', encrypt($shop->id))}}" class="dropdown-item">-->
+                                                
+                                            <!--</a>-->
+                                            <!--{{translate('Profile')}}-->
                                         @endcan
-                                        @can('login_as_seller')
-                                            <a href="{{route('sellers.login', encrypt($shop->id))}}" class="dropdown-item">
-                                                {{translate('Log in as this Seller')}}
-                                            </a>
-                                        @endcan
-                                        @can('pay_to_seller')
-                                            <a href="javascript:void();" onclick="show_seller_payment_modal('{{$shop->id}}');" class="dropdown-item">
-                                                {{translate('Go to Payment')}}
-                                            </a>
-                                        @endcan
-                                        @can('seller_payment_history')
-                                            <a href="{{route('sellers.payment_history', encrypt($shop->user_id))}}" class="dropdown-item">
-                                                {{translate('Payment History')}}
-                                            </a>
-                                        @endcan
+                                        <!--@can('login_as_seller')-->
+                                        <!--    <a href="{{route('sellers.login', encrypt($shop->id))}}" class="dropdown-item">-->
+                                        <!--        {{translate('Log in as this Seller')}}-->
+                                        <!--    </a>-->
+                                        <!--@endcan-->
+                                        <!--@can('pay_to_seller')-->
+                                        <!--    <a href="javascript:void();" onclick="show_seller_payment_modal('{{$shop->id}}');" class="dropdown-item">-->
+                                        <!--        {{translate('Go to Payment')}}-->
+                                        <!--    </a>-->
+                                        <!--@endcan-->
+                                        <!--@can('seller_payment_history')-->
+                                        <!--    <a href="{{route('sellers.payment_history', encrypt($shop->user_id))}}" class="dropdown-item">-->
+                                        <!--        {{translate('Payment History')}}-->
+                                        <!--    </a>-->
+                                        <!--@endcan-->
                                         @can('edit_seller')
                                             <a href="{{route('sellers.edit', encrypt($shop->id))}}" class="dropdown-item">
                                                 {{translate('Edit')}}
                                             </a>
                                         @endcan
-                                        @can('ban_seller')
-                                            @if($shop->user->banned != 1)
-                                                <a href="javascript:void();" onclick="confirm_ban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">
-                                                    {{translate('Ban this seller')}}
-                                                    <i class="fa fa-ban text-danger" aria-hidden="true"></i>
-                                                </a>
-                                            @else
-                                                <a href="javascript:void();" onclick="confirm_unban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">
-                                                    {{translate('Unban this seller')}}
-                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                                </a>
-                                            @endif
-                                        @endcan
-                                        @can('mark_seller_suspected')
-                                            @if($shop->user->is_suspicious == 1)
-                                                <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', true);" class="dropdown-item">
-                                                        {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}
-                                                </a>
-                                            @else
-                                                <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', false);" class="dropdown-item">
-                                                        {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}
-                                                </a>
-                                            @endif
-                                        @endcan
+                                        <!--@can('ban_seller')-->
+                                        <!--    @if($shop->user->banned != 1)-->
+                                        <!--        <a href="javascript:void();" onclick="confirm_ban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">-->
+                                        <!--            {{translate('Ban this seller')}}-->
+                                        <!--            <i class="fa fa-ban text-danger" aria-hidden="true"></i>-->
+                                        <!--        </a>-->
+                                        <!--    @else-->
+                                        <!--        <a href="javascript:void();" onclick="confirm_unban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item">-->
+                                        <!--            {{translate('Unban this seller')}}-->
+                                        <!--            <i class="fa fa-check text-success" aria-hidden="true"></i>-->
+                                        <!--        </a>-->
+                                        <!--    @endif-->
+                                        <!--@endcan-->
+                                        <!--@can('mark_seller_suspected')-->
+                                        <!--    @if($shop->user->is_suspicious == 1)-->
+                                        <!--        <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', true);" class="dropdown-item">-->
+                                        <!--                {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}-->
+                                        <!--        </a>-->
+                                        <!--    @else-->
+                                        <!--        <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', false);" class="dropdown-item">-->
+                                        <!--                {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}-->
+                                        <!--        </a>-->
+                                        <!--    @endif-->
+                                        <!--@endcan-->
 
 
                                         @can('delete_seller')

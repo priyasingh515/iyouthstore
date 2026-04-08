@@ -66,66 +66,56 @@
             <div class="col-6 text-right d-none d-lg-block top-text-color-visibility"
                 style="color: {{ $topHeaderTextColor }}">
                 <ul class="list-inline mb-0 h-100 d-flex justify-content-end align-items-center">
+                    <li class="list-inline-item ml-3">
 
+                        <button id="langToggleBtn" class="translate-btn" onclick="toggleTranslate()">
+                            🌐 हिंदी
+                        </button>
 
-                    <ul class="list-inline mb-0 h-100 d-flex justify-content-end align-items-center">
+                        <!-- Hidden Google Translate -->
+                        <div id="google_translate_element" style="display:none;"></div>
 
-                        <!-- ⭐ LANGUAGE TOGGLE BUTTON ADD HERE -->
-                        <li class="list-inline-item ml-3">
+                    </li>
+                    @if (get_setting('vendor_system_activation') == 1)
+                        <!-- Seller Dropdown and Helpline -->
+                        <li class="list-inline-item d-flex">
 
-                            <button id="langToggleBtn" class="translate-btn" onclick="toggleTranslate()">
-                                🌐 हिंदी
-                            </button>
-
-                            <!-- Hidden Google Translate -->
-                            <div id="google_translate_element" style="display:none;"></div>
-
-                        </li>
-
-
-
-
-                        @if (get_setting('vendor_system_activation') == 1)
-                            <!-- Seller Dropdown and Helpline -->
-                            <li class="list-inline-item d-flex">
-
-                                <!-- Become a Seller Dropdown -->
-                                <div class="dropdown">
-                                    <a href="{{ route(get_setting('seller_registration_verify') === '1' ? 'shop-reg.verification' : 'shops.create') }}"
-                                        class="fs-12 dropdown-toggle top-text-color-visibility"
-                                        style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                        {{ translate('Become a Seller !') }}
-                                    </a>
-
-                                    <!-- Dropdown Menu -->
-                                    <div class="dropdown-menu fs-12 p-0 mt-1">
-                                        <a class="dropdown-item py-2 px-2 text-dark"
-                                            href="{{ route('seller.login') }}">
-                                            {{ translate('Login to Seller') }}
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        @endif
-                        @if (get_setting('helpline_number'))
-                            <!-- Helpline -->
-                            <li class="list-inline-item ml-3 pl-3 mr-0 pr-0 top-text-color-visibility"
-                                style="color: {{ $topHeaderTextColor }}">
-                                <a href="tel:{{ get_setting('helpline_number') }}"
-                                    class="fs-12 d-inline-block py-2 top-text-color-visibility"
-                                    style="color: {{ $topHeaderTextColor }}">
-                                    <span>{{ translate('Helpline') }}</span>
-                                    <span>{{ get_setting('helpline_number') }}</span>
+                            <!-- Become a Seller Dropdown -->
+                            <div class="dropdown">
+                                <a href="{{ route(get_setting('seller_registration_verify') === '1' ? 'shop-reg.verification' : 'shops.create') }}"
+                                    class="fs-12 dropdown-toggle top-text-color-visibility"
+                                    style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    {{ translate('Become a Seller !') }}
                                 </a>
-                            </li>
-                        @else
-                            <!-- Helpline Text -->
-                            <div class="fs-12 ml-4 top-text-color-visibility" style="color: {{ $topHeaderTextColor }}">
-                                {{ translate('Helpline') }}: +01 234 567 8900
+
+                                <!-- Dropdown Menu -->
+                                <div class="dropdown-menu fs-12 p-0 mt-1">
+                                    <a class="dropdown-item py-2 px-2 text-dark" href="{{ route('seller.login') }}">
+                                        {{ translate('Login to Seller') }}
+                                    </a>
+                                </div>
                             </div>
-                        @endif
-                    </ul>
+                        </li>
+                    @endif
+                    @if (get_setting('helpline_number'))
+                        <!-- Helpline -->
+                        <li class="list-inline-item ml-3 pl-3 mr-0 pr-0 top-text-color-visibility"
+                            style="color: {{ $topHeaderTextColor }}">
+                            <a href="tel:{{ get_setting('helpline_number') }}"
+                                class="fs-12 d-inline-block py-2 top-text-color-visibility"
+                                style="color: {{ $topHeaderTextColor }}">
+                                <span>{{ translate('Helpline') }}</span>
+                                <span>{{ get_setting('helpline_number') }}</span>
+                            </a>
+                        </li>
+                    @else
+                        <!-- Helpline Text -->
+                        <div class="fs-12 ml-4 top-text-color-visibility" style="color: {{ $topHeaderTextColor }}">
+                            {{ translate('Helpline') }}: +01 234 567 8900
+                        </div>
+                    @endif
+                </ul>
             </div>
         </div>
     </div>
@@ -525,25 +515,25 @@
                                     </li>
                                 @endif
 
-                                <li class="user-top-nav-element border border-top-0" data-id="1">
-                                    <a href="{{ route('digital_purchase_history.index') }}"
-                                        class="text-truncate text-dark px-4 fs-14 d-flex align-items-center hov-column-gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16.001" height="16"
-                                            viewBox="0 0 16.001 16">
-                                            <g id="Group_25262" data-name="Group 25262"
-                                                transform="translate(-1388.154 -562.604)">
-                                                <path id="Path_2963" data-name="Path 2963"
-                                                    d="M77.864,98.69V92.1a.5.5,0,1,0-1,0V98.69l-1.437-1.437a.5.5,0,0,0-.707.707l1.851,1.852a1,1,0,0,0,.707.293h.172a1,1,0,0,0,.707-.293l1.851-1.852a.5.5,0,0,0-.7-.713Z"
-                                                    transform="translate(1318.79 478.5)" fill="#b5b5bf" />
-                                                <path id="Path_2964" data-name="Path 2964"
-                                                    d="M67.155,88.6a3,3,0,0,1-.474-5.963q-.009-.089-.015-.179a5.5,5.5,0,0,1,10.977-.718,3.5,3.5,0,0,1-.989,6.859h-1.5a.5.5,0,0,1,0-1l1.5,0a2.5,2.5,0,0,0,.417-4.967.5.5,0,0,1-.417-.5,4.5,4.5,0,1,0-8.908.866.512.512,0,0,1,.009.121.5.5,0,0,1-.52.479,2,2,0,1,0-.162,4l.081,0h2a.5.5,0,0,1,0,1Z"
-                                                    transform="translate(1324 486)" fill="#b5b5bf" />
-                                            </g>
-                                        </svg>
-                                        <span
-                                            class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>
-                                    </a>
-                                </li>
+                                <!--<li class="user-top-nav-element border border-top-0" data-id="1">-->
+                                <!--    <a href="{{ route('digital_purchase_history.index') }}"-->
+                                <!--        class="text-truncate text-dark px-4 fs-14 d-flex align-items-center hov-column-gap-1">-->
+                                <!--        <svg xmlns="http://www.w3.org/2000/svg" width="16.001" height="16"-->
+                                <!--            viewBox="0 0 16.001 16">-->
+                                <!--            <g id="Group_25262" data-name="Group 25262"-->
+                                <!--                transform="translate(-1388.154 -562.604)">-->
+                                <!--                <path id="Path_2963" data-name="Path 2963"-->
+                                <!--                    d="M77.864,98.69V92.1a.5.5,0,1,0-1,0V98.69l-1.437-1.437a.5.5,0,0,0-.707.707l1.851,1.852a1,1,0,0,0,.707.293h.172a1,1,0,0,0,.707-.293l1.851-1.852a.5.5,0,0,0-.7-.713Z"-->
+                                <!--                    transform="translate(1318.79 478.5)" fill="#b5b5bf" />-->
+                                <!--                <path id="Path_2964" data-name="Path 2964"-->
+                                <!--                    d="M67.155,88.6a3,3,0,0,1-.474-5.963q-.009-.089-.015-.179a5.5,5.5,0,0,1,10.977-.718,3.5,3.5,0,0,1-.989,6.859h-1.5a.5.5,0,0,1,0-1l1.5,0a2.5,2.5,0,0,0,.417-4.967.5.5,0,0,1-.417-.5,4.5,4.5,0,1,0-8.908.866.512.512,0,0,1,.009.121.5.5,0,0,1-.52.479,2,2,0,1,0-.162,4l.081,0h2a.5.5,0,0,1,0,1Z"-->
+                                <!--                    transform="translate(1324 486)" fill="#b5b5bf" />-->
+                                <!--            </g>-->
+                                <!--        </svg>-->
+                                <!--        <span-->
+                                <!--            class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>-->
+                                <!--    </a>-->
+                                <!--</li>-->
                                 @if (get_setting('conversation_system') == 1)
                                     <li class="user-top-nav-element border border-top-0" data-id="1">
                                         <a href="{{ route('conversations.index') }}"

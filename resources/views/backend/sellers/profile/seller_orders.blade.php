@@ -19,7 +19,7 @@
                         <th>{{translate('Order ID')}}</th>
                         <th>{{translate('Order Date')}}</th>
                         <th data-breakpoints="sm">{{translate('Amount')}}</th>
-                        <th data-breakpoints="md">{{translate('Due')}}</th>
+                        <!--<th data-breakpoints="md">{{translate('Due')}}</th>-->
                         <th data-breakpoints="lg">{{translate('Status')}}</th>
                         <th class="text-right">{{translate('Action')}}</th>
                     </tr>
@@ -50,13 +50,13 @@
                         <td>
                             <b> {{ single_price($order->grand_total) }}</b>
                         </td>
-                        <td>
-                            @if ($order->payment_status == 'unpaid')
-                            <b> {{ single_price($order->grand_total) }}</b>
-                            @else
-                            <b> {{ single_price(0.00) }}</b>
-                            @endif
-                        </td>
+                        <!--<td>-->
+                        <!--    @if ($order->payment_status == 'unpaid')-->
+                        <!--    <b> {{ single_price($order->grand_total) }}</b>-->
+                        <!--    @else-->
+                        <!--    <b> {{ single_price(0.00) }}</b>-->
+                        <!--    @endif-->
+                        <!--</td>-->
                         <td>
                             @if ($order->delivery_status == 'delivered')
                             <span class="status-delivered">{{ translate(ucfirst(str_replace('_', ' ', $order->delivery_status))) }}</span>
@@ -94,18 +94,18 @@
                                             {{ translate('View') }}
                                         </a>
                                         @endcan
-                                        <a href="{{ route('invoice.download', $order->id) }}" class="dropdown-item fs-13">
-                                            {{ translate('Download Invoice') }}
-                                        </a>
+                                        <!--<a href="{{ route('invoice.download', $order->id) }}" class="dropdown-item fs-13">-->
+                                        <!--    {{ translate('Download Invoice') }}-->
+                                        <!--</a>-->
 
-                                        <a href="javascript:void(0);" onclick="printInvoice({{ $order->id }})" class="dropdown-item fs-13">
-                                            {{ translate('Print') }}
-                                        </a>
+                                        <!--<a href="javascript:void(0);" onclick="printInvoice({{ $order->id }})" class="dropdown-item fs-13">-->
+                                        <!--    {{ translate('Print') }}-->
+                                        <!--</a>-->
                                         @if(auth()->user()->can('unpaid_order_payment_notification_send') && $order->payment_status == 'unpaid' && $unpaid_order_payment_notification->status == 1)
-                                        <a href="javascript:void();" class="dropdown-item confirm-delete fs-13"
-                                            onclick="unpaid_order_payment_notification('{{ $order->id }}');">
-                                            {{ translate('Payment Notification') }}
-                                        </a>
+                                        <!--<a href="javascript:void();" class="dropdown-item confirm-delete fs-13"-->
+                                        <!--    onclick="unpaid_order_payment_notification('{{ $order->id }}');">-->
+                                        <!--    {{ translate('Payment Notification') }}-->
+                                        <!--</a>-->
                                         @endif
                                     </div>
                                 </div>

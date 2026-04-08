@@ -57,32 +57,48 @@
                     <li class="nav-item">
                         <button class="nav-link" onclick="changeSellerTab(this, 'overview')">{{translate('Overview')}}</button>
                     </li>
+                   
                     <li class="nav-item">
                         <button class="nav-link" onclick="changeSellerTab(this, 'products')">{{translate('Items')}}</button>
                     </li>
                     <li class="nav-item">
                         <button id="order_tab" class="nav-link" onclick="changeSellerTab(this, 'orders')">{{translate('Orders')}}</button>
                     </li>
-                    <li class="nav-item">
-                        <button class="nav-link" onclick="changeSellerTab(this, 'payments')">{{translate('Payment History')}}</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" onclick="changeSellerTab(this, 'documents')">{{translate('Documents')}}</button>
-                    </li>
+                       <li class="nav-item">
+                                <button class="nav-link" onclick="changeSellerTab(this, 'assignment_history')">
+                                    {{ translate('Assignment History') }}
+                                </button>
+                            </li>
+                      <li class="nav-item">
+                                <button class="nav-link" onclick="changeSellerTab(this, 'low_stock')">
+                                    {{ translate('Low Stock') }}
+                                </button>
+                            </li>
+                             <li class="nav-item">
+                                <button class="nav-link" onclick="changeSellerTab(this, 'inactive_products')">
+                                    {{ translate('Inactive Products') }}
+                                </button>
+                            </li>
+                    <!--<li class="nav-item">-->
+                    <!--    <button class="nav-link" onclick="changeSellerTab(this, 'payments')">{{translate('Payment History')}}</button>-->
+                    <!--</li>-->
+                    <!--<li class="nav-item">-->
+                    <!--    <button class="nav-link" onclick="changeSellerTab(this, 'documents')">{{translate('Documents')}}</button>-->
+                    <!--</li>-->
                 </ul>
                  </div>
                 <!-- Right: Button and Icons -->
                 <div class="d-flex align-items-center ml-auto mt-3 mt-md-0 mr-n5">
 
                     @can('product_delete' || 'order_delete')
-                    <div class="dropdown mb-2 mb-md-0 mr-3 bulk-action-visibility d-none">
-                        <button class="btn border dropdown-toggle py-1" type="button" data-toggle="dropdown">
-                            {{translate('Bulk Action')}}
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-xs">
-                            <a class="dropdown-item fs-13 confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal"> {{translate('Delete selection')}}</a>
-                        </div>
-                    </div>
+                    <!--<div class="dropdown mb-2 mb-md-0 mr-3 bulk-action-visibility d-none">-->
+                    <!--    <button class="btn border dropdown-toggle py-1" type="button" data-toggle="dropdown">-->
+                    <!--        {{translate('Bulk Action')}}-->
+                    <!--    </button>-->
+                    <!--    <div class="dropdown-menu dropdown-menu-right dropdown-menu-xs">-->
+                    <!--        <a class="dropdown-item fs-13 confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal"> {{translate('Delete selection')}}</a>-->
+                    <!--    </div>-->
+                    <!--</div>-->
                     @endcan
 
                     <!-- Show on md and above -->
@@ -116,101 +132,101 @@
                         </button>
 
                         <!-- Mail Icon -->
-                        <div class="ml-2 icon-container" data-toggle="tooltip" title="Mail Seller">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                viewBox="0 0 32 32">
-                                <g id="Rectangle_23615" data-name="Rectangle 23615" fill="#fff" stroke="#dce0e6"
-                                    stroke-width="1">
-                                    <rect width="32" height="32" rx="6" stroke="none" />
-                                    <rect x="0.5" y="0.5" width="31" height="31" rx="5.5"
-                                        fill="none" />
-                                </g>
-                                <path id="Path_42640" data-name="Path 42640"
-                                    d="M18,5.6A1.6,1.6,0,0,0,16.4,4H3.6A1.6,1.6,0,0,0,2,5.6v9.6a1.6,1.6,0,0,0,1.6,1.6H16.4A1.6,1.6,0,0,0,18,15.2Zm-1.6,0L10,9.592,3.6,5.6Zm0,9.6H3.6v-8l6.4,4,6.4-4Z"
-                                    transform="translate(6 6)" fill="#9393a3" />
-                            </svg>
-                        </div>
+                        <!--<div class="ml-2 icon-container" data-toggle="tooltip" title="Mail Seller">-->
+                        <!--    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"-->
+                        <!--        viewBox="0 0 32 32">-->
+                        <!--        <g id="Rectangle_23615" data-name="Rectangle 23615" fill="#fff" stroke="#dce0e6"-->
+                        <!--            stroke-width="1">-->
+                        <!--            <rect width="32" height="32" rx="6" stroke="none" />-->
+                        <!--            <rect x="0.5" y="0.5" width="31" height="31" rx="5.5"-->
+                        <!--                fill="none" />-->
+                        <!--        </g>-->
+                        <!--        <path id="Path_42640" data-name="Path 42640"-->
+                        <!--            d="M18,5.6A1.6,1.6,0,0,0,16.4,4H3.6A1.6,1.6,0,0,0,2,5.6v9.6a1.6,1.6,0,0,0,1.6,1.6H16.4A1.6,1.6,0,0,0,18,15.2Zm-1.6,0L10,9.592,3.6,5.6Zm0,9.6H3.6v-8l6.4,4,6.4-4Z"-->
+                        <!--            transform="translate(6 6)" fill="#9393a3" />-->
+                        <!--    </svg>-->
+                        <!--</div>-->
 
                         <!-- Menu Dropdown Icon -->
-                        <div class="dropdown ml-2">
-                            <a href="#"
-                                class="text-muted p-0 border-0 bg-transparent shadow-none text-secondary"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                    viewBox="0 0 32 32">
-                                    <g id="Rectangle_23616" data-name="Rectangle 23616" fill="#fff"
-                                        stroke="#dce0e6" stroke-width="1">
-                                        <rect width="32" height="32" rx="6" stroke="none" />
-                                        <rect x="0.5" y="0.5" width="31" height="31" rx="5.5"
-                                            fill="none" />
-                                    </g>
-                                    <g id="Group_30571" data-name="Group 30571" transform="translate(-1733 -445)">
-                                        <circle id="Ellipse_1018" data-name="Ellipse 1018" cx="1.5"
-                                            cy="1.5" r="1.5" transform="translate(1748 459.5)"
-                                            fill="#9393a3" />
-                                        <circle id="Ellipse_1019" data-name="Ellipse 1019" cx="1.5"
-                                            cy="1.5" r="1.5" transform="translate(1748 453)" fill="#9393a3" />
-                                        <circle id="Ellipse_1020" data-name="Ellipse 1020" cx="1.5"
-                                            cy="1.5" r="1.5" transform="translate(1748 466)" fill="#9393a3" />
-                                    </g>
-                                </svg>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-xs">
-                                @can('login_as_seller')
-                                <a href="{{route('sellers.login', encrypt($shop->id))}}" class="dropdown-item fs-13">
-                                    {{translate('Log in as this Seller')}}
-                                </a>
-                                @endcan
+                        <!--<div class="dropdown ml-2">-->
+                        <!--    <a href="#"-->
+                        <!--        class="text-muted p-0 border-0 bg-transparent shadow-none text-secondary"-->
+                        <!--        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">-->
+                        <!--        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"-->
+                        <!--            viewBox="0 0 32 32">-->
+                        <!--            <g id="Rectangle_23616" data-name="Rectangle 23616" fill="#fff"-->
+                        <!--                stroke="#dce0e6" stroke-width="1">-->
+                        <!--                <rect width="32" height="32" rx="6" stroke="none" />-->
+                        <!--                <rect x="0.5" y="0.5" width="31" height="31" rx="5.5"-->
+                        <!--                    fill="none" />-->
+                        <!--            </g>-->
+                        <!--            <g id="Group_30571" data-name="Group 30571" transform="translate(-1733 -445)">-->
+                        <!--                <circle id="Ellipse_1018" data-name="Ellipse 1018" cx="1.5"-->
+                        <!--                    cy="1.5" r="1.5" transform="translate(1748 459.5)"-->
+                        <!--                    fill="#9393a3" />-->
+                        <!--                <circle id="Ellipse_1019" data-name="Ellipse 1019" cx="1.5"-->
+                        <!--                    cy="1.5" r="1.5" transform="translate(1748 453)" fill="#9393a3" />-->
+                        <!--                <circle id="Ellipse_1020" data-name="Ellipse 1020" cx="1.5"-->
+                        <!--                    cy="1.5" r="1.5" transform="translate(1748 466)" fill="#9393a3" />-->
+                        <!--            </g>-->
+                        <!--        </svg>-->
+                        <!--    </a>-->
+                        <!--    <div class="dropdown-menu dropdown-menu-right dropdown-menu-xs">-->
+                        <!--        @can('login_as_seller')-->
+                        <!--        <a href="{{route('sellers.login', encrypt($shop->id))}}" class="dropdown-item fs-13">-->
+                        <!--            {{translate('Log in as this Seller')}}-->
+                        <!--        </a>-->
+                        <!--        @endcan-->
 
-                                @can('pay_to_seller')
-                                <a href="javascript:void();" onclick="show_seller_payment_modal('{{$shop->id}}');" class="dropdown-item fs-13">
-                                    {{translate('Go to Payment')}}
-                                </a>
-                                @endcan
-                                @can('seller_payment_history')
-                                <a href="{{route('sellers.payment_history', encrypt($shop->user_id))}}" class="dropdown-item fs-13">
-                                    {{translate('Payment History')}}
-                                </a>
-                                @endcan
-                                @can('edit_seller')
-                                <a href="{{route('sellers.edit', encrypt($shop->id))}}" class="dropdown-item fs-13">
-                                    {{translate('Edit')}}
-                                </a>
-                                @endcan
-                                @can('ban_seller')
-                                @if($shop->user->banned != 1)
-                                <a href="javascript:void();" onclick="confirm_ban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item fs-13">
-                                    {{translate('Ban this seller')}}
-                                    <i class="fa fa-ban text-danger" aria-hidden="true"></i>
-                                </a>
-                                @else
-                                <a href="javascript:void();" onclick="confirm_unban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item fs-13">
-                                    {{translate('Unban this seller')}}
-                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                </a>
-                                @endif
-                                @endcan
-                                @can('mark_seller_suspected')
-                                @if($shop->user->is_suspicious == 1)
-                                <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', true);" class="dropdown-item">
-                                    {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}
-                                </a>
-                                @else
-                                <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', false);" class="dropdown-item">
-                                    {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}
-                                </a>
-                                @endif
-                                @endcan
+                        <!--        @can('pay_to_seller')-->
+                        <!--        <a href="javascript:void();" onclick="show_seller_payment_modal('{{$shop->id}}');" class="dropdown-item fs-13">-->
+                        <!--            {{translate('Go to Payment')}}-->
+                        <!--        </a>-->
+                        <!--        @endcan-->
+                        <!--        @can('seller_payment_history')-->
+                        <!--        <a href="{{route('sellers.payment_history', encrypt($shop->user_id))}}" class="dropdown-item fs-13">-->
+                        <!--            {{translate('Payment History')}}-->
+                        <!--        </a>-->
+                        <!--        @endcan-->
+                        <!--        @can('edit_seller')-->
+                        <!--        <a href="{{route('sellers.edit', encrypt($shop->id))}}" class="dropdown-item fs-13">-->
+                        <!--            {{translate('Edit')}}-->
+                        <!--        </a>-->
+                        <!--        @endcan-->
+                        <!--        @can('ban_seller')-->
+                        <!--        @if($shop->user->banned != 1)-->
+                        <!--        <a href="javascript:void();" onclick="confirm_ban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item fs-13">-->
+                        <!--            {{translate('Ban this seller')}}-->
+                        <!--            <i class="fa fa-ban text-danger" aria-hidden="true"></i>-->
+                        <!--        </a>-->
+                        <!--        @else-->
+                        <!--        <a href="javascript:void();" onclick="confirm_unban('{{route('sellers.ban', $shop->id)}}');" class="dropdown-item fs-13">-->
+                        <!--            {{translate('Unban this seller')}}-->
+                        <!--            <i class="fa fa-check text-success" aria-hidden="true"></i>-->
+                        <!--        </a>-->
+                        <!--        @endif-->
+                        <!--        @endcan-->
+                        <!--        @can('mark_seller_suspected')-->
+                        <!--        @if($shop->user->is_suspicious == 1)-->
+                        <!--        <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', true);" class="dropdown-item">-->
+                        <!--            {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}-->
+                        <!--        </a>-->
+                        <!--        @else-->
+                        <!--        <a href="javascript:void();" onclick="confirm_suspicious('{{route('seller.suspicious', encrypt($shop->user->id))}}', false);" class="dropdown-item">-->
+                        <!--            {{ translate(" Mark as " . ($shop->user->is_suspicious == 1 ? 'unsuspect' : 'suspicious') . " ") }}-->
+                        <!--        </a>-->
+                        <!--        @endif-->
+                        <!--        @endcan-->
 
 
-                                @can('delete_seller')
-                                <a href="javascript:void();" class="dropdown-item confirm-delete" data-href="{{route('sellers.destroy', $shop->id)}}">
-                                    {{translate('Delete')}}
-                                </a>
-                                @endcan
+                        <!--        @can('delete_seller')-->
+                        <!--        <a href="javascript:void();" class="dropdown-item confirm-delete" data-href="{{route('sellers.destroy', $shop->id)}}">-->
+                        <!--            {{translate('Delete')}}-->
+                        <!--        </a>-->
+                        <!--        @endcan-->
 
-                            </div>
-                        </div>
+                        <!--    </div>-->
+                        <!--</div>-->
                     </div>
 
 

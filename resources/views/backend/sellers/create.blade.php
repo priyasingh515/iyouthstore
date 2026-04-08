@@ -90,12 +90,7 @@
                                     </option>
                                 @endforeach
 
-                                <option value="other">Other (Type Manually)</option>
-
                             </select>
-
-                            <input type="text" class="form-control mt-2 d-none" name="district_manual"
-                                id="districtManual" placeholder="Enter District Name">
 
                         </div>
                     </div>
@@ -117,12 +112,7 @@
                                     </option>
                                 @endforeach
 
-                                <option value="other">Other (Type Manually)</option>
-
                             </select>
-
-                            <input type="text" class="form-control mt-2 d-none" name="block_manual" id="blockManual"
-                                placeholder="Enter Block Name">
 
                         </div>
                     </div>
@@ -145,12 +135,7 @@
                                     </option>
                                 @endforeach
 
-                                <option value="other">Other (Type Manually)</option>
-
                             </select>
-
-                            <input type="text" class="form-control mt-2 d-none" name="sub_district_manual" id="subManual"
-                                placeholder="Enter SubDistrict Name">
 
                         </div>
 
@@ -249,21 +234,15 @@
     <script>
         $(document).ready(function() {
 
-            // hide all initially
-
+      
             $('.block-select option').hide();
             $('.block-select option:first').show();
-            $('.block-select option[value="other"]').show();
 
-
+       
             $('.subdistrict-select option').hide();
             $('.subdistrict-select option:first').show();
-            $('.subdistrict-select option[value="other"]').show();
 
-
-
-            // district change
-
+            
             $('.district-select').on('change', function() {
 
                 let district = $(this).val();
@@ -271,96 +250,37 @@
                 $('.block-select').val('');
                 $('.subdistrict-select').val('');
 
-
                 $('.block-select option').hide();
                 $('.block-select option:first').show();
-                $('.block-select option[value="other"]').show();
-
 
                 $('.subdistrict-select option').hide();
                 $('.subdistrict-select option:first').show();
-                $('.subdistrict-select option[value="other"]').show();
-
 
                 $('.block-select option').each(function() {
-
                     if ($(this).data('district') == district) {
-
                         $(this).show();
-
                     }
-
                 });
-
-
-                toggleManualField(this, '#districtManual');
 
             });
 
-
-
-            // block change
-
+          
             $('.block-select').on('change', function() {
 
                 let block = $(this).val();
 
                 $('.subdistrict-select').val('');
 
-
                 $('.subdistrict-select option').hide();
                 $('.subdistrict-select option:first').show();
-                $('.subdistrict-select option[value="other"]').show();
-
 
                 $('.subdistrict-select option').each(function() {
-
                     if ($(this).data('block') == block) {
-
                         $(this).show();
-
                     }
-
                 });
 
-
-                toggleManualField(this, '#blockManual');
-
             });
-
-
-
-            // subdistrict change
-
-            $('.subdistrict-select').on('change', function() {
-
-                toggleManualField(this, '#subManual');
-
-            });
-
-
-
-            // manual toggle function
-
-            function toggleManualField(select, input) {
-
-                if ($(select).val() === 'other') {
-
-                    $(input)
-                        .removeClass('d-none')
-                        .prop('required', true);
-
-                } else {
-
-                    $(input)
-                        .addClass('d-none')
-                        .prop('required', false)
-                        .val('');
-
-                }
-
-            }
-
 
         });
     </script>

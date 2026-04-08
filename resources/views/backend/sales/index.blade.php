@@ -220,13 +220,13 @@
                                         title="{{ translate('Download Invoice') }}">
                                         <i class="las la-download"></i>
                                     </a>
-                                    @if(auth()->user()->can('unpaid_order_payment_notification_send') && $order->payment_status == 'unpaid' && $unpaid_order_payment_notification->status == 1)
-                                        <a class="btn btn-soft-warning btn-icon btn-circle btn-sm"
-                                            href="javascript:void();" onclick="unpaid_order_payment_notification('{{ $order->id }}');"
-                                            title="{{ translate('Unpaid Order Payment Notification') }}">
-                                            <i class="las la-bell"></i>
-                                        </a>
-                                    @endif
+                                    <!--@if(auth()->user()->can('unpaid_order_payment_notification_send') && $order->payment_status == 'unpaid' && $unpaid_order_payment_notification->status == 1)-->
+                                    <!--    <a class="btn btn-soft-warning btn-icon btn-circle btn-sm"-->
+                                    <!--        href="javascript:void();" onclick="unpaid_order_payment_notification('{{ $order->id }}');"-->
+                                    <!--        title="{{ translate('Unpaid Order Payment Notification') }}">-->
+                                    <!--        <i class="las la-bell"></i>-->
+                                    <!--    </a>-->
+                                    <!--@endif-->
                                     @can('delete_order')
                                         <a href="#"
                                             class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"

@@ -10,7 +10,7 @@
 		</div>
 	</div>
 
-	@include('header.' .get_element_type_by_id(get_setting('header_element')))
+
 	<br>
 
 	<div class="row">
@@ -44,29 +44,29 @@
 							</div>
 						</div>
 						<!-- Show Language Switcher -->
-						<div class="form-group row">
-							<label class="col-md-3 col-from-label">{{translate('Show Language Switcher?')}}</label>
-							<div class="col-md-8">
-								<label class="aiz-switch aiz-switch-success mb-0">
-									<input type="hidden" name="types[]" value="show_language_switcher">
-									<input type="checkbox" name="show_language_switcher"
-										@if(get_setting('show_language_switcher') == 'on') checked @endif>
-									<span></span>
-								</label>
-							</div>
-						</div>
+						<!--<div class="form-group row">-->
+						<!--	<label class="col-md-3 col-from-label">{{translate('Show Language Switcher?')}}</label>-->
+						<!--	<div class="col-md-8">-->
+						<!--		<label class="aiz-switch aiz-switch-success mb-0">-->
+						<!--			<input type="hidden" name="types[]" value="show_language_switcher">-->
+						<!--			<input type="checkbox" name="show_language_switcher"-->
+						<!--				@if(get_setting('show_language_switcher') == 'on') checked @endif>-->
+						<!--			<span></span>-->
+						<!--		</label>-->
+						<!--	</div>-->
+						<!--</div>-->
 						<!-- Show Currency Switcher -->
-						<div class="form-group row">
-							<label class="col-md-3 col-from-label">{{translate('Show Currency Switcher?')}}</label>
-							<div class="col-md-8">
-								<label class="aiz-switch aiz-switch-success mb-0">
-									<input type="hidden" name="types[]" value="show_currency_switcher">
-									<input type="checkbox" name="show_currency_switcher"
-										@if(get_setting('show_currency_switcher') == 'on') checked @endif>
-									<span></span>
-								</label>
-							</div>
-						</div>
+						<!--<div class="form-group row">-->
+						<!--	<label class="col-md-3 col-from-label">{{translate('Show Currency Switcher?')}}</label>-->
+						<!--	<div class="col-md-8">-->
+						<!--		<label class="aiz-switch aiz-switch-success mb-0">-->
+						<!--			<input type="hidden" name="types[]" value="show_currency_switcher">-->
+						<!--			<input type="checkbox" name="show_currency_switcher"-->
+						<!--				@if(get_setting('show_currency_switcher') == 'on') checked @endif>-->
+						<!--			<span></span>-->
+						<!--		</label>-->
+						<!--	</div>-->
+						<!--</div>-->
 						<!-- Enable stikcy header -->
 						<div class="form-group row">
 							<label class="col-md-3 col-from-label">{{translate('Enable stikcy header?')}}</label>

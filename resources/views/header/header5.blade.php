@@ -10,6 +10,16 @@
             <!-- Right side with helpline and gear icon -->
             <div class="col-6 mt-2 ml-auto text-right">
                 <ul class="list-inline mb-0 h-100 d-flex justify-content-end align-items-center">
+                    <li class="list-inline-item ml-3">
+
+                        <button id="langToggleBtn" class="translate-btn" onclick="toggleTranslate()">
+                            🌐 हिंदी
+                        </button>
+
+                        <!-- Hidden Google Translate -->
+                        <div id="google_translate_element" style="display:none;"></div>
+
+                    </li>
                     <!-- Helpline -->
                     <li class="list-inline-item">
                         <div class="d-flex align-items-center">
@@ -538,6 +548,7 @@
                             @include('frontend.partials.cart.cart')
                         </div>
                     </div> --}}
+
                     @auth
                         @if (Auth::user()->user_type != 'seller')
                             <div class="d-none d-xl-block align-self-stretch ml-5 mr-0 has-transition bg-black-10"

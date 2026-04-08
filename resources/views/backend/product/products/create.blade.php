@@ -639,7 +639,7 @@
                                                 class="text-danger">*</span></label>
                                         <div class="col-md-6">
                                             <input type="number" lang="en" min="0" value="0"
-                                                step="0.01" placeholder="{{ translate('Seller Price') }}"
+                                                step="0.01" placeholder="{{ translate('Seller price') }}"
                                                 name="seller_price"
                                                 class="form-control @error('seller_price') is-invalid @enderror">
                                         </div>
@@ -778,42 +778,44 @@
                                 </div>
 
                                 <!-- Stock Visibility State -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Stock Visibility State') }}</h5>
+                                <!--<h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">-->
+                                <!--    {{ translate('Stock Visibility State') }}</h5>-->
                                 <div class="w-100">
                                     <!-- Show Stock Quantity -->
-                                    <div class="form-group row">
-                                        <label
-                                            class="col-md-3 col-from-label">{{ translate('Show Stock Quantity') }}</label>
-                                        <div class="col-md-9">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="quantity"
-                                                    checked>
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <!--<div class="form-group row">-->
+                                    <!--    <label-->
+                                    <!--        class="col-md-3 col-from-label">{{ translate('Show Stock Quantity') }}</label>-->
+                                    <!--    <div class="col-md-9">-->
+                                    <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
+                                    <!--            <input type="radio" name="stock_visibility_state" value="quantity"-->
+                                    <!--                checked>-->
+                                    <!--            <span></span>-->
+                                    <!--        </label>-->
+                                    <!--    </div>-->
+                                    <!--</div>-->
                                     <!-- Show Stock With Text Only -->
-                                    <div class="form-group row">
-                                        <label
-                                            class="col-md-3 col-from-label">{{ translate('Show Stock With Text Only') }}</label>
-                                        <div class="col-md-9">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="text">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <!--<div class="form-group row">-->
+                                    <!--    <label-->
+                                    <!--        class="col-md-3 col-from-label">{{ translate('Show Stock With Text Only') }}</label>-->
+                                    <!--    <div class="col-md-9">-->
+                                    <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
+                                    <!--            <input type="radio" name="stock_visibility_state" value="text">-->
+                                    <!--            <span></span>-->
+                                    <!--        </label>-->
+                                    <!--    </div>-->
+                                    <!--</div>-->
                                     <!-- Hide Stock -->
-                                    <div class="form-group row">
-                                        <label class="col-md-3 col-from-label">{{ translate('Hide Stock') }}</label>
-                                        <div class="col-md-9">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="hide">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <!--<div class="form-group row">-->
+                                    <!--    <label class="col-md-3 col-from-label">{{ translate('Hide Stock') }}</label>-->
+                                    <!--    <div class="col-md-9">-->
+                                    <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
+                                    <!--            <input type="radio" name="stock_visibility_state" value="hide">-->
+                                    <!--            <span></span>-->
+                                    <!--        </label>-->
+                                    <!--    </div>-->
+                                    <!--</div>-->
+                                    
+                                         <input type="hidden" name="stock_visibility_state" value="hide">
                                 </div>
                             </div>
                         </div>

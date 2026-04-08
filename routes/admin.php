@@ -6,9 +6,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AttributeController;
-use App\Http\Controllers\BlocksController;
 use App\Http\Controllers\BlogCategoryController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\BlocksController;
 use App\Http\Controllers\BrandBulkUploadController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\BusinessSettingsController;
@@ -25,10 +25,8 @@ use App\Http\Controllers\CustomAlertController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\CustomerProductController;
-use App\Http\Controllers\Cybersource\CybersourceSettingController;
 use App\Http\Controllers\DigitalProductController;
 use App\Http\Controllers\DynamicPopupController;
-use App\Http\Controllers\ElementController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\FlashDealController;
 use App\Http\Controllers\LanguageController;
@@ -45,7 +43,6 @@ use App\Http\Controllers\ProductBulkUploadController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductQueryController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProfileUpdateRequestController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoleController;
@@ -62,8 +59,11 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\Cybersource\CybersourceSettingController;
+use App\Http\Controllers\ElementController;
+use App\Http\Controllers\InactiveProductController;
+use App\Http\Controllers\ProfileUpdateRequestController;
 use App\Http\Controllers\SellerPurchaseController;
-
 
 /*
   |--------------------------------------------------------------------------
@@ -141,11 +141,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/products/seller/{product_type}', 'seller_products')->name('products.seller');
         Route::get('/products/all', 'all_products')->name('products.all');
         Route::get('/products/create', 'create')->name('products.create');
-        Route::get('/products/assign', 'assign')->name('products.assign');
-
-        Route::post('/products/assign/store', 'assignProduct')->name('product.assign.store');
-
         Route::post('/products/store/', 'store')->name('products.store');
+        Route::get('/products/assign', 'assign')->name('products.assign');
+        Route::post('/products/assign/store', 'assignProduct')->name('product.assign.store');
         Route::get('/products/admin/{id}/edit', 'admin_product_edit')->name('products.admin.edit');
         Route::get('/products/seller/{id}/edit', 'seller_product_edit')->name('products.seller.edit');
         Route::post('/products/update/{product}', 'update')->name('products.update');
@@ -164,6 +162,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/product-search', 'product_search')->name('product.search');
         Route::post('/get-selected-products', 'get_selected_products')->name('get-selected-products');
         Route::post('/set-product-discount', 'setProductDiscount')->name('set_product_discount');
+        Route::get('/admin/assignment-history', 'assignmentHistoryIndex')->name('assignment.history.index');
+        Route::get('/admin/assignment-history/show/{seller}', 'showAssignmentHistory')->name('assignment.history.show');
+        Route::get('/admin/low-seller-stock','lowSellerStock')->name('seller.low.stock');
+
     });
 
     // Digital Product
@@ -201,9 +203,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     // Seller
     Route::resource('sellers', SellerController::class);
     Route::controller(SellerController::class)->group(function () {
+        Route::get('/seller/stock', 'sellerInventory')->name('sellers.stock');
+        Route::get('/seller/stock/{id}', 'sellerInventoryDetail')->name('sellers.stock.detail');
         Route::get('/seller/rating-followers', 'index')->name('sellers.rating_followers');
-
-
         Route::get('sellers_ban/{id}', 'ban')->name('sellers.ban');
         Route::get('/sellers/destroy/{id}', 'destroy')->name('sellers.destroy');
         Route::post('/bulk-seller-delete', 'bulk_seller_delete')->name('bulk-seller-delete');
@@ -225,9 +227,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('seller-suspicious/{seller}', 'suspicious')->name('seller.suspicious');
         Route::get('/seller/verification-file/delete', 'deleteVerificationFile')->name('seller.verification.file.delete');
     });
-
-
-    Route::post('/get-cities',[SellerController::class,'getCities'])->name('get.cities');
 
     // Seller Payment
     Route::controller(PaymentController::class)->group(function () {
@@ -259,16 +258,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/newsletter/send', 'send')->name('newsletters.send');
         Route::post('/newsletter/test/smtp', 'testEmail')->name('test.smtp');
     });
-
-
-    //seller purchase
-    Route::resource('/seller-purchases', SellerPurchaseController::class);
-    Route::post('/seller/update-delivery-status', [SellerPurchaseController::class, 'updateDeliveryStatus'])
-        ->name('seller.update.delivery.status');
-
-    Route::post('/seller/update-payment-status', [SellerPurchaseController::class, 'updatePaymentStatus'])
-        ->name('seller.update.payment.status');
-
 
     // Dynamic Popup
     Route::resource('dynamic-popups', DynamicPopupController::class);
@@ -363,6 +352,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/tax/destroy/{id}', 'destroy')->name('tax.destroy');
         Route::post('tax-status', 'change_tax_status')->name('taxes.tax-status');
     });
+
+    //seller purchase
+    Route::resource('/seller-purchases', SellerPurchaseController::class);
+    Route::post('/seller/update-delivery-status', [SellerPurchaseController::class, 'updateDeliveryStatus'])
+        ->name('seller.update.delivery.status');
+
+    Route::post('/seller/update-payment-status', [SellerPurchaseController::class, 'updatePaymentStatus'])
+        ->name('seller.update.payment.status');
+
 
     // Language
     Route::resource('/languages', LanguageController::class);
@@ -469,7 +467,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
         Route::post('/bulk-order-delete', 'bulk_order_delete')->name('bulk-order-delete');
 
-        // Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
+        Route::get('/orders/destroy/{id}', 'destroy')->name('orders.destroy');
         Route::post('/orders/details', 'order_details')->name('orders.details');
         Route::post('/orders/update_delivery_status', 'update_delivery_status')->name('orders.update_delivery_status');
         Route::post('/orders/update_payment_status', 'update_payment_status')->name('orders.update_payment_status');
@@ -498,46 +496,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/wallet-history', 'wallet_transaction_history')->name('wallet-history.index');
         Route::get('/cart_report', 'cart_report')->name('cart_report.index');
     });
-
-    // Route::get(
-    //     '/admin/profile-requests',
-    //     [ProfileUpdateRequestController::class, 'index']
-    // )->name('admin.profile.update.requests');
-
-    // Route::get(
-    //     '/admin/profile-request-details/{id}',
-    //     [ProfileUpdateRequestController::class, 'details']
-    // )->name('admin.profile.requests.details');
-    // Route::post(
-    //     '/admin/profile-update/approve/{id}',
-    //     [ProfileUpdateRequestController::class, 'approve']
-    // )->name('admin.profile.requests.approve');
-    // Route::post(
-    //     '/admin/profile-update/reject/{id}',
-    //     [ProfileUpdateRequestController::class, 'reject']
-    // )->name('admin.profile.requests.reject');
-    // Route::delete(
-    //     '/profile-requests/{id}/delete',
-    //     [ProfileUpdateRequestController::class, 'delete']
-    // )
-    //     ->name('admin.profile.requests.delete');
-
-
-    //Profile Update Request
-
-    Route::prefix('admin')->name('admin.')->controller(ProfileUpdateRequestController::class)->group(function () {
-
-        Route::get('/profile-requests', 'index')->name('profile.update.requests');
-
-        Route::get('/profile-request-details/{id}', 'details')->name('profile.requests.details');
-
-        Route::post('/profile-update/approve/{id}', 'approve')->name('profile.requests.approve');
-
-        Route::post('/profile-update/reject/{id}', 'reject')->name('profile.requests.reject');
-
-        Route::delete('/profile-requests/{id}/delete', 'delete')->name('profile.requests.delete');
-    });
-
 
     // Earning Report
     Route::group(['prefix' => 'reports'], function () {
@@ -583,6 +541,31 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/custom-review/update', 'customReviewUpdate')->name('custom-review.update');
         Route::post('/custom-review/get-products', 'getProductByCategory')->name('get-custom-review-product-by-category');
     });
+
+
+    //Profile Update Request
+
+    Route::prefix('admin')->name('admin.')->controller(ProfileUpdateRequestController::class)->group(function () {
+
+        Route::get('/profile-requests', 'index')->name('profile.update.requests');
+
+        Route::get('/profile-request-details/{id}', 'details')->name('profile.requests.details');
+
+        Route::post('/profile-update/approve/{id}', 'approve')->name('profile.requests.approve');
+
+        Route::post('/profile-update/reject/{id}', 'reject')->name('profile.requests.reject');
+
+        Route::delete('/profile-requests/{id}/delete', 'delete')->name('profile.requests.delete');
+    });
+
+    Route::get(
+        '/admin/inactive-products',
+        [InactiveProductController::class, 'index']
+    )->name('admin.inactive.products');
+
+    Route::get('/inactive-products/{seller_id}', [InactiveProductController::class, 'show'])->name('inactive_products.show');
+
+
 
     //Support_Ticket
     Route::controller(SupportTicketController::class)->group(function () {
@@ -700,7 +683,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     Route::get('/blocks/edit/{id}', [BlocksController::class, 'edit'])->name('blocks.edit');
     Route::post('/blocks/update/{id}', [BlocksController::class, 'update'])->name('blocks.update');
     Route::get('/blocks/destroy/{id}', [BlocksController::class, 'destroy'])->name('blocks.destroy');
-    Route::post('/blocks/status', [BlocksController::class,'updateStatus'])->name('blocks.status');
+    Route::post('/blocks/status', [BlocksController::class, 'updateStatus'])->name('blocks.status');
 
     //subdisctricts
     Route::get('/subdistricts', [SubDistrictsController::class, 'index'])->name('subdistricts.index');
@@ -708,8 +691,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     Route::get('/subdistricts/edit/{id}', [SubDistrictsController::class, 'edit'])->name('subdistricts.edit');
     Route::post('/subdistricts/update/{id}', [SubDistrictsController::class, 'update'])->name('subdistricts.update');
     Route::get('/subdistricts/destroy/{id}', [SubDistrictsController::class, 'destroy'])->name('subdistricts.destroy');
-    Route::post('/subdistricts/status',[SubDistrictsController::class, 'updateStatus'])->name('subdistricts.status');
-    Route::get('/get-blocks',[SubDistrictsController::class, 'getBlocks'])->name('subdistricts.getBlocks');
+    Route::post('/subdistricts/status', [SubDistrictsController::class, 'updateStatus'])->name('subdistricts.status');
+    Route::get('/get-blocks', [SubDistrictsController::class, 'getBlocks'])->name('subdistricts.getBlocks');
+
 
     //Areas
     Route::resource('areas', AreaController::class);
@@ -718,9 +702,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/areas/destroy/{id}', 'destroy')->name('areas.destroy');
         Route::post('/areas/status', 'updateStatus')->name('areas.status');
     });
-
-
-
 
     Route::view('/system/update', 'backend.system.update')->name('system_update');
     Route::view('/system/server-status', 'backend.system.server_status')->name('system_server');

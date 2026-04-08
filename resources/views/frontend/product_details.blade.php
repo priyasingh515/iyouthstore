@@ -7,7 +7,7 @@
 @section('meta_keywords'){{ $detailedProduct->tags }}@stop
 
 @section('meta')
-    @php
+    {{-- @php
         $availability = "out of stock";
         $qty = 0;
         if($detailedProduct->variant_product) {
@@ -21,6 +21,9 @@
         if($qty > 0){
             $availability = "in stock";
         }
+    @endphp --}}
+      @php
+        $availability = 'in stock'; 
     @endphp
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="{{ $detailedProduct->meta_title }}">

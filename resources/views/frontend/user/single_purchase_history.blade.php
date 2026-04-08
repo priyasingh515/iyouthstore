@@ -34,18 +34,18 @@
       <div class="row align-items-center mb-2 d-none d-md-flex">
           <div class="col-md-6">
               <div class="row fs-12">
-                  <div class="col-auto w-200px">
-                      <span class="font-weight-bold light-blue">{{ get_shop_by_user_id($order->seller_id)->name??"Inhouse Products" }}</span>
-                  </div>
+                  <!--<div class="col-auto w-200px">-->
+                  <!--    <span class="font-weight-bold light-blue">{{ get_shop_by_user_id($order->seller_id)->name??"Inhouse Products" }}</span>-->
+                  <!--</div>-->
                   <div class="col">
                       <span class="text-muted">{{ translate('Date')}}: {{ date('d-m-Y', $order->date) }}</span>
                   </div>
               </div>
           </div>
           <div class="col-md-6 text-right">
-              <a type="button" class="btn btn-sm border rounded px-4 py-1 text-muted reorder-btn" href="{{ route('re_order', encrypt($order->id)) }}">
-                  {{ translate('Reorder') }}
-              </a>
+              <!--<a type="button" class="btn btn-sm border rounded px-4 py-1 text-muted reorder-btn" href="{{ route('re_order', encrypt($order->id)) }}">-->
+              <!--    {{ translate('Reorder') }}-->
+              <!--</a>-->
 
               <div class="d-inline-block dropdown ml-1">
                   <button type="button"

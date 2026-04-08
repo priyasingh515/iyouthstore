@@ -78,11 +78,11 @@
                                         In My Stock : {{ $product->product_stock ?? 0 }}
                                     </p>
 
-                                    @if ($stock > 0)
-                                        <span class="badge badge-inline badge-success mt-1">In Stock</span>
-                                    @else
-                                        <span class="badge badge-inline badge-danger mt-1">Out Of Stock</span>
-                                    @endif
+                                    <!--@if ($stock > 0)-->
+                                    <!--    <span class="badge badge-inline badge-success mt-1">In Stock</span>-->
+                                    <!--@else-->
+                                    <!--    <span class="badge badge-inline badge-danger mt-1">Out Of Stock</span>-->
+                                    <!--@endif-->
 
                                 </div>
 

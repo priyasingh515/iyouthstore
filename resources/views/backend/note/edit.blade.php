@@ -26,15 +26,15 @@
                     @csrf
 
                     <div class="form-group row">
-                        <label class="col-md-2 col-form-label">Subject</label>
+                        <label class="col-md-2 col-form-label">{{ translate('Type') }}</label>
                         <div class="col-md-10">
-                             <input type="text" name="note_type" id="" class="form-control" value="{{ $note->note_type }}">
-                            {{-- <select name="note_type" required class="form-control aiz-selectpicker mb-2 mb-md-0">
-                                @foreach ($types as $type)
-                                    <option value="{{ $type->value }}" class="text-uppercase" @selected($type->value == $note->note_type)>
-                                        {{ translate($type->name) }}</option>
-                                @endforeach
-                            </select> --}}
+                            <input type="text" class="form-control" value="{{ $note->note_type }}" required name="note_type">
+                            <!--<select name="note_type" required class="form-control aiz-selectpicker mb-2 mb-md-0">-->
+                            <!--    @foreach ($types as $type)-->
+                            <!--        <option value="{{ $type->value }}" class="text-uppercase" @selected($type->value == $note->note_type)>-->
+                            <!--            {{ translate($type->name) }}</option>-->
+                            <!--    @endforeach-->
+                            <!--</select>-->
                         </div>
                     </div>
 

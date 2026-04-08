@@ -28,8 +28,7 @@
     </div>
     {{-- <form action="{{ route('seller.profile.update', $user->id) }}" method="POST" enctype="multipart/form-data">
     <input name="_method" type="hidden" value="POST"> --}}
-    <form id="profileUpdateForm" action="{{ route('seller.profile.request.store') }}" method="POST"
-        enctype="multipart/form-data">
+    <form id="profileUpdateForm" action="{{ route('seller.profile.request.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <!-- Basic Info-->
         <div class="card">
@@ -163,7 +162,8 @@
     </div> --}}
 
         <div class="form-group mb-0 text-right">
-            <button type="submit" class="btn btn-primary">{{ translate('Send Update Request') }}</button>
+            <button type="submit"
+                class="btn btn-primary">{{ translate('Send Update Request') }}</button>
         </div>
     </form>
 
@@ -245,7 +245,8 @@
         </div>
     </div>
 
-    {{-- Shop Location --}}
+
+       {{-- Shop Location --}}
     <form action="{{route('seller.location.update')}}" method="POST">
         @csrf
 
@@ -330,6 +331,8 @@
         </div>
 
     </form>
+
+
 
     <!-- Change Email -->
     <form action="{{ route('user.change.email') }}" method="POST">
@@ -772,7 +775,7 @@
         });
     </script>
 
-    <script>
+     <script>
         function detectLocation() {
 
             if (navigator.geolocation) {
@@ -807,6 +810,8 @@
 
         }
     </script>
+
+
 
     @if (get_setting('google_map') == 1)
         @include('frontend.partials.google_map')

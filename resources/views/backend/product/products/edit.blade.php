@@ -184,7 +184,7 @@
                                                     <input type="number" lang="en"
                                                         class="form-control @error('min_qty') is-invalid @enderror"
                                                         name="min_qty"
-                                                        value="@if ($product->min_qty <= 1) {{ 1 }}@else{{ $product->min_qty }} @endif"
+                                                        value="{{$product->min_qty}}"
                                                         min="1">
                                                     <small
                                                         class="text-muted">{{ translate('The minimum quantity needs to be purchased by your customer.') }}</small>
@@ -749,7 +749,7 @@
                                         <label class="col-md-3 col-from-label">{{ translate('Seller Price') }} <span
                                                 class="text-danger">*</span></label>
                                         <div class="col-md-6">
-                                            <input type="text" placeholder="{{ translate('Seller Price') }}"
+                                            <input type="text" placeholder="{{ translate('Seller price') }}"
                                                 name="seller_price"
                                                 class="form-control @error('seller_price') is-invalid @enderror"
                                                 value="{{ $product->seller_price }}">
@@ -908,44 +908,45 @@
                                 </div>
 
                                 <!-- Stock Visibility State -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Stock Visibility State') }}</h5>
+                                <!--<h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">-->
+                                <!--    {{ translate('Stock Visibility State') }}</h5>-->
                                 <div class="w-100">
                                     <!-- Show Stock Quantity -->
-                                    <div class="form-group row">
-                                        <label
-                                            class="col-md-3 col-from-label">{{ translate('Show Stock Quantity') }}</label>
-                                        <div class="col-md-9">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="quantity"
-                                                    @if ($product->stock_visibility_state == 'quantity') checked @endif>
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <!--<div class="form-group row">-->
+                                    <!--    <label-->
+                                    <!--        class="col-md-3 col-from-label">{{ translate('Show Stock Quantity') }}</label>-->
+                                    <!--    <div class="col-md-9">-->
+                                    <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
+                                    <!--            <input type="radio" name="stock_visibility_state" value="quantity"-->
+                                    <!--                @if ($product->stock_visibility_state == 'quantity') checked @endif>-->
+                                    <!--            <span></span>-->
+                                    <!--        </label>-->
+                                    <!--    </div>-->
+                                    <!--</div>-->
                                     <!-- Show Stock With Text Only -->
-                                    <div class="form-group row">
-                                        <label
-                                            class="col-md-3 col-from-label">{{ translate('Show Stock With Text Only') }}</label>
-                                        <div class="col-md-9">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="text"
-                                                    @if ($product->stock_visibility_state == 'text') checked @endif>
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <!--<div class="form-group row">-->
+                                    <!--    <label-->
+                                    <!--        class="col-md-3 col-from-label">{{ translate('Show Stock With Text Only') }}</label>-->
+                                    <!--    <div class="col-md-9">-->
+                                    <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
+                                    <!--            <input type="radio" name="stock_visibility_state" value="text"-->
+                                    <!--                @if ($product->stock_visibility_state == 'text') checked @endif>-->
+                                    <!--            <span></span>-->
+                                    <!--        </label>-->
+                                    <!--    </div>-->
+                                    <!--</div>-->
                                     <!-- Hide Stock -->
-                                    <div class="form-group row">
-                                        <label class="col-md-3 col-from-label">{{ translate('Hide Stock') }}</label>
-                                        <div class="col-md-9">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="hide"
-                                                    @if ($product->stock_visibility_state == 'hide') checked @endif>
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <!--<div class="form-group row">-->
+                                    <!--    <label class="col-md-3 col-from-label">{{ translate('Hide Stock') }}</label>-->
+                                    <!--    <div class="col-md-9">-->
+                                    <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
+                                    <!--            <input type="radio" name="stock_visibility_state" value="hide"-->
+                                    <!--                @if ($product->stock_visibility_state == 'hide') checked @endif>-->
+                                    <!--            <span></span>-->
+                                    <!--        </label>-->
+                                    <!--    </div>-->
+                                    <!--</div>-->
+                                                                                    <input type="hidden" name="stock_visibility_state" value="hide">
                                 </div>
                             </div>
                         </div>

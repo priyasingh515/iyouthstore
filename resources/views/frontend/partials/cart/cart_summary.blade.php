@@ -154,13 +154,19 @@
                 @endif
             @endif
 
-            @if ($proceed == 1)
+      @if(Request::is('cart'))
+            @if ($proceed == 1 && session('is_within_radius'))
             <!-- Continue to Shipping -->
             <div class="mt-4">
+                
                 <a href="{{ route('checkout') }}" class="btn btn-primary btn-block fs-14 fw-700 rounded-0 px-4">
                     {{ translate('Proceed to Checkout')}} ({{ sprintf("%02d", count($carts)) }})
                 </a>
             </div>
+            @else 
+            
+            <p class="bg-warning p-1">Service Not available in your location...</p>
+            @endif
             @endif
 
         </div>

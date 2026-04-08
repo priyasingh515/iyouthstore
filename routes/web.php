@@ -75,7 +75,6 @@ Route::controller(DemoController::class)->group(function () {
     Route::get('/migrate_attribute_values', 'migrate_attribute_values');
 });
 
-
 Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
@@ -117,9 +116,6 @@ Route::controller(ShopController::class)->group(function () {
     Route::post('/shop/registration/verification-code-confirmation', 'regVerifyCodeConfirmation')->name('shop-reg.verify_code_confirmation');
     
 });
-
-
-  route::get('get-cities', [ShopController::class, 'getCities'])->name('getCities');
 
 Route::controller(HomeController::class)->group(function () {
     Route::get('/registration/verification', 'verifyRegEmailorPhone')->name('registration.verification');
@@ -410,6 +406,9 @@ Route::group(['middleware' => ['auth']], function () {
     });
 });
 
+  route::get('get-cities', [ShopController::class, 'getCities'])->name('getCities');
+
+
 Route::get('/instamojo/payment/pay-success', [InstamojoController::class, 'success'])->name('instamojo.success');
 
 Route::post('rozer/payment/pay-success', [RazorpayController::class, 'payment'])->name('payment.rozer');
@@ -516,4 +515,5 @@ Route::controller(ContactController::class)->group(function () {
 });
 
 Route::post('/store-location', [HomeController::class, 'store'])->name('store-location');
+
 

@@ -57,13 +57,13 @@
                                 value="{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}" disabled>
                         @endif
                     </div>
-                    {{-- <div class="col-md-3 ml-auto">
-                        <label for="update_tracking_code">
-                            {{ translate('Tracking Code (optional)') }}
-                        </label>
-                        <input type="text" class="form-control" id="update_tracking_code"
-                            value="{{ $order->tracking_code }}">
-                    </div> --}}
+                    <!--<div class="col-md-3 ml-auto">-->
+                    <!--    <label for="update_tracking_code">-->
+                    <!--        {{ translate('Tracking Code (optional)') }}-->
+                    <!--    </label>-->
+                    <!--    <input type="text" class="form-control" id="update_tracking_code"-->
+                    <!--        value="{{ $order->tracking_code }}">-->
+                    <!--</div>-->
                 @endif
             </div>
             <div class="row gutters-5 mt-2">
@@ -205,17 +205,17 @@
                                         <div class="border rounded p-3 shadow-sm bg-white">
                                             <p class="mb-2"><strong>Payment Proof</strong></p>
 
-                                            <a href="{{ asset('uploads/payment_proof/' . $order->payment_proof) }}"
+                                            <a href="{{ asset('public/uploads/payment_proof/' . $order->payment_proof) }}"
                                                 target="_blank">
 
-                                                <img src="{{ asset('uploads/payment_proof/' . $order->payment_proof) }}"
+                                                <img src="{{ asset('public/uploads/payment_proof/' . $order->payment_proof) }}"
                                                     class="img-fluid rounded shadow"
-                                                    style="max-height:220px; object-fit:cover;">
+                                                    style="max-height:80px; object-fit:cover;">
 
                                             </a>
 
                                             <div class="mt-2">
-                                                <a href="{{ asset('uploads/payment_proof/' . $order->payment_proof) }}"
+                                                <a href="{{ asset('public/uploads/payment_proof/' . $order->payment_proof) }}"
                                                     class="btn btn-sm btn-outline-success" target="_blank">
                                                     <i class="las la-download"></i> Download
                                                 </a>

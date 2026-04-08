@@ -81,6 +81,7 @@
                                 <th data-breakpoints="md">{{ translate('Amount') }}</th>
                                 <th data-breakpoints="lg">{{ translate('Delivery Status') }}</th>
                                 <th>{{ translate('Payment Status') }}</th>
+                                <th>{{ translate('Action') }}</th>
                                 <th class="text-right">{{ translate('Options') }}</th>
                             </tr>
                         </thead>
@@ -135,6 +136,30 @@
                                                 <span class="badge badge-inline badge-danger">{{ translate('Unpaid') }}</span>
                                             @endif
                                         </td>
+                                        
+                                        
+                                        <td>
+                                            @if($order->seller_approval == 0)
+                                             <a href="{{ route('seller.orders.show', encrypt($order->id)) }}"
+                                                class="btn btn-success btn-sm "
+                                                title="{{ translate('Accept Order') }}">
+                                              {{ translate('Accept Order') }}
+                                            </a>
+                                            
+                                                <a href="{{ route('seller.orders.show', encrypt($order->id)) }}"
+                                                class="btn btn-info btn-sm "
+                                                title="{{ translate('Reject & Transfer Order') }}">
+                                              {{ translate('Reject & Transfer Order') }}
+                                            </a>
+                                            @else 
+                                              <a href="{{ route('seller.orders.show', encrypt($order->id)) }}"
+                                                class="btn btn-danger btn-sm "
+                                                title="{{ translate('Reject Order') }}">
+                                              {{ translate('Reject Order') }}
+                                            </a>
+                                            @endif
+                                        </td>
+                                        
                                         <td class="text-right">
                                             @if (addon_is_activated('pos_system') && $order->order_from == 'pos')
                                                 <a class="btn btn-soft-success btn-icon btn-circle btn-sm"

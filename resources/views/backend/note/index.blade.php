@@ -16,19 +16,19 @@
         </div>
     </div>
 
-    {{-- <div class="card">
-        <div class="card-body">
-            <div class="form-group mb-0 row">
-                <label class="col-md-2 col-from-label">{{translate('Seller Can Add Note')}}?</label>
-                <div class="col-md-10">
-                    <label class="aiz-switch aiz-switch-success mb-0">
-                        <input type="checkbox" onchange="updateSettings(this, 'seller_can_add_note')" @if(get_setting('seller_can_add_note')) checked @endif >
-                        <span></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div> --}}
+    <!--<div class="card">-->
+    <!--    <div class="card-body">-->
+    <!--        <div class="form-group mb-0 row">-->
+    <!--            <label class="col-md-2 col-from-label">{{translate('Seller Can Add Note')}}?</label>-->
+    <!--            <div class="col-md-10">-->
+    <!--                <label class="aiz-switch aiz-switch-success mb-0">-->
+    <!--                    <input type="checkbox" onchange="updateSettings(this, 'seller_can_add_note')" @if(get_setting('seller_can_add_note')) checked @endif >-->
+    <!--                    <span></span>-->
+    <!--                </label>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</div>-->
 
     <div class="card">
         <form class="" id="sort_notes" action="" method="GET">
@@ -43,14 +43,14 @@
                         href="javascript:void(0);" onclick="sort_notes('all')">
                         {{ translate('All') }}
                     </a>
-                    <a class="btn btn-sm btn-circle fs-12 fw-600 mr-2 {{ $noteUserType == 'in_house' ? $activeClasss : $inActiveClasses }}"
-                        href="javascript:void(0);" onclick="sort_notes('in_house')">
-                        {{ translate('In-House') }}
-                    </a>
-                    <a class="btn btn-sm btn-circle fs-12 fw-600 mr-2 {{ $noteUserType == 'seller' ? $activeClasss : $inActiveClasses }}"
-                        href="javascript:void(0);" onclick="sort_notes('seller')">
-                        {{ translate('Seller') }}
-                    </a>
+                    <!--<a class="btn btn-sm btn-circle fs-12 fw-600 mr-2 {{ $noteUserType == 'in_house' ? $activeClasss : $inActiveClasses }}"-->
+                    <!--    href="javascript:void(0);" onclick="sort_notes('in_house')">-->
+                    <!--    {{ translate('In-House') }}-->
+                    <!--</a>-->
+                    <!--<a class="btn btn-sm btn-circle fs-12 fw-600 mr-2 {{ $noteUserType == 'seller' ? $activeClasss : $inActiveClasses }}"-->
+                    <!--    href="javascript:void(0);" onclick="sort_notes('seller')">-->
+                    <!--    {{ translate('Seller') }}-->
+                    <!--</a>-->
                 </div>
                 <div class="d-flex mt-3">
                     <div class="form-group mb-0">
@@ -68,7 +68,7 @@
                         <th data-breakpoints="lg">{{ translate('User') }}</th>
                         <th data-breakpoints="lg">{{ translate('Type') }}</th>
                         <th data-breakpoints="lg" width="60%">{{ translate('Description') }}</th>
-                        <th data-breakpoints="lg">{{ translate('Seller Can Access') }}?</th>
+                        <!--<th data-breakpoints="lg">{{ translate('Seller Can Access') }}?</th>-->
                         <th width="10%" class="text-right">{{ translate('Options') }}</th>
                     </tr>
                 </thead>
@@ -82,14 +82,14 @@
                                     }}</td>
                             <td>{{ translate($note->note_type) }}</td>
                             <td><p class="text-truncate-2">{{ $note->getTranslation('description') }}</p></td>
-                            <td>
-                                @if( $note->user_id == get_admin()->id)
-                                    <label class="aiz-switch aiz-switch-success mb-0">
-                                        <input onchange="updateSellerAccess(this)" value="{{ $note->id }}" type="checkbox" <?php if ($note->seller_access == 1) echo "checked"; ?> >
-                                        <span class="slider round"></span>
-                                    </label>
-                                @endif
-                            </td>
+                            <!--<td>-->
+                            <!--    @if( $note->user_id == get_admin()->id)-->
+                            <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
+                            <!--            <input onchange="updateSellerAccess(this)" value="{{ $note->id }}" type="checkbox" <?php if ($note->seller_access == 1) echo "checked"; ?> >-->
+                            <!--            <span class="slider round"></span>-->
+                            <!--        </label>-->
+                            <!--    @endif-->
+                            <!--</td>-->
                             <td class="text-right">
                                 <a href="javascript:void(0);" onclick="noteView('{{ route('get-single-note', $note->id )}}')" class="btn btn-soft-success btn-icon btn-circle btn-sm" title="{{ translate('Note Description') }}">
                                     <i class="las la-eye"></i>

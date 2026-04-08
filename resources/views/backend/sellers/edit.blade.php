@@ -77,23 +77,11 @@
                                 @foreach ($districts as $district)
                                     <option value="{{ $district->id }}"
                                         {{ $shop->user->district == $district->id ? 'selected' : '' }}>
-
                                         {{ $district->name }}
-
                                     </option>
                                 @endforeach
 
-                                <option value="other" {{ !is_numeric($shop->user->district) ? 'selected' : '' }}>
-                                    Other
-                                </option>
-
                             </select>
-
-
-                            <input type="text" name="district_manual" id="districtManual"
-                                class="form-control mt-2 {{ !is_numeric($shop->user->district) ? '' : 'd-none' }}"
-                                value="{{ !is_numeric($shop->user->district) ? $shop->user->district : '' }}"
-                                placeholder="Enter District">
 
                         </div>
                     </div>
@@ -121,17 +109,7 @@
                                     </option>
                                 @endforeach
 
-                                <option value="other" {{ !is_numeric($shop->user->block) ? 'selected' : '' }}>
-                                    Other
-                                </option>
-
                             </select>
-
-
-                            <input type="text" name="block_manual" id="blockManual"
-                                class="form-control mt-2 {{ !is_numeric($shop->user->block) ? '' : 'd-none' }}"
-                                value="{{ !is_numeric($shop->user->block) ? $shop->user->block : '' }}"
-                                placeholder="Enter Block">
 
                         </div>
                     </div>
@@ -159,17 +137,7 @@
                                     </option>
                                 @endforeach
 
-                                <option value="other" {{ !is_numeric($shop->user->sub_district) ? 'selected' : '' }}>
-                                    Other
-                                </option>
-
                             </select>
-
-
-                            <input type="text" name="sub_district_manual" id="subManual"
-                                class="form-control mt-2 {{ !is_numeric($shop->user->sub_district) ? '' : 'd-none' }}"
-                                value="{{ !is_numeric($shop->user->sub_district) ? $shop->user->sub_district : '' }}"
-                                placeholder="Enter SubDistrict">
 
                         </div>
                     </div>
@@ -185,25 +153,6 @@
                         <div class="col-sm-9">
 
                             <input type="text" name="city" class="form-control" value="{{ $shop->user->city }}">
-
-                        </div>
-                    </div>
-
-
-
-                    {{-- Password --}}
-                    <div class="form-group row">
-                        <label class="col-sm-3 col-from-label">
-                            Password
-                        </label>
-
-                        <div class="col-sm-9">
-
-                            <input type="password" name="password" class="form-control">
-
-                            <small class="text-muted">
-                                Leave blank if you don't want to change password
-                            </small>
 
                         </div>
                     </div>
@@ -235,40 +184,25 @@
             let selectedBlock = $('.block-select').val();
             let selectedSub = $('.subdistrict-select').val();
 
-
+     
             $('.block-select option').hide();
             $('.block-select option:first').show();
-            $('.block-select option[value="other"]').show();
 
-    
             $('.block-select option').each(function() {
-
                 if ($(this).data('district') == selectedDistrict) {
-
                     $(this).show();
-
                 }
-
             });
 
-  
             $('.block-select').val(selectedBlock);
-
-
 
             $('.subdistrict-select option').hide();
             $('.subdistrict-select option:first').show();
-            $('.subdistrict-select option[value="other"]').show();
 
-      
             $('.subdistrict-select option').each(function() {
-
                 if ($(this).data('block') == selectedBlock) {
-
                     $(this).show();
-
                 }
-
             });
 
             $('.subdistrict-select').val(selectedSub);
@@ -283,20 +217,14 @@
 
                 $('.block-select option').hide();
                 $('.block-select option:first').show();
-                $('.block-select option[value="other"]').show();
 
                 $('.block-select option').each(function() {
-
                     if ($(this).data('district') == district) {
-
                         $(this).show();
-
                     }
-
                 });
 
             });
-
 
             $('.block-select').on('change', function() {
 
@@ -306,16 +234,11 @@
 
                 $('.subdistrict-select option').hide();
                 $('.subdistrict-select option:first').show();
-                $('.subdistrict-select option[value="other"]').show();
 
                 $('.subdistrict-select option').each(function() {
-
                     if ($(this).data('block') == block) {
-
                         $(this).show();
-
                     }
-
                 });
 
             });

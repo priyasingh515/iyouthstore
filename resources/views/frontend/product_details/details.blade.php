@@ -448,7 +448,7 @@
                                 <input type="number" name="quantity"
                                     class="col border-0 text-center flex-grow-1 fs-16 input-number" placeholder="1"
                                     value="{{ $detailedProduct->min_qty }}" min="{{ $detailedProduct->min_qty }}"
-                                    max="10" lang="en">
+                                    max="10"z lang="en">
                                 <button class="btn col-auto btn-icon btn-sm btn-light rounded-0" type="button"
                                     data-type="plus" data-field="quantity">
                                     <i class="las la-plus"></i>
@@ -460,14 +460,14 @@
                                     $qty += $stock->qty;
                                 }
                             @endphp
-                            <div class="avialable-amount opacity-60">
+                            {{-- <div class="avialable-amount opacity-60">
                                 @if ($detailedProduct->stock_visibility_state == 'quantity')
                                     (<span id="available-quantity">{{ $qty }}</span>
                                     {{ translate('available') }})
                                 @elseif($detailedProduct->stock_visibility_state == 'text' && $qty >= 1)
                                     (<span id="available-quantity">{{ translate('In Stock') }}</span>)
                                 @endif
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>

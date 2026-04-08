@@ -15,11 +15,11 @@
     @endcan
 </div>
 
-<p>
-    <span class="bg-danger d-inline-block h-10px rounded-2 w-10px" ></span> {{ translate('This color indicates that the customer is marked as blocked.') }}
-    <br>
-    <span class="bg-info d-inline-block h-10px rounded-2 w-10px"></span> {{ translate('This color indicates that the customer is marked as suspicious.') }}
-</p>
+<!--<p>-->
+<!--    <span class="bg-danger d-inline-block h-10px rounded-2 w-10px" ></span> {{ translate('This color indicates that the customer is marked as blocked.') }}-->
+<!--    <br>-->
+<!--    <span class="bg-info d-inline-block h-10px rounded-2 w-10px"></span> {{ translate('This color indicates that the customer is marked as suspicious.') }}-->
+<!--</p>-->
 
 <div class="card">
     <form class="" id="sort_customers" action="" method="GET">
@@ -67,8 +67,8 @@
                         <th>{{translate('Name')}}</th>
                         <th data-breakpoints="lg">{{translate('Email Address')}}</th>
                         <th data-breakpoints="lg">{{translate('Phone')}}</th>
-                        <th data-breakpoints="lg">{{translate('Package')}}</th>
-                        <th data-breakpoints="lg">{{translate('Wallet Balance')}}</th>
+                        <!--<th data-breakpoints="lg">{{translate('Package')}}</th>-->
+                        <!--<th data-breakpoints="lg">{{translate('Wallet Balance')}}</th>-->
                         <th data-breakpoints="lg">{{translate('Verification Status')}}</th>
                         <th class="text-right">{{translate('Options')}}</th>
                     </tr>
@@ -98,12 +98,12 @@
                                     </p>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->phone}}</td>
-                                <td>
-                                    @if ($user->customer_package != null)
-                                        {{$user->customer_package->getTranslation('name')}}
-                                    @endif
-                                </td>
-                                <td>{{single_price($user->balance)}}</td>
+                                <!--<td>-->
+                                <!--    @if ($user->customer_package != null)-->
+                                <!--        {{$user->customer_package->getTranslation('name')}}-->
+                                <!--    @endif-->
+                                <!--</td>-->
+                                <!--<td>{{single_price($user->balance)}}</td>-->
                                 <td>
                                     @if($user->email_verified_at != null)
                                         <span class="badge badge-inline badge-success">{{translate('Verified')}}</span>
@@ -112,22 +112,22 @@
                                     @endif
                                 </td>
                                 <td class="text-right">
-                                    @if($user->email_verified_at != null && auth()->user()->can('login_as_customer'))
-                                        <a href="{{route('customers.login', encrypt($user->id))}}" class="btn btn-soft-primary btn-icon btn-circle btn-sm" title="{{ translate('Log in as this Customer') }}">
-                                            <i class="las la-edit"></i>
-                                        </a>
-                                    @endif
-                                    @can('ban_customer')
-                                        @if($user->banned != 1)
-                                            <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm" onclick="confirm_ban('{{route('customers.ban', encrypt($user->id))}}');" title="{{ translate('Ban this Customer') }}">
-                                                <i class="las la-user-slash"></i>
-                                            </a>
-                                            @else
-                                            <a href="#" class="btn btn-soft-success btn-icon btn-circle btn-sm" onclick="confirm_unban('{{route('customers.ban', encrypt($user->id))}}');" title="{{ translate('Unban this Customer') }}">
-                                                <i class="las la-user-check"></i>
-                                            </a>
-                                        @endif
-                                    @endcan
+                                    <!--@if($user->email_verified_at != null && auth()->user()->can('login_as_customer'))-->
+                                    <!--    <a href="{{route('customers.login', encrypt($user->id))}}" class="btn btn-soft-primary btn-icon btn-circle btn-sm" title="{{ translate('Log in as this Customer') }}">-->
+                                    <!--        <i class="las la-edit"></i>-->
+                                    <!--    </a>-->
+                                    <!--@endif-->
+                                    <!--@can('ban_customer')-->
+                                    <!--    @if($user->banned != 1)-->
+                                    <!--        <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm" onclick="confirm_ban('{{route('customers.ban', encrypt($user->id))}}');" title="{{ translate('Ban this Customer') }}">-->
+                                    <!--            <i class="las la-user-slash"></i>-->
+                                    <!--        </a>-->
+                                    <!--        @else-->
+                                    <!--        <a href="#" class="btn btn-soft-success btn-icon btn-circle btn-sm" onclick="confirm_unban('{{route('customers.ban', encrypt($user->id))}}');" title="{{ translate('Unban this Customer') }}">-->
+                                    <!--            <i class="las la-user-check"></i>-->
+                                    <!--        </a>-->
+                                    <!--    @endif-->
+                                    <!--@endcan-->
                                     @can('delete_customer')
                                         <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete" data-href="{{route('customers.destroy', $user->id)}}" title="{{ translate('Delete') }}">
                                             <i class="las la-trash"></i>

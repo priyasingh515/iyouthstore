@@ -517,25 +517,25 @@
                                     </li>
                                 @endif
 
-                                <li class="user-top-nav-element border border-top-0" data-id="1">
-                                    <a href="{{ route('digital_purchase_history.index') }}"
-                                        class="text-truncate text-dark px-4 fs-14 d-flex align-items-center hov-column-gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16.001" height="16"
-                                            viewBox="0 0 16.001 16">
-                                            <g id="Group_25262" data-name="Group 25262"
-                                                transform="translate(-1388.154 -562.604)">
-                                                <path id="Path_2963" data-name="Path 2963"
-                                                    d="M77.864,98.69V92.1a.5.5,0,1,0-1,0V98.69l-1.437-1.437a.5.5,0,0,0-.707.707l1.851,1.852a1,1,0,0,0,.707.293h.172a1,1,0,0,0,.707-.293l1.851-1.852a.5.5,0,0,0-.7-.713Z"
-                                                    transform="translate(1318.79 478.5)" fill="#b5b5bf" />
-                                                <path id="Path_2964" data-name="Path 2964"
-                                                    d="M67.155,88.6a3,3,0,0,1-.474-5.963q-.009-.089-.015-.179a5.5,5.5,0,0,1,10.977-.718,3.5,3.5,0,0,1-.989,6.859h-1.5a.5.5,0,0,1,0-1l1.5,0a2.5,2.5,0,0,0,.417-4.967.5.5,0,0,1-.417-.5,4.5,4.5,0,1,0-8.908.866.512.512,0,0,1,.009.121.5.5,0,0,1-.52.479,2,2,0,1,0-.162,4l.081,0h2a.5.5,0,0,1,0,1Z"
-                                                    transform="translate(1324 486)" fill="#b5b5bf" />
-                                            </g>
-                                        </svg>
-                                        <span
-                                            class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>
-                                    </a>
-                                </li>
+                                <!--<li class="user-top-nav-element border border-top-0" data-id="1">-->
+                                <!--    <a href="{{ route('digital_purchase_history.index') }}"-->
+                                <!--        class="text-truncate text-dark px-4 fs-14 d-flex align-items-center hov-column-gap-1">-->
+                                <!--        <svg xmlns="http://www.w3.org/2000/svg" width="16.001" height="16"-->
+                                <!--            viewBox="0 0 16.001 16">-->
+                                <!--            <g id="Group_25262" data-name="Group 25262"-->
+                                <!--                transform="translate(-1388.154 -562.604)">-->
+                                <!--                <path id="Path_2963" data-name="Path 2963"-->
+                                <!--                    d="M77.864,98.69V92.1a.5.5,0,1,0-1,0V98.69l-1.437-1.437a.5.5,0,0,0-.707.707l1.851,1.852a1,1,0,0,0,.707.293h.172a1,1,0,0,0,.707-.293l1.851-1.852a.5.5,0,0,0-.7-.713Z"-->
+                                <!--                    transform="translate(1318.79 478.5)" fill="#b5b5bf" />-->
+                                <!--                <path id="Path_2964" data-name="Path 2964"-->
+                                <!--                    d="M67.155,88.6a3,3,0,0,1-.474-5.963q-.009-.089-.015-.179a5.5,5.5,0,0,1,10.977-.718,3.5,3.5,0,0,1-.989,6.859h-1.5a.5.5,0,0,1,0-1l1.5,0a2.5,2.5,0,0,0,.417-4.967.5.5,0,0,1-.417-.5,4.5,4.5,0,1,0-8.908.866.512.512,0,0,1,.009.121.5.5,0,0,1-.52.479,2,2,0,1,0-.162,4l.081,0h2a.5.5,0,0,1,0,1Z"-->
+                                <!--                    transform="translate(1324 486)" fill="#b5b5bf" />-->
+                                <!--            </g>-->
+                                <!--        </svg>-->
+                                <!--        <span-->
+                                <!--            class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>-->
+                                <!--    </a>-->
+                                <!--</li>-->
                                 @if (get_setting('conversation_system') == 1)
                                     <li class="user-top-nav-element border border-top-0" data-id="1">
                                         <a href="{{ route('conversations.index') }}"

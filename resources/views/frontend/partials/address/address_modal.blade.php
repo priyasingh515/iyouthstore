@@ -1,3 +1,4 @@
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- New Address Modal -->
 <div class="modal fade" id="new-address-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -134,10 +135,10 @@
                                 <input type="hidden" name="country_code" value="">
                             </div>
                         </div>
-
-                        <input type="hidden" id="latitude" name="latitude">
-                        <input type="hidden" id="longitude" name="longitude">
-                        {{-- <button type="button" onclick="getLocation()">Use My Location</button> --}}
+                        
+                        <!--<input type="hidden" id="latitude" name="latitude">-->
+                        <!--<input type="hidden" id="longitude" name="longitude">-->
+                        <!--<button type="button" onclick="getLocation()">Use My Location</button>-->
 
                         <!-- Save button -->
                         <div class="form-group text-right">
@@ -167,7 +168,6 @@
         </div>
     </div>
 </div>
-
 <script>
     function getLocation() {
         if (navigator.geolocation) {

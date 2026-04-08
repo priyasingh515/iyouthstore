@@ -164,19 +164,19 @@
                                                 @endif
                                             </div>
 
-                                            <div class="form-group">
-                                                <label for="shop_name"
-                                                    class="fs-12 fw-700 text-soft-dark">{{ translate('Shop Name') }}</label>
-                                                <input type="text"
-                                                    class="form-control rounded-0{{ $errors->has('shop_name') ? ' is-invalid' : '' }}"
-                                                    value="{{ old('shop_name') }}"
-                                                    placeholder="{{ translate('Shop Name') }}" name="shop_name" required>
-                                                @if ($errors->has('shop_name'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('shop_name') }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>
+                                            <!--<div class="form-group">-->
+                                            <!--    <label for="shop_name"-->
+                                            <!--        class="fs-12 fw-700 text-soft-dark">{{ translate('Shop Name') }}</label>-->
+                                            <!--    <input type="text"-->
+                                            <!--        class="form-control rounded-0{{ $errors->has('shop_name') ? ' is-invalid' : '' }}"-->
+                                            <!--        value="{{ old('shop_name') }}"-->
+                                            <!--        placeholder="{{ translate('Shop Name') }}" name="shop_name" required>-->
+                                            <!--    @if ($errors->has('shop_name'))-->
+                                            <!--        <span class="invalid-feedback" role="alert">-->
+                                            <!--            <strong>{{ $errors->first('shop_name') }}</strong>-->
+                                            <!--        </span>-->
+                                            <!--    @endif-->
+                                            <!--</div>-->
 
                                             <!-- password -->
                                             <div class="form-group mb-0">
@@ -219,6 +219,54 @@
 
                                             <input type="hidden" name="latitude" id="latitude">
                                             <input type="hidden" name="longitude" id="longitude">
+                                            
+                                            
+                                                <div class="container">
+        
+           <div class="col-lg-12">
+                    <div>
+        
+    <div onclick="openstoreFormModal()"
+        class="btn btn-outline-primary ml-2">
+        Click here to start your iYouth Store
+        
+    </div>
+                    </div>
+                </div>
+    </div>
+    
+
+<div class="modal fade" id="storeForm" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+
+
+<div class="modal-body">
+        If you want to start your own business and are interested in getting an iYouth Store franchise, please download the files from the link below, study them, and then apply to open a franchise store.
+Fill out the application completely and send it to iYouth Pvt. Ltd. .
+      </div>
+      
+      <div>
+
+          <a class="btn btn-small btn-primary mx-2" href="{{ asset('public/uploads/all/files/image1.jpeg') }}">
+              <!--About iYouth Store-->
+                            Brochure 1
+          </a>
+                    <a class="btn btn-small btn-primary mx-2" href="{{ asset('public/uploads/all/files/image2.jpeg') }}">
+              <!--About iYouth Store-->
+                            Brochure 2
+          </a>
+          <a class="btn btn-small btn-info mx-2 mt-2 mt-md-0" href="{{ asset('public/uploads/all/files/application_form2.pdf') }}">
+              Application Form
+          </a>
+          
+      </div>
+
+        </div>
+    </div>
+</div>
+
+    
 
 
                                             <!-- Recaptcha -->
@@ -333,11 +381,48 @@
 
         });
     </script>
+    
+         <script>
+             
+             
+        document.addEventListener("DOMContentLoaded", function() {
+
+function openstoreFormModal() {
+    $('#storeForm').modal('show');
+}
+
+            if (navigator.geolocation) {
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+
+                        document.getElementById("latitude").value =
+                            position.coords.latitude;
+
+                        document.getElementById("longitude").value =
+                            position.coords.longitude;
+
+                        console.log("Latitude:", position.coords.latitude);
+                        console.log("Longitude:", position.coords.longitude);
+                    },
+                    function(error) {
+                        alert("Location access denied or unavailable.");
+                    }
+                );
+
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+
+        });
+    </script>
+
     <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @if (get_setting('google_recaptcha') == 1 && get_setting('recaptcha_seller_register') == 1)
         <script src="https://www.google.com/recaptcha/api.js?render={{ env('CAPTCHA_KEY') }}"></script>
+    
 
         <script type="text/javascript">
             document.getElementById('reg-form').addEventListener('submit', function(e) {
