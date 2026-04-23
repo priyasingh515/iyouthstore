@@ -103,16 +103,27 @@
                                 </td>
 
                                 <td class="text-right">
+                                    {{-- <a class="btn btn-soft-warning btn-icon btn-circle btn-sm"
+                                        href="{{ route('payment.view', $order->id) }}"
+                                        title="View Payment">
+                                        <i class="las la-credit-card"></i>
+                                    </a> --}}
+
+                                    <button type="button"
+                                        class="btn btn-soft-warning btn-icon btn-circle btn-sm view-payment-btn"
+                                        data-id="{{ $order->id }}">
+                                        <i class="las la-credit-card"></i>
+                                    </button>
 
                                     <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
                                         href="{{ route('seller-purchases.show', encrypt($order->id)) }}" title="View">
                                         <i class="las la-eye"></i>
                                     </a>
 
-                                    <!-- <a class="btn btn-soft-info btn-icon btn-circle btn-sm"
+                                    <a class="btn btn-soft-info btn-icon btn-circle btn-sm"
                                         href="{{ route('invoice.download', $order->id) }}" title="Download Invoice">
                                         <i class="las la-download"></i>
-                                    </a> -->
+                                    </a>
 
                                     <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm"
                                         onclick="confirmDelete(event, {{ $order->id }})" title="Delete">
@@ -176,6 +187,65 @@
     </div>
 
 
+    {{-- <div class="modal fade" id="paymentModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5>Payment Details</h5>
+                    <button type="button" onclick="closeModal()">×</button>
+                </div>
+
+                <div class="modal-body" id="paymentModalBody">
+                    Loading...
+                </div>
+
+            </div>
+        </div>
+    </div> --}}
+
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="las la-credit-card"></i> Payment Details
+                </h5>
+
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    &times;
+                </button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body p-4" id="paymentModalBody">
+
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2 text-muted">Loading payment details...</p>
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer justify-content-between">
+
+                <small class="text-muted">
+                    Verify payment before approving
+                </small>
+
+                <button type="button" class="btn btn-light" data-dismiss="modal">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
     <script>
         let deleteOrderId = null;
         let confirmAction = null;
@@ -222,6 +292,119 @@
 
         $('#reusable-confirm-modal').on('hidden.bs.modal', function() {
             confirmAction = null;
+        });
+    </script>
+    <script>
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.view-payment-btn');
+
+            if (!btn) {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const orderId = btn.dataset.id;
+            const modalBody = document.getElementById('paymentModalBody');
+            let paymentUrl = "{{ route('payment.view', ':id') }}";
+            paymentUrl = paymentUrl.replace(':id', orderId);
+
+            modalBody.innerHTML = 'Loading...';
+            $('#paymentModal').modal('show');
+
+            fetch(paymentUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load payment details');
+                    }
+
+                    return response.text();
+                })
+                .then(data => {
+                    modalBody.innerHTML = data;
+                })
+                .catch(() => {
+                    modalBody.innerHTML = 'Error loading data';
+                });
+        });
+
+        function closeModal() {
+            $('#paymentModal').modal('hide');
+        }
+    </script>
+
+    <script>
+        document.addEventListener('click', function(e) {
+
+            // APPROVE
+            if (e.target.closest('.approve-btn')) {
+
+                let id = e.target.closest('.approve-btn').dataset.id;
+
+                let url = "{{ url('admin/payment') }}/" + id + "/approve";
+
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(async res => {
+                        if (!res.ok) {
+                            let text = await res.text();
+                            console.error(text);
+                            throw new Error('Server error');
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Something went wrong');
+                    });
+            }
+
+            // REJECT
+            if (e.target.closest('.reject-btn')) {
+
+                let id = e.target.closest('.reject-btn').dataset.id;
+
+                let url = "{{ url('admin/payment') }}/" + id + "/reject";
+
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(async res => {
+                        if (!res.ok) {
+                            let text = await res.text();
+                            console.error(text);
+                            throw new Error('Server error');
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Something went wrong');
+                    });
+            }
+
         });
     </script>
 @endsection

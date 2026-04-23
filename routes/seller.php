@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\Seller\DashboardController;
+use App\Http\Controllers\Seller\OrderController;
 use App\Http\Controllers\Seller\PurchaseController;
 use App\Http\Controllers\ProfileUpdateRequestController;
+use App\Http\Controllers\Seller\PaymentController;
 use App\Http\Controllers\Seller\ProfileController;
 
 //Upload
@@ -85,6 +87,10 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
 
     //Order
     Route::resource('orders', OrderController::class);
+    Route::post('/order/reject', [OrderController::class, 'rejectOrder'])->name('order.reject');
+    Route::post('/order/accept', [OrderController::class, 'acceptOrder'])->name('order.accept');
+    Route::get('/order-products/{id}', [OrderController::class, 'getOrderProducts'])->name('order.products');
+    Route::post('/order/partial-accept', [OrderController::class, 'acceptPartialOrderSimple'])->name('order.partial.accept');
     Route::controller(OrderController::class)->group(function () {
         Route::post('/orders/update_delivery_status', 'update_delivery_status')->name('orders.update_delivery_status');
         Route::post('/orders/update_payment_status', 'update_payment_status')->name('orders.update_payment_status');
@@ -92,6 +98,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         // Order bulk export
         Route::get('/order-bulk-export', 'orderBulkExport')->name('order-bulk-export');
     });
+
+
 
     Route::controller(InvoiceController::class)->group(function () {
         Route::get('/invoice/{order_id}', 'invoice_download')->name('invoice.download');
@@ -129,7 +137,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     )->name('profile.request.store');
 
 
-      Route::post('location/update',[ProfileController::class,'updateLocation'])->name('location.update');
+    Route::post('location/update', [ProfileController::class, 'updateLocation'])->name('location.update');
 
     //Buy Products
 
@@ -147,6 +155,10 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         ->name('my-purchases');
     Route::get('/my-purchases/{id}', [PurchaseController::class, 'showPurchase'])->name('my-purchases.show');
 
+    //Payments
+
+    Route::get('/payment', [PurchaseController::class, 'showPaymentDetails'])->name('payment.page');
+    Route::post('/payment/submit', [PurchaseController::class, 'store'])->name('payment.submit');
 
     // Address
     Route::resource('addresses', AddressController::class);

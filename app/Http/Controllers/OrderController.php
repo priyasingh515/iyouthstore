@@ -17,8 +17,11 @@ use App\Models\SmsTemplate;
 use Auth;
 use Mail;
 use App\Mail\InvoiceEmailManager;
+use App\Models\OrderSellerQueue;
 use App\Models\OrdersExport;
+use App\Models\OutOfStockRequest;
 use App\Models\SellerProduct;
+use App\Models\Shop;
 use App\Utility\NotificationUtility;
 use CoreComponentRepository;
 use App\Utility\SmsUtility;
@@ -27,6 +30,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\OrderNotification;
 use App\Utility\EmailUtility;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -347,167 +351,415 @@ class OrderController extends Controller
     // }
 
 
+    // public function store(Request $request)
+    // {
+    //     $carts = Cart::where('user_id', Auth::id())->active()->get();
+
+    //     if ($carts->isEmpty()) {
+    //         flash(translate('Your cart is empty'))->warning();
+    //         return redirect()->route('home');
+    //     }
+
+    //     $address = Address::where('id', $carts[0]['address_id'])->first();
+
+
+    //     $customerLat = null;
+    //     $customerLng = null;
+
+    //     if ($address && $address->latitude && $address->longitude) {
+
+    //         $customerLat = $address->latitude;
+    //         $customerLng = $address->longitude;
+    //     } elseif (session()->has('user_latitude') && session()->has('user_longitude')) {
+
+    //         $customerLat = session('user_latitude');
+    //         $customerLng = session('user_longitude');
+    //     } else {
+    //         flash(translate('Please set your delivery location'))->warning();
+    //         return redirect()->back();
+    //     }
+
+
+    //     if (!$address || !$address->latitude || !$address->longitude) {
+    //         flash(translate('Location not found'))->warning();
+    //         return redirect()->back();
+    //     }
+
+    //     $customerLat = $address->latitude;
+    //     $customerLng = $address->longitude;
+
+
+    //     $nearbySellers = \App\Models\Shop::selectRaw("
+    //     shops.*, (6371 * acos(
+    //         cos(radians(?)) *
+    //         cos(radians(latitude)) *
+    //         cos(radians(longitude) - radians(?)) +
+    //         sin(radians(?)) *
+    //         sin(radians(latitude))
+    //     )) AS distance
+    // ", [$customerLat, $customerLng, $customerLat])
+    //         ->where('registration_approval', 1)
+    //         ->where('verification_status', 1)
+    //         ->having('distance', '<=', 20) // 
+    //         ->orderBy('distance')
+    //         // ->first();
+    //         ->get();
+
+    //     // if (!$nearbySellers) {
+    //     //     flash(translate('Shop not available in your area'))->warning();
+    //     // }
+
+    //     if ($nearbySellers->isEmpty()) {
+    //         flash(translate('Shop not available in your area'))->warning();
+    //         return redirect()->back();
+    //     }
+
+
+    //     $shippingAddress = [
+    //         'name'        => Auth::user()->name,
+    //         'email'       => Auth::user()->email,
+    //         'address'     => $address->address,
+    //         'country'     => $address->country->name ?? '',
+    //         'state'       => $address->state->name ?? '',
+    //         'city'        => $address->city->name ?? '',
+    //         'postal_code' => $address->postal_code,
+    //         'phone'       => $address->phone,
+    //         'lat_lang'    => $customerLat . ',' . $customerLng,
+    //     ];
+
+
+
+    //     $combined_order = new CombinedOrder;
+    //     $combined_order->user_id = Auth::id();
+    //     $combined_order->shipping_address = json_encode($shippingAddress);
+    //     $combined_order->grand_total = 0;
+    //     $combined_order->save();
+
+
+    //     $order = new Order;
+    //     $order->combined_order_id = $combined_order->id;
+    //     $order->user_id = Auth::id();
+    //     // $order->seller_id = $nearestSeller->user_id;
+    //     $order->seller_id = null;
+    //     $order->status = 'pending_acceptance';
+    //     $order->shipping_address = $combined_order->shipping_address;
+    //     $order->additional_info = $request->additional_info;
+    //     $order->payment_type = $request->payment_option;
+    //     $order->delivery_viewed = 0;
+    //     $order->payment_status_viewed = 0;
+    //     $order->code = date('Ymd-His') . rand(10, 99);
+    //     $order->date = strtotime('now');
+    //     $order->save();
+
+
+
+    //     foreach ($nearbySellers as $index => $seller) {
+    //         \App\Models\OrderSellerQueue::create([
+    //             'order_id' => $order->id,
+    //             'seller_id' => $seller->user_id,
+    //             'priority' => $index + 1,
+    //             'status' => 'pending'
+    //         ]);
+    //     }
+
+    //     // assign first seller
+    //     $firstSeller = \App\Models\OrderSellerQueue::where('order_id', $order->id)
+    //         ->orderBy('priority')
+    //         ->first();
+
+    //     if ($firstSeller) {
+    //         $order->seller_id = $firstSeller->seller_id;
+    //         $order->save();
+    //     }
+
+    //     $subtotal = 0;
+    //     $tax = 0;
+    //     $shipping = 0;
+    //     $coupon_discount = 0;
+
+
+
+    //     foreach ($carts as $cartItem) {
+
+    //         $product = Product::find($cartItem['product_id']);
+
+    //         $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
+    //         $tax += cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
+    //         $coupon_discount += $cartItem['discount'];
+
+    //         $order_detail = new OrderDetail;
+    //         $order_detail->order_id = $order->id;
+    //         $order_detail->seller_id = $order->seller_id;
+    //         $order_detail->product_id = $product->id;
+    //         $order_detail->variation = $cartItem['variation'];
+    //         $order_detail->price = cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
+    //         $order_detail->tax = cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
+    //         $order_detail->shipping_type = $cartItem['shipping_type'];
+    //         $order_detail->shipping_cost = $cartItem['shipping_cost'];
+    //         $order_detail->quantity = $cartItem['quantity'];
+    //         $order_detail->save();
+
+    //         $shipping += $order_detail->shipping_cost;
+
+    //         // Stock update --- commentted 
+    //         // if ($product->digital != 1) {
+    //         //     $stock = $product->stocks->where('variant', $cartItem['variation'])->first();
+    //         //     if ($stock && $stock->qty >= $cartItem['quantity']) {
+    //         //         $stock->qty -= $cartItem['quantity'];
+    //         //         $stock->save();
+    //         //     }
+    //         // }
+
+    //         $product->num_of_sale += $cartItem['quantity'];
+    //         $product->save();
+    //     }
+
+
+    //     $order->grand_total = $subtotal + $tax + $shipping - $coupon_discount;
+    //     $order->save();
+
+    //     $combined_order->grand_total = $order->grand_total;
+    //     $combined_order->save();
+
+    //     $request->session()->put('combined_order_id', $combined_order->id);
+
+    //     flash(translate('Order placed successfully'))->success();
+
+    //     return redirect()->route('order_confirmed');
+    // }
+
+
     public function store(Request $request)
     {
-        $carts = Cart::where('user_id', Auth::id())->active()->get();
+        DB::beginTransaction();
 
-        if ($carts->isEmpty()) {
-            flash(translate('Your cart is empty'))->warning();
-            return redirect()->route('home');
-        }
+        try {
+            $carts = Cart::where('user_id', Auth::id())->active()->get();
 
-        $address = Address::where('id', $carts[0]['address_id'])->first();
-
-
-        $customerLat = null;
-        $customerLng = null;
-
-        if ($address && $address->latitude && $address->longitude) {
-
-            $customerLat = $address->latitude;
-            $customerLng = $address->longitude;
-        } elseif (session()->has('user_latitude') && session()->has('user_longitude')) {
-
-            $customerLat = session('user_latitude');
-            $customerLng = session('user_longitude');
-        } else {
-            flash(translate('Please set your delivery location'))->warning();
-            return redirect()->back();
-        }
-
-
-        if (!$address || !$address->latitude || !$address->longitude) {
-            flash(translate('Location not found'))->warning();
-            return redirect()->back();
-        }
-
-        $customerLat = $address->latitude;
-        $customerLng = $address->longitude;
-
-
-        $nearestSeller = \App\Models\Shop::selectRaw("
-        shops.*, (6371 * acos(
-            cos(radians(?)) *
-            cos(radians(latitude)) *
-            cos(radians(longitude) - radians(?)) +
-            sin(radians(?)) *
-            sin(radians(latitude))
-        )) AS distance
-    ", [$customerLat, $customerLng, $customerLat])
-            ->where('registration_approval', 1)
-            ->where('verification_status', 1)
-            ->having('distance', '<=', 20) // 
-            ->orderBy('distance')
-            ->first();
-
-        if (!$nearestSeller) {
-            flash(translate('Shop not available in your area'))->warning();
-        }
-
-
-        foreach ($carts as $cartItem) {
-
-            $sellerProduct = SellerProduct::where('product_id', $cartItem['product_id'])
-                ->where('user_id', $nearestSeller->user_id)->first();
-
-            if ($cartItem['quantity'] > $sellerProduct->stock) {
-                flash(translate('stock not available in the shop'))->warning();
-                return redirect()->back();
+            if ($carts->isEmpty()) {
+                flash('Cart is empty')->warning();
+                return back();
             }
-        }
 
-        $shippingAddress = [
-            'name'        => Auth::user()->name,
-            'email'       => Auth::user()->email,
-            'address'     => $address->address,
-            'country'     => $address->country->name ?? '',
-            'state'       => $address->state->name ?? '',
-            'city'        => $address->city->name ?? '',
-            'postal_code' => $address->postal_code,
-            'phone'       => $address->phone,
-            'lat_lang'    => $customerLat . ',' . $customerLng,
-        ];
+            $address = Address::find($carts[0]->address_id);
 
+            // if (!$address || !$address->latitude || !$address->longitude) {
+            //     flash('Location not found')->warning();
+            //     return back();
+            // }
 
+            // $lat = $address->latitude;
+            // $lng = $address->longitude;
 
-        $combined_order = new CombinedOrder;
-        $combined_order->user_id = Auth::id();
-        $combined_order->shipping_address = json_encode($shippingAddress);
-        $combined_order->grand_total = 0;
-        $combined_order->save();
+            if (!$address) {
+                flash('Address not found')->warning();
+                return back();
+            }
 
+            if ($address->latitude !== null && $address->longitude !== null) {
+                $lat = $address->latitude;
+                $lng = $address->longitude;
+            } elseif (session()->has('user_latitude') && session()->has('user_longitude')) {
+                $lat = session('user_latitude');
+                $lng = session('user_longitude');
+            } else {
+                flash('Please select your delivery location')->warning();
+                return back();
+            }
 
-        $order = new Order;
-        $order->combined_order_id = $combined_order->id;
-        $order->user_id = Auth::id();
-        $order->seller_id = $nearestSeller->user_id;
-        $order->shipping_address = $combined_order->shipping_address;
-        $order->additional_info = $request->additional_info;
-        $order->payment_type = $request->payment_option;
-        $order->delivery_viewed = 0;
-        $order->payment_status_viewed = 0;
-        $order->code = date('Ymd-His') . rand(10, 99);
-        $order->date = strtotime('now');
-        $order->save();
+            $nearbySellers = Shop::selectRaw("
+            shops.*, (6371 * acos(
+                cos(radians(?)) *
+                cos(radians(latitude)) *
+                cos(radians(longitude) - radians(?)) +
+                sin(radians(?)) *
+                sin(radians(latitude))
+            )) AS distance
+        ", [$lat, $lng, $lat])
+                ->where('registration_approval', 1)
+                ->where('verification_status', 1)
+                ->having('distance', '<=', 20)
+                ->orderBy('distance')
+                ->get();
 
-        $subtotal = 0;
-        $tax = 0;
-        $shipping = 0;
-        $coupon_discount = 0;
+            if ($nearbySellers->isEmpty()) {
+                flash('No shop nearby')->warning();
+                return back();
+            }
 
+            // $validSellers = [];
 
+            // foreach ($nearbySellers as $seller) {
 
-        foreach ($carts as $cartItem) {
+            //     $hasStock = true;
 
-            $product = Product::find($cartItem['product_id']);
+            //     foreach ($carts as $cartItem) {
 
-            $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
-            $tax += cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
-            $coupon_discount += $cartItem['discount'];
+            //         $sellerProduct = SellerProduct::where('product_id', $cartItem->product_id)
+            //             ->where('seller_id', $seller->user_id)
+            //             ->first();
 
-            $order_detail = new OrderDetail;
-            $order_detail->order_id = $order->id;
-            $order_detail->seller_id = $order->seller_id;
-            $order_detail->product_id = $product->id;
-            $order_detail->variation = $cartItem['variation'];
-            $order_detail->price = cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
-            $order_detail->tax = cart_product_tax($cartItem, $product, false) * $cartItem['quantity'];
-            $order_detail->shipping_type = $cartItem['shipping_type'];
-            $order_detail->shipping_cost = $cartItem['shipping_cost'];
-            $order_detail->quantity = $cartItem['quantity'];
-            $order_detail->save();
+            //         if (!$sellerProduct || $sellerProduct->stock < $cartItem->quantity) {
+            //             $hasStock = false;
+            //             break;
+            //         }
+            //     }
 
-            $shipping += $order_detail->shipping_cost;
-
-            // Stock update --- commentted 
-            // if ($product->digital != 1) {
-            //     $stock = $product->stocks->where('variant', $cartItem['variation'])->first();
-            //     if ($stock && $stock->qty >= $cartItem['quantity']) {
-            //         $stock->qty -= $cartItem['quantity'];
-            //         $stock->save();
+            //     if ($hasStock) {
+            //         $validSellers[] = $seller->user_id;
             //     }
             // }
 
-            $product->num_of_sale += $cartItem['quantity'];
-            $product->save();
+
+            $validSellers = [];
+            $invalidSellers = [];
+
+            foreach ($nearbySellers as $seller) {
+
+                $hasAnyStock = false;
+
+                foreach ($carts as $cartItem) {
+
+                    $sellerProduct = SellerProduct::where('product_id', $cartItem->product_id)
+                        ->where('seller_id', $seller->user_id)
+                        ->first();
+
+                    if ($sellerProduct && $sellerProduct->stock >= $cartItem->quantity) {
+                        $hasAnyStock = true;
+                        break;
+                    }
+                }
+
+                if ($hasAnyStock) {
+                    $validSellers[] = $seller->user_id;
+                } else {
+                    $invalidSellers[] = $seller->user_id;
+                }
+            }
+
+            // if (empty($validSellers)) {
+            //     flash('Product out of stock')->error();
+            //     return back();
+            // }
+            $invalidSellers = array_slice($invalidSellers, 0, 3);
+            if (empty($validSellers)) {
+
+                foreach ($carts as $cartItem) {
+
+                    OutOfStockRequest::create([
+                        'user_id' => Auth::id(),
+                        'product_id' => $cartItem->product_id,
+                        'quantity' => $cartItem->quantity,
+                        'lat' => round($lat, 4),
+                        'lng' => round($lng, 4),
+                        'seller_ids' => array_values(array_unique($invalidSellers)),
+
+                    ]);
+                }
+                DB::commit();
+
+                flash('Product out of stock')->error();
+                return back();
+            }
+
+
+            $validSellers = array_slice($validSellers, 0, 3);
+
+
+            $combined_order = new CombinedOrder();
+            $combined_order->user_id = Auth::id();
+            // $combined_order->shipping_address = json_encode([
+            //     'address' => $address->address,
+            //     'lat' => $lat,
+            //     'lng' => $lng
+            // ]);
+            $combined_order->shipping_address = json_encode([
+                'name'        => Auth::user()->name,
+                'email'       => Auth::user()->email,
+                'address'     => $address->address,
+                'city'        => optional($address->city)->name,
+                'state'       => optional($address->state)->name,
+                'country'     => optional($address->country)->name,
+                'postal_code' => $address->postal_code,
+                'phone'       => $address->phone,
+                'lat'         => $lat,
+                'lng'         => $lng
+            ]);
+            $combined_order->grand_total = 0;
+            $combined_order->save();
+
+            $order = new Order();
+            $order->combined_order_id = $combined_order->id;
+            $order->user_id = Auth::id();
+            $order->seller_id = null;
+            $order->status = 'pending_acceptance';
+            $order->shipping_address = $combined_order->shipping_address;
+            $order->payment_type = $request->payment_option;
+            $order->delivery_viewed = 0;
+            $order->payment_status_viewed = 0;
+            $order->code = date('Ymd-His') . rand(10, 99);
+            $order->date = strtotime('now');
+            $order->save();
+
+
+            foreach ($validSellers as $index => $sellerId) {
+                OrderSellerQueue::create([
+                    'order_id' => $order->id,
+                    'seller_id' => $sellerId,
+                    'priority' => $index + 1,
+                    'status' => 'pending'
+                ]);
+            }
+
+
+            $firstSeller = OrderSellerQueue::where('order_id', $order->id)
+                ->orderBy('priority')
+                ->first();
+
+            if ($firstSeller) {
+                $order->seller_id = $firstSeller->seller_id;
+                $order->save();
+            }
+
+
+            $total = 0;
+
+            foreach ($carts as $cartItem) {
+
+                $product = Product::find($cartItem->product_id);
+
+                $price = cart_product_price($cartItem, $product, false, false) * $cartItem->quantity;
+
+                $orderDetail = new OrderDetail();
+                $orderDetail->order_id = $order->id;
+                $orderDetail->seller_id = $order->seller_id;
+                $orderDetail->product_id = $product->id;
+                $orderDetail->quantity = $cartItem->quantity;
+                $orderDetail->price = $price;
+                $orderDetail->save();
+
+                $total += $price;
+            }
+
+            $order->grand_total = $total;
+            $order->save();
+
+            $combined_order->grand_total = $total;
+            $combined_order->save();
+
+            $request->session()->put('combined_order_id', $combined_order->id);
+
+            Cart::where('user_id', Auth::id())->delete();
+
+            DB::commit();
+
+            flash('Order placed successfully')->success();
+            return redirect()->route('order_confirmed');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e);
         }
-
-
-        $order->grand_total = $subtotal + $tax + $shipping - $coupon_discount;
-        $order->save();
-
-        $combined_order->grand_total = $order->grand_total;
-        $combined_order->save();
-
-        $request->session()->put('combined_order_id', $combined_order->id);
-
-        flash(translate('Order placed successfully'))->success();
-
-        return redirect()->route('order_confirmed');
     }
-
-
-
     /**
      * Display the specified resource.
      *

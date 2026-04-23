@@ -69,7 +69,7 @@
                                     <strong class="text-primary d-block mb-1">
                                         ₹ {{ $product->seller_price }}
                                     </strong>
-{{-- 
+                                    {{-- 
                                     <p class="small text-success mb-0">
                                         Available : {{ $stock }}
                                     </p> --}}
@@ -78,11 +78,13 @@
                                         In My Stock : {{ $product->product_stock ?? 0 }}
                                     </p>
 
-                                    <!--@if ($stock > 0)-->
+                                    <!--@if ($stock > 0)
+    -->
                                     <!--    <span class="badge badge-inline badge-success mt-1">In Stock</span>-->
-                                    <!--@else-->
+                                <!--@else-->
                                     <!--    <span class="badge badge-inline badge-danger mt-1">Out Of Stock</span>-->
-                                    <!--@endif-->
+                                    <!--
+    @endif-->
 
                                 </div>
 
@@ -104,7 +106,8 @@
                                             </button>
 
                                             <input type="number" name="qty" id="qty-{{ $product->id }}"
-                                                value="1" min="1"
+                                                value="{{ $product->seller_min_purchase_limit ?? 1 }}"
+                                                min="{{ $product->seller_min_purchase_limit ?? 1 }}"
                                                 max="{{ $product->seller_purchase_limit ?? $stock }}"
                                                 class="form-control text-center mx-2" style="max-width:60px;height:32px;"
                                                 {{ $stock == 0 ? 'disabled' : '' }}>
@@ -171,16 +174,96 @@
 
                 let current = parseInt(input.val()) || 1;
 
-                if (current > 1) {
+                // if (current > 1) {
+                //     input.val(current - 1);
+                // }
+
+                let min = parseInt(input.attr('min')) || 1;
+
+                if (current > min) {
                     input.val(current - 1);
                 }
 
             });
 
+            // $(document).on('click', '.ajax-add-cart', function() {
+
+            //     let productId = $(this).data('product');
+            //     let qty = $('#qty-' + productId).val();
+
+
+
+            //     $.ajax({
+            //         url: "{{ route('seller.cart.add') }}",
+            //         type: "POST",
+            //         data: {
+            //             product_id: productId,
+            //             qty: qty,
+            //             _token: "{{ csrf_token() }}"
+            //         },
+            //         success: function(res) {
+
+            //             if (res.status) {
+            //                 AIZ.plugins.notify('success', res.message);
+            //             } else {
+            //                 AIZ.plugins.notify('danger', res.message);
+            //             }
+            //             if (res.cart_count !== undefined) {
+
+            //                 $('#seller-cart-count').text(res.cart_count);
+
+            //                 if (res.cart_count > 0) {
+            //                     $('#seller-cart-count').show();
+            //                 } else {
+            //                     $('#seller-cart-count').hide();
+            //                 }
+
+            //             }
+
+            //         },
+
+            //         error: function() {
+            //             AIZ.plugins.notify('danger', 'Something went wrong');
+            //         }
+            //     });
+
+            // });
+
             $(document).on('click', '.ajax-add-cart', function() {
 
                 let productId = $(this).data('product');
-                let qty = $('#qty-' + productId).val();
+                let input = $('#qty-' + productId);
+
+                let min = parseInt(input.attr('min')) || 1;
+                let max = parseInt(input.attr('max')) || 9999;
+                // let qty = parseInt(input.val());
+
+                let raw = input.val();
+
+
+                if (!raw || raw.trim() === '') {
+                    AIZ.plugins.notify('danger', 'Please enter quantity');
+                    input.val(input.attr('min') || 1); // reset to min
+                    return;
+                }
+
+                let qty = parseInt(raw);
+
+                if (isNaN(qty) || qty <= 0) {
+                    AIZ.plugins.notify('danger', 'Quantity must be greater than 0');
+                    input.val(min);
+                    return;
+                }
+
+                if (qty < min) {
+                    AIZ.plugins.notify('danger', 'Minimum quantity is ' + min);
+                    return;
+                }
+
+                if (qty > max) {
+                    AIZ.plugins.notify('danger', 'Maximum quantity is ' + max);
+                    return;
+                }
 
                 $.ajax({
                     url: "{{ route('seller.cart.add') }}",
@@ -197,8 +280,8 @@
                         } else {
                             AIZ.plugins.notify('danger', res.message);
                         }
-                        if (res.cart_count !== undefined) {
 
+                        if (res.cart_count !== undefined) {
                             $('#seller-cart-count').text(res.cart_count);
 
                             if (res.cart_count > 0) {
@@ -206,11 +289,8 @@
                             } else {
                                 $('#seller-cart-count').hide();
                             }
-
                         }
-
                     },
-
                     error: function() {
                         AIZ.plugins.notify('danger', 'Something went wrong');
                     }

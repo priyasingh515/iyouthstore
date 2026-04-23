@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SellersExport;
 use App\Models\Addon;
 use App\Models\Block;
 use App\Models\Cart;
@@ -15,6 +16,8 @@ use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\SellerProduct;
+use App\Models\SellerProductAssignment;
+use App\Models\State;
 use App\Models\SubDistrict;
 use App\Models\Wishlist;
 use Illuminate\Support\Facades\Hash;
@@ -29,6 +32,8 @@ use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Facades\Notification;
 use Log;
 use DB;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class SellerController extends Controller
 {
@@ -238,15 +243,36 @@ class SellerController extends Controller
             [
                 'name' => 'required|max:255',
                 'email' => 'required|email|unique:users,email',
-                // 'shop_name' => 'max:200',
-                // 'address' => 'max:500',
-
                 'password' => 'required|min:6|confirmed',
                 'state' => 'required',
                 'district_id' => 'required',
                 'block_id' => 'required',
                 'sub_district_id' => 'required',
                 'city' => 'required|max:255',
+                'gender' => 'nullable|max:50',
+                'father_husband_name' => 'nullable|max:255',
+                'dob' => 'nullable|date',
+                'age' => 'nullable|max:10',
+                'aadhaar' => 'nullable|max:50',
+                'pan' => 'nullable|max:50',
+                'address' => 'nullable|max:500',
+                'postal_code' => 'nullable|max:20',
+                'phone' => 'nullable|max:20',
+                'alternate_phone' => 'nullable|max:20',
+                'whatsapp_number' => 'nullable|max:20',
+                'qualification' => 'nullable|max:255',
+                'experience' => 'nullable|max:255',
+                'shop_address' => 'nullable|max:500',
+                'shop_size' => 'nullable|max:100',
+                'rent_type' => 'nullable|max:100',
+                'monthly_rent' => 'nullable|max:100',
+                'bank_acc_no' => 'nullable|max:100',
+                'bank_name' => 'nullable|max:255',
+                'bank_acc_name' => 'nullable|max:255',
+                'bank_routing_no' => 'nullable|max:100',
+                'security_deposit' => 'nullable|max:100',
+                'payment_status' => 'nullable|max:100',
+                'payment_mode' => 'nullable|max:100',
             ],
             [
                 'name.required' => translate('Name is required'),
@@ -271,26 +297,27 @@ class SellerController extends Controller
         $user->name     = $request->name;
         $user->email    = $request->email;
         $user->user_type = "seller";
-
-        $district = $request->district_id == 'other'
-            ? $request->district_manual
-            : $request->district_id;
-
-        $block = $request->block_id == 'other'
-            ? $request->block_manual
-            : $request->block_id;
-
-        $subdistrict = $request->sub_district_id == 'other'
-            ? $request->sub_district_manual
-            : $request->sub_district_id;
+        $user->gender = $request->gender;
+        $user->father_husband_name = $request->father_husband_name;
+        $user->dob = $request->dob;
+        $user->age = $request->age;
+        $user->aadhaar = $request->aadhaar;
+        $user->pan = $request->pan;
+        $user->address = $request->address;
+        $user->postal_code = $request->postal_code;
+        $user->phone = $request->phone;
+        $user->alternate_phone = $request->alternate_phone;
+        $user->whatsapp_number = $request->whatsapp_number;
+        $user->qualification = $request->qualification;
+        $user->experience = $request->experience;
 
         $user->state = $request->state;
-        $user->district = $district;
-        $user->block = $block;
-        $user->sub_district = $subdistrict;
+        $user->district = $request->district_id;
+        $user->block = $request->block_id;
+        $user->sub_district = $request->sub_district_id;
         $user->city = $request->city;
-
         $user->email_verified_at = now();
+
 
 
         $user->password = Hash::make($request->password);
@@ -298,11 +325,20 @@ class SellerController extends Controller
         if ($user->save()) {
             $shop           = new Shop;
             $shop->user_id  = $user->id;
-            // $shop->name     = $request->shop_name;
-            // $shop->address  = $request->address;
-            // $shop->slug     = 'demo-shop-' . $user->id;
-
+            $shop->name = $request->name . "'s Shop";
+            $shop->address = $request->shop_address;
+            $shop->shop_size = $request->shop_size;
+            $shop->rent_type = $request->rent_type;
+            $shop->monthly_rent = $request->monthly_rent;
+            $shop->bank_acc_no = $request->bank_acc_no;
+            $shop->bank_name = $request->bank_name;
+            $shop->bank_acc_name = $request->bank_acc_name;
+            $shop->bank_routing_no = $request->bank_routing_no;
+            $shop->security_deposit = $request->security_deposit;
+            $shop->payment_status = $request->payment_status;
+            $shop->payment_mode = $request->payment_mode;
             $shop->registration_approval = 1;
+            $shop->shop_id = $this->generateLocationUniqueId($request->district_id, $request->block_id, $request->sub_district_id);
             $shop->save();
 
             // try {
@@ -335,6 +371,41 @@ class SellerController extends Controller
         }
         flash(translate('Something went wrong'))->error();
         return back();
+    }
+
+    function generateLocationUniqueId($districtId, $blockId, $subDistrictId)
+    {
+        return DB::transaction(function () use ($districtId, $blockId, $subDistrictId) {
+
+            $district = City::find($districtId);
+            if (!$district) {
+                return null;
+            }
+
+            $districtCode = $district->district_code;
+
+            $blockName = Block::where('id', $blockId)->value('name');
+            $subDistrictName = SubDistrict::where('id', $subDistrictId)->value('name');
+
+            $prefix = $districtCode . '-' . $blockName . '-' . $subDistrictName;
+
+            $lastShop = Shop::where('shop_id', 'like', $prefix . '-%')
+                ->lockForUpdate()
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($lastShop) {
+                $lastNumber = (int) substr(
+                    $lastShop->shop_id,
+                    strrpos($lastShop->shop_id, '-') + 1
+                );
+                $newNumber = $lastNumber + 1;
+            } else {
+                $newNumber = 1;
+            }
+
+            return $prefix . '-' . $newNumber;
+        });
     }
 
     /**
@@ -408,38 +479,79 @@ class SellerController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:6|confirmed',
             'state' => 'required',
             'district_id' => 'required',
             'block_id' => 'required',
             'sub_district_id' => 'required',
             'city' => 'required|max:255',
+            'gender' => 'nullable|max:50',
+            'father_husband_name' => 'nullable|max:255',
+            'dob' => 'nullable|date',
+            'age' => 'nullable|max:10',
+            'aadhaar' => 'nullable|max:50',
+            'pan' => 'nullable|max:50',
+            'address' => 'nullable|max:500',
+            'postal_code' => 'nullable|max:20',
+            'phone' => 'nullable|max:20',
+            'alternate_phone' => 'nullable|max:20',
+            'whatsapp_number' => 'nullable|max:20',
+            'qualification' => 'nullable|max:255',
+            'experience' => 'nullable|max:255',
+            'shop_address' => 'nullable|max:500',
+            'shop_size' => 'nullable|max:100',
+            'rent_type' => 'nullable|max:100',
+            'monthly_rent' => 'nullable|max:100',
+            'bank_acc_no' => 'nullable|max:100',
+            'bank_name' => 'nullable|max:255',
+            'bank_acc_name' => 'nullable|max:255',
+            'bank_routing_no' => 'nullable|max:100',
+            'security_deposit' => 'nullable|max:100',
+            'payment_status' => 'nullable|max:100',
+            'payment_mode' => 'nullable|max:100',
         ]);
 
-        $district = $request->district_id == 'other'
-            ? $request->district_manual
-            : $request->district_id;
 
-        $block = $request->block_id == 'other'
-            ? $request->block_manual
-            : $request->block_id;
-
-        $subdistrict = $request->sub_district_id == 'other'
-            ? $request->sub_district_manual
-            : $request->sub_district_id;
 
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->gender = $request->gender;
+        $user->father_husband_name = $request->father_husband_name;
+        $user->dob = $request->dob;
+        $user->age = $request->age;
+        $user->aadhaar = $request->aadhaar;
+        $user->pan = $request->pan;
+        $user->address = $request->address;
+        $user->postal_code = $request->postal_code;
+        $user->phone = $request->phone;
+        $user->alternate_phone = $request->alternate_phone;
+        $user->whatsapp_number = $request->whatsapp_number;
+        $user->qualification = $request->qualification;
+        $user->experience = $request->experience;
         $user->state = $request->state;
-        $user->district = $district;
-        $user->block = $block;
-        $user->sub_district = $subdistrict;
+        $user->district = $request->district_id;
+        $user->block = $request->block_id;
+        $user->sub_district = $request->sub_district_id;
         $user->city = $request->city;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 
+        $shop->address = $request->shop_address;
+        $shop->shop_size = $request->shop_size;
+        $shop->rent_type = $request->rent_type;
+        $shop->monthly_rent = $request->monthly_rent;
+        $shop->bank_acc_no = $request->bank_acc_no;
+        $shop->bank_name = $request->bank_name;
+        $shop->bank_acc_name = $request->bank_acc_name;
+        $shop->bank_routing_no = $request->bank_routing_no;
+        $shop->security_deposit = $request->security_deposit;
+        $shop->payment_status = $request->payment_status;
+        $shop->payment_mode = $request->payment_mode;
+
         $user->save();
+        $shop->save();
 
         flash(translate('Seller has been updated successfully'))->success();
 
@@ -745,6 +857,100 @@ class SellerController extends Controller
         return view('backend.sellers.profile.index', compact('shop', 'addresses', 'default_shipping_address', 'products'));
     }
 
+    // public function getSellerProfileTab(Shop $shop, Request $request)
+    // {
+    //     $tab = $request->get('tab', 'overview');
+    //     $page = $request->get('page', 1);
+    //     $addresses = $shop->user->addresses->where('set_default', 0);
+    //     $default_shipping_address = $shop->user->addresses()->where('set_default', 1)->first();
+    //     $shop->last_login = $this->getsellerLastLogin($shop->user_id);
+    //     $payments = Payment::where('seller_id', $shop->user_id)->orderBy('created_at', 'desc')->paginate(15);
+    //     $products = Product::where('user_id', $shop->user_id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc')->paginate(15);
+    //     $type = 'SellerProfile';
+    //     $unpaid_order_payment_notification = get_notification_type('complete_unpaid_order_payment', 'type');
+    //     $orders = Order::where('seller_id', $shop->user_id)
+    //         ->orderBy('id', 'desc')
+    //         ->select('orders.id')
+    //         ->distinct()->paginate(15);
+    //     $assignment_history = SellerProductAssignment::join('products', 'products.id', '=', 'seller_product_assignments.product_id')
+    //         ->select(
+    //             'products.name as product_name',
+    //             'seller_product_assignments.quantity',
+    //             'seller_product_assignments.created_at'
+    //         )
+    //         ->where('seller_product_assignments.seller_id', $shop->user_id)
+    //         ->orderBy('seller_product_assignments.created_at', 'desc')
+    //         ->paginate(15);
+
+    //     $low_stock = SellerProduct::join('products', 'products.id', '=', 'seller_products.product_id')
+    //         ->select(
+    //             'products.name as product_name',
+    //             'seller_products.stock'
+    //         )
+    //         ->where('seller_products.seller_id', $shop->user_id)
+    //         ->where('seller_products.stock', '<=', 5)
+    //         ->paginate(15);
+
+    //     $inactive_products = collect();
+
+    //     if ($tab == 'inactive_products') {
+
+    //         $fromDate = now()->subMonths(2)->toDateString();
+    //         $toDate = now()->toDateString();
+
+    //         $inactive_products = DB::select("
+    //     SELECT 
+    //         p.id,
+    //         p.name,
+    //         sp.created_at AS assigned_date,
+    //         last_sales.last_sold_date
+
+    //     FROM seller_products sp
+
+    //     JOIN products p 
+    //         ON p.id = sp.product_id
+
+    //     LEFT JOIN
+    //     (
+    //         SELECT 
+    //             seller_id,
+    //             product_id,
+    //             MAX(created_at) AS last_sold_date
+    //         FROM order_details
+    //         WHERE DATE(created_at) <= ?
+    //         GROUP BY seller_id, product_id
+    //     ) AS last_sales
+    //         ON last_sales.product_id = sp.product_id
+    //         AND last_sales.seller_id = sp.seller_id
+
+    //     WHERE sp.seller_id = ?
+
+    //     AND
+    //     (
+    //         (last_sales.last_sold_date IS NULL AND DATE(sp.created_at) <= ?)
+    //         OR DATE(last_sales.last_sold_date) < ?
+    //     )
+
+    //     ORDER BY sp.created_at ASC
+    // ", [$toDate, $shop->user_id, $toDate, $fromDate]);
+    //     }
+    //     $html = view('backend.sellers.profile.seller_' . $tab, compact(
+    //         'products',
+    //         'shop',
+    //         'addresses',
+    //         'default_shipping_address',
+    //         'page',
+    //         'orders',
+    //         'type',
+    //         'unpaid_order_payment_notification',
+    //         'payments',
+    //         'assignment_history',
+    //         'low_stock',
+    //         'inactive_products'
+    //     ))->render();
+    //     return response()->json(['html' => $html]);
+    // }
+
     public function getSellerProfileTab(Shop $shop, Request $request)
     {
         $tab = $request->get('tab', 'overview');
@@ -753,6 +959,10 @@ class SellerController extends Controller
         $default_shipping_address = $shop->user->addresses()->where('set_default', 1)->first();
         $shop->last_login = $this->getsellerLastLogin($shop->user_id);
         $payments = Payment::where('seller_id', $shop->user_id)->orderBy('created_at', 'desc')->paginate(15);
+        $sellerProducts = \App\Models\SellerProduct::where('seller_id', $shop->user_id)
+            ->with('product')
+            ->latest()
+            ->paginate(15);
         $products = Product::where('user_id', $shop->user_id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc')->paginate(15);
         $type = 'SellerProfile';
         $unpaid_order_payment_notification = get_notification_type('complete_unpaid_order_payment', 'type');
@@ -760,7 +970,94 @@ class SellerController extends Controller
             ->orderBy('id', 'desc')
             ->select('orders.id')
             ->distinct()->paginate(15);
-        $html = view('backend.sellers.profile.seller_' . $tab, compact('products', 'shop', 'addresses', 'default_shipping_address', 'page', 'orders', 'type', 'unpaid_order_payment_notification', 'payments'))->render();
+        $assignment_history = SellerProductAssignment::join('products', 'products.id', '=', 'seller_product_assignments.product_id')
+            ->select(
+                'products.name as product_name',
+                'seller_product_assignments.quantity',
+                'seller_product_assignments.created_at'
+            )
+            ->where('seller_product_assignments.seller_id', $shop->user_id)
+            ->orderBy('seller_product_assignments.created_at', 'desc')
+            ->paginate(15);
+
+        $low_stock = SellerProduct::join('products', 'products.id', '=', 'seller_products.product_id')
+            ->select(
+                'products.name as product_name',
+                'seller_products.stock'
+            )
+            ->where('seller_products.seller_id', $shop->user_id)
+            ->where('seller_products.stock', '<=', 5)
+            ->paginate(15);
+
+        $inactive_products = collect();
+
+        $fromDate = $request->input('from_date', now()->subMonths(2)->toDateString());
+        $toDate   = $request->input('to_date', now()->toDateString());
+
+        if ($fromDate > $toDate) {
+            [$fromDate, $toDate] = [$toDate, $fromDate];
+        }
+
+        $inactive_products = collect();
+
+        if ($tab == 'inactive_products') {
+
+            $inactive_products = DB::select("
+        SELECT 
+            p.id,
+            p.name,
+            sp.created_at AS assigned_date,
+            last_sales.last_sold_date
+
+        FROM seller_products sp
+
+        JOIN products p 
+            ON p.id = sp.product_id
+
+        LEFT JOIN
+        (
+            SELECT 
+                seller_id,
+                product_id,
+                MAX(created_at) AS last_sold_date
+            FROM order_details
+            WHERE DATE(created_at) <= ?
+            GROUP BY seller_id, product_id
+        ) AS last_sales
+            ON last_sales.product_id = sp.product_id
+            AND last_sales.seller_id = sp.seller_id
+
+        WHERE sp.seller_id = ?
+
+        AND
+        (
+            (last_sales.last_sold_date IS NULL AND DATE(sp.created_at) <= ?)
+            OR DATE(last_sales.last_sold_date) < ?
+        )
+
+        ORDER BY sp.created_at ASC
+    ", [$toDate, $shop->user_id, $toDate, $fromDate]);
+        }
+
+        \Log::info($sellerProducts->first());
+
+        $html = view('backend.sellers.profile.seller_' . $tab, compact(
+            'products',
+            'shop',
+            'addresses',
+            'default_shipping_address',
+            'page',
+            'orders',
+            'type',
+            'sellerProducts',
+            'unpaid_order_payment_notification',
+            'payments',
+            'assignment_history',
+            'low_stock',
+            'inactive_products',
+            'toDate',
+            'fromDate'
+        ))->render();
         return response()->json(['html' => $html]);
     }
 
@@ -829,5 +1126,473 @@ class SellerController extends Controller
             flash(translate('Failed to delete verification file. Please try again later.'))->error();
             return back();
         }
+    }
+    public function bulk_upload()
+    {
+        return view('backend.sellers.bulk_upload');
+    }
+
+    // public function bulk_store(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:csv,xlsx'
+    //     ]);
+
+    //     if ($request->file('file')->getClientOriginalExtension() === 'xlsx' && !extension_loaded('zip')) {
+    //         flash(translate('Please enable the Zip extension to import XLSX files.'))->error();
+    //         return back();
+    //     }
+
+    //     $rows = Excel::toArray([], $request->file('file'));
+
+    //     $success = 0;
+    //     $skipped = 0;
+    //     $skipReasons = [];
+
+    //     foreach ($rows[0] as $key => $row) {
+    //         $rowNumber = $key + 1;
+
+    //         if ($key == 0) {
+    //             continue; // skip header
+    //         }
+
+    //         if (!isset($row[0]) || count(array_filter($row, function ($value) {
+    //             return $value !== null && trim((string) $value) !== '';
+    //         })) === 0) {
+    //             continue;
+    //         }
+
+    //         $name = trim($row[0]);
+    //         $email = trim($row[1] ?? '');
+    //         $password = trim($row[2] ?? '');
+    //         $state = trim($row[3] ?? '');
+    //         $district_name = trim($row[4] ?? '');
+    //         $block_name = trim($row[5] ?? '');
+    //         $sub_name = trim($row[6] ?? '');
+    //         $city = trim($row[7] ?? '');
+
+    //         if ($name === '' || $email === '' || $password === '' || $state === '' || $district_name === '' || $block_name === '' || $sub_name === '' || $city === '') {
+    //             $skipped++;
+    //             $skipReasons[] = 'Row ' . $rowNumber . ': missing one or more required columns.';
+    //             continue;
+    //         }
+
+    //         $district = City::whereRaw('LOWER(name) = ?', [strtolower($district_name)])->first();
+    //         if (!$district || empty($district->district_code)) {
+    //             $skipped++;
+    //             $skipReasons[] = 'Row ' . $rowNumber . ': district "' . $district_name . '" not found or missing district code.';
+    //             continue;
+    //         }
+
+    //         $block = Block::whereRaw('LOWER(name) = ?', [strtolower($block_name)])
+    //             ->where('district_id', $district->id)
+    //             ->first();
+    //         if (!$block) {
+    //             $skipped++;
+    //             $skipReasons[] = 'Row ' . $rowNumber . ': block "' . $block_name . '" not found for district "' . $district_name . '".';
+    //             continue;
+    //         }
+
+    //         $sub = SubDistrict::whereRaw('LOWER(name) = ?', [strtolower($sub_name)])
+    //             ->where('block_id', $block->id)
+    //             ->first();
+    //         if (!$sub) {
+    //             $skipped++;
+    //             $skipReasons[] = 'Row ' . $rowNumber . ': sub-district "' . $sub_name . '" not found for block "' . $block_name . '".';
+    //             continue;
+    //         }
+
+    //         if (User::where('email', $email)->exists()) {
+    //             $skipped++;
+    //             $skipReasons[] = 'Row ' . $rowNumber . ': email "' . $email . '" already exists.';
+    //             continue;
+    //         }
+
+    //         $user = new User;
+    //         $user->name = $name;
+    //         $user->email = $email;
+    //         $user->password = Hash::make($password);
+    //         $user->user_type = "seller";
+
+    //         $user->state = $state;
+    //         $user->district = $district->id;
+    //         $user->block = $block->id;
+    //         $user->sub_district = $sub->id;
+    //         $user->city = $city;
+    //         $user->email_verified_at = now();
+
+    //         if ($user->save()) {
+
+    //             $shop = new Shop;
+    //             $shop->user_id = $user->id;
+    //             $shop->registration_approval = 1;
+
+    //             $shop->shop_id = $this->generateLocationUniqueId(
+    //                 $district->id,
+    //                 $block->id,
+    //                 $sub->id
+    //             );
+
+    //             $shop->save();
+
+    //             $success++;
+    //         }
+    //     }
+
+    //     if (!empty($skipReasons)) {
+    //         session()->flash('bulk_import_skip_reasons', $skipReasons);
+    //     }
+
+    //     flash(translate($success . ' sellers imported, ' . $skipped . ' skipped.'))->success();
+    //     return back();
+    // }
+
+    public function bulk_store(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:csv,xlsx'
+        ]);
+
+        $worksheets = Excel::toArray([], $request->file('file'));
+
+        $success = 0;
+        $skipped = 0;
+        $skipReasons = [];
+
+        foreach ($worksheets as $sheetIndex => $rows) {
+            $titleRow = $rows[0] ?? [];
+            $headerRow = $rows[1] ?? [];
+            $sheetTitle = trim((string) ($titleRow[0] ?? ''));
+
+            $normalizedHeaders = [];
+            foreach ($headerRow as $headerIndex => $headerValue) {
+                $normalizedHeaders[$headerIndex] = strtolower(trim((string) $headerValue));
+            }
+
+            $findColumn = function (array $candidates, $defaultIndex = null) use ($normalizedHeaders) {
+                foreach ($normalizedHeaders as $index => $header) {
+                    if (in_array($header, $candidates, true)) {
+                        return $index;
+                    }
+                }
+
+                return $defaultIndex;
+            };
+
+            $nameCol = $findColumn(['name'], 1);
+            $genderCol = $findColumn(['gender'], 2);
+            $fatherCol = $findColumn(['pita/pati'], 3);
+            $dobCol = $findColumn(['dob'], 4);
+            $ageCol = $findColumn(['age'], 5);
+            $aadhaarCol = $findColumn(['adhar', 'aadhaar'], 6);
+            $panCol = $findColumn(['pan'], 7);
+            $addressCol = $findColumn(['address'], 8);
+            $gramCol = $findColumn(['grampanchayat'], 9);
+            $subCol = $findColumn(['janpat panchayat'], 10);
+            $districtCol = $findColumn(['zila', 'district'], null);
+            $stateCol = $findColumn(['state'], null);
+            $pincodeCol = $findColumn(['pin code', 'pincode'], 13);
+            $phoneCol = $findColumn(['mobile no.', 'mobile no', 'mobile'], 14);
+            $altCol = $findColumn(['alternate numbers', 'alternate number'], 15);
+            $whatsappCol = $findColumn(['whatsapp no.', 'whatsapp no'], 16);
+            $emailCol = $findColumn(['email id', 'email'], 17);
+            $qualificationCol = $findColumn(['qualification'], 18);
+            $experienceCol = $findColumn(['exprience', 'experience'], 19);
+            $shopAddressCol = $findColumn(["store's add.", 'store add.', 'store address'], 20);
+            $shopSizeCol = $findColumn(['shop size'], 21);
+            $rentTypeCol = $findColumn(['own / rented', 'own/rented'], 22);
+            $monthlyRentCol = $findColumn(['monthly rent'], 23);
+            $accountNoCol = $findColumn(['bank ac/no.', 'bank ac/no', 'bank account no.'], 24);
+            $bankNameCol = $findColumn(['bank name'], 25);
+            $branchCol = $findColumn(['branch name'], 26);
+            $ifscCol = $findColumn(['ifsc code', 'ifsc'], 27);
+            $securityCol = $findColumn(['security deposit'], 28);
+            $paymentStatusCol = $findColumn(['paid/unpaid'], 29);
+            $paymentModeCol = $findColumn(['mode of payment'], 30);
+
+            foreach ($rows as $key => $row) {
+
+                $displayRow = $key + 1;
+                $sheetLabel = 'Sheet ' . ($sheetIndex + 1);
+
+                // Row 1 is the report title, row 2 is the header row
+                if ($key < 2) {
+                    continue;
+                }
+
+                if (!isset($row[1]) || trim((string) $row[1]) == '') {
+                    continue;
+                }
+
+                try {
+
+
+                    // ========================
+                    //  EXTRACT DATA
+                    // ========================
+                    $name = trim((string) ($row[$nameCol] ?? ''));
+                    $gender = trim((string) ($row[$genderCol] ?? ''));
+                    $father = trim((string) ($row[$fatherCol] ?? ''));
+                    $dobValue = $row[$dobCol] ?? '';
+                    $dob = trim((string) $dobValue);
+
+                    if ($dobValue !== null && $dobValue !== '') {
+                        try {
+                            if (is_numeric($dobValue)) {
+                                $dob = Carbon::instance(ExcelDate::excelToDateTimeObject($dobValue))->format('Y-m-d');
+                            } else {
+                                $dob = Carbon::parse($dobValue)->format('Y-m-d');
+                            }
+                        } catch (\Exception $e) {
+                            // Keep the original value if parsing fails.
+                        }
+                    }
+                    $age = trim((string) ($row[$ageCol] ?? ''));
+                    $aadhaar = trim((string) ($row[$aadhaarCol] ?? ''));
+                    $pan = trim((string) ($row[$panCol] ?? ''));
+                    $address = trim((string) ($row[$addressCol] ?? ''));
+
+                    $gram = trim((string) ($row[$gramCol] ?? ''));
+                    $subName = trim((string) ($row[$subCol] ?? ''));
+                    $districtName = $districtCol !== null ? trim((string) ($row[$districtCol] ?? '')) : '';
+                    $stateName = $stateCol !== null ? trim((string) ($row[$stateCol] ?? '')) : '';
+
+                    $pincode = trim((string) ($row[$pincodeCol] ?? ''));
+                    $phone = trim((string) ($row[$phoneCol] ?? ''));
+                    $alt = trim((string) ($row[$altCol] ?? ''));
+                    $whatsapp = trim((string) ($row[$whatsappCol] ?? ''));
+                    $email = trim((string) ($row[$emailCol] ?? ''));
+
+                    $qualification = trim((string) ($row[$qualificationCol] ?? ''));
+                    $experience = trim((string) ($row[$experienceCol] ?? ''));
+
+                    // SHOP
+                    $shop_address = trim((string) ($row[$shopAddressCol] ?? ''));
+                    $shop_size = trim((string) ($row[$shopSizeCol] ?? ''));
+                    $rent_type = trim((string) ($row[$rentTypeCol] ?? ''));
+                    $monthly_rent = trim((string) ($row[$monthlyRentCol] ?? ''));
+
+                    $account_no = trim((string) ($row[$accountNoCol] ?? ''));
+                    $bank_name = trim((string) ($row[$bankNameCol] ?? ''));
+                    $branch = trim((string) ($row[$branchCol] ?? ''));
+                    $ifsc = trim((string) ($row[$ifscCol] ?? ''));
+
+                    $security = trim((string) ($row[$securityCol] ?? ''));
+                    $payment_status = trim((string) ($row[$paymentStatusCol] ?? ''));
+                    $payment_mode = trim((string) ($row[$paymentModeCol] ?? ''));
+
+                    if ($subName === '' && $sheetTitle !== '' && strtolower($sheetTitle) !== 'details for udyam registration') {
+                        $subName = $sheetTitle;
+                    }
+
+                    if ($districtName === '') {
+                        $districtName = 'Bilaspur';
+                    }
+
+                    if ($stateName === '') {
+                        $stateName = 'Chhattisgarh';
+                    }
+
+                    // ========================
+                    // BASIC VALIDATION
+                    // ========================
+                    if ($name == '') {
+                        $skipped++;
+                        $skipReasons[] = "$sheetLabel Row $displayRow: Missing required field(s): name";
+                        continue;
+                    }
+
+                    if ($aadhaar == '') {
+                        $aadhaar = 'MISSING-' . ($sheetIndex + 1) . '-' . $displayRow . '-' . time();
+                    }
+
+                    // ========================
+                    // LOCATION MAPPING
+                    // ========================
+                    // $state = State::where('name', 'LIKE', "%$stateName%")->first();
+                    // if (!$state) {
+                    //     $skipped++;
+                    //     continue;
+                    // }
+
+                    // $district = City::where('name', 'LIKE', "%$districtName%")
+                    //     ->where('state_id', $state->id)
+                    //     ->first();
+
+                    // if (!$district) {
+                    //     $skipped++;
+                    //     continue;
+                    // }
+
+                    // // Janpat → SubDistrict
+                    // $sub = SubDistrict::where('name', 'LIKE', "%$subName%")->first();
+                    // if (!$sub) {
+                    //     $skipped++;
+                    //     continue;
+                    // }
+
+                    // $block = Block::where('id', $sub->block_id)->first();
+
+                    $state = null;
+
+                    if ($stateName !== '') {
+                        $state = State::where('name', 'LIKE', "%$stateName%")->first();
+                    }
+
+                    if (!$state) {
+                        $stateName = 'Chhattisgarh';
+                        $state = State::where('name', 'LIKE', '%Chhattisgarh%')->first()
+                            ?? State::where('name', 'LIKE', '%Chhatisgarh%')->first();
+                    }
+
+                    if (!$state) {
+                        $skipped++;
+                        $skipReasons[] = "$sheetLabel Row $displayRow: Default state 'Chhattisgarh' not found";
+                        continue;
+                    }
+
+                    $district = null;
+
+                    if ($districtName !== '') {
+                        $district = City::where('name', 'LIKE', "%$districtName%")
+                            ->where('state_id', $state->id)
+                            ->first();
+                    }
+
+                    if (!$district && $stateName !== '') {
+                        $district = City::where('name', 'LIKE', "%$stateName%")
+                            ->where('state_id', $state->id)
+                            ->first();
+                    }
+
+                    if (!$district) {
+                        $districtName = 'Bilaspur';
+                        $district = City::where('name', 'LIKE', '%Bilaspur%')
+                            ->where('state_id', $state->id)
+                            ->first();
+                    }
+
+                    if (!$district) {
+                        $skipped++;
+                        $skipReasons[] = "$sheetLabel Row $displayRow: Default district 'Bilaspur' not found";
+                        continue;
+                    }
+
+                    // ✅ Janpat
+                    $sub = SubDistrict::where('name', 'LIKE', "%$subName%")
+                        ->where('district_id', $district->id)
+                        ->first();
+
+                    if (!$sub) {
+                        $skipped++;
+                        $skipReasons[] = "$sheetLabel Row $displayRow: Janpat '$subName' not found in district '{$district->name}'";
+                        continue;
+                    }
+
+                    // ✅ Block from sub
+                    $block = Block::where('id', $sub->block_id)->first();
+
+                    if (!$block || (int) $block->district_id !== (int) $district->id) {
+                        $skipped++;
+                        $skipReasons[] = "$sheetLabel Row $displayRow: Block not found for Janpat '$subName' in district '{$district->name}'";
+                        continue;
+                    }
+
+                    // ========================
+                    // 👤 CREATE USER
+                    // ========================
+                    $user = new User;
+
+                    $user->name = $name;
+                    $user->gender = $gender;
+                    $user->father_husband_name = $father;
+                    $user->dob = $dob;
+                    $user->age = $age;
+
+                    $user->aadhaar = $aadhaar;
+                    $user->phone = $phone ?: $aadhaar;
+                    $user->pan = $pan;
+
+                    $user->address = $address;
+                    $user->city = $gram;
+                    $user->postal_code = $pincode;
+                    $user->alternate_phone = $alt;
+                    $user->whatsapp_number = $whatsapp;
+                    $generatedEmail = strtolower(preg_replace('/\s+/', '', $name)) . rand(100, 999) . '@gmail.com';
+                    $candidateEmail = $email !== '' ? strtolower($email) : $generatedEmail;
+
+                    if (User::where('email', $candidateEmail)->exists()) {
+                        $candidateEmail = strtolower(preg_replace('/\s+/', '', $name)) . $aadhaar . '@iyouth.local';
+                    }
+
+                    if (User::where('email', $candidateEmail)->exists()) {
+                        $skipped++;
+                        $skipReasons[] = "$sheetLabel Row $displayRow: Email '$candidateEmail' already exists";
+                        continue;
+                    }
+
+                    $user->email = $candidateEmail;
+
+                    $user->qualification = $qualification;
+                    $user->experience = $experience;
+
+                    $user->state = $state->name;
+                    $user->district = $district->id;
+                    $user->block = $block->id;
+                    $user->sub_district = $sub->id;
+
+                    $user->password = Hash::make($user->phone);
+                    $user->user_type = "seller";
+
+                    $user->email_verified_at = now();
+                    $user->save();
+
+                    // ========================
+                    // 🏪 CREATE SHOP
+                    // ========================
+                    $shop = new Shop;
+
+                    $shop->user_id = $user->id;
+                    $shop->name = $name . "'s Shop";
+
+                    $shop->address = $shop_address;
+                    $shop->shop_size = $shop_size;
+                    $shop->rent_type = $rent_type;
+                    $shop->monthly_rent = $monthly_rent;
+
+                    $shop->bank_acc_no = $account_no;
+                    $shop->bank_name = $bank_name;
+                    $shop->bank_acc_name = $branch;
+                    $shop->bank_routing_no = $ifsc;
+
+                    $shop->security_deposit = $security;
+                    $shop->payment_status = $payment_status;
+                    $shop->payment_mode = $payment_mode;
+
+                    $shop->registration_approval = 1;
+                    $shop->verification_status = 1;
+                    $shop->shop_id = $this->generateLocationUniqueId($district->id, $block->id, $sub->id);
+
+                    $shop->save();
+
+                    $success++;
+                } catch (\Exception $e) {
+                    $skipped++;
+                    $skipReasons[] = "$sheetLabel Row $displayRow error: " . $e->getMessage();
+                }
+            }
+        }
+
+        if (!empty($skipReasons)) {
+            session()->flash('bulk_import_skip_reasons', $skipReasons);
+        }
+
+        flash("$success imported, $skipped skipped")->success();
+        return back();
+    }
+
+    public function export()
+    {
+        return Excel::download(new SellersExport, 'sellers.xlsx');
     }
 }

@@ -54,6 +54,10 @@
                                             <i class="las la-eye"></i>
 
                                         </a>
+                                        <a class="btn btn-soft-info btn-icon btn-circle btn-sm"
+                                            href="{{ route('invoice.download', $order->id) }}" title="Download Invoice">
+                                            <i class="las la-download"></i>
+                                        </a>
 
                                     </td>
                                 </tr>

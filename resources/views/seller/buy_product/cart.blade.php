@@ -76,14 +76,18 @@
 
                                                 @php
                                                     $product = $cart->product;
-                                                    $stock = $product->stocks->sum('qty');
-                                                    $limit = $product->seller_purchase_limit;
-                                                    $maxAllowed = $limit ? min($limit, $stock) : $stock;
+                                                    // $stock = $product->stocks->sum('qty');
+                                                    // $limit = $product->seller_purchase_limit;
+                                                    $limit = $product->seller_purchase_limit ?? 9999;
+                                                    $maxAllowed = $limit;
+                                                    // $maxAllowed = $limit ? min($limit, $stock) : $stock;
+                                                    $minLimit = $product->seller_min_purchase_limit ?? 1;
                                                 @endphp
 
                                                 <input type="number" name="qty" id="cart-qty-{{ $cart->id }}"
-                                                    value="{{ $cart->quantity }}" min="1" max="{{ $maxAllowed }}"
-                                                    class="form-control text-center mx-2" style="width:70px;">
+                                                    value="{{ $cart->quantity }}" min="{{ $minLimit }}"
+                                                    max="{{ $maxAllowed }}" class="form-control text-center mx-2"
+                                                    style="width:70px;">
 
                                                 <button type="button" class="btn btn-light border qty-plus"
                                                     data-id="{{ $cart->id }}">
@@ -268,9 +272,15 @@
             let id = $(this).data('id');
             let input = $('#cart-qty-' + id);
 
-            if (input.val() > 1) {
-                input.val(parseInt(input.val()) - 1);
+            let min = parseInt(input.attr('min')) || 1;
+            let current = parseInt(input.val()) || 1;
+
+            if (current <= min) {
+                AIZ.plugins.notify('warning', 'Minimum purchase limit is ' + min);
+                return;
             }
+
+            input.val(current - 1);
 
         });
 
@@ -296,8 +306,24 @@
         $(document).on('click', '.update-cart', function() {
 
             let cartId = $(this).data('id');
-            let qty = $('#cart-qty-' + cartId).val();
+            let input = $('#cart-qty-' + cartId);
 
+            let min = parseInt(input.attr('min')) || 1;
+            let max = parseInt(input.attr('max')) || 9999;
+            let qty = parseInt(input.val());
+
+            // ✅ VALIDATION
+            if (qty < min) {
+                AIZ.plugins.notify('danger', 'Minimum quantity is ' + min);
+                return;
+            }
+
+            if (qty > max) {
+                AIZ.plugins.notify('danger', 'Maximum quantity is ' + max);
+                return;
+            }
+
+            // ✅ AJAX CALL
             $.ajax({
                 url: "{{ route('seller.cart.update') }}",
                 type: "POST",
@@ -310,7 +336,7 @@
 
                     if (res.status) {
                         AIZ.plugins.notify('success', res.message);
-                        location.reload(); // refresh totals
+                        location.reload();
                     } else {
                         AIZ.plugins.notify('danger', res.message);
                     }
@@ -319,8 +345,6 @@
             });
 
         });
-
-
         /* DELETE CART */
         $(document).on('click', '.delete-cart', function() {
 
@@ -354,15 +378,53 @@
 
 
     <script>
+        // $(document).on('click', '#checkout-btn', function() {
+
+        //     openCartConfirmModal('Confirm place order?', function() {
+        //         $.ajax({
+
+        //             url: "{{ route('seller.cart.checkout') }}",
+
+        //             type: "POST",
+
+        //             data: {
+        //                 _token: "{{ csrf_token() }}"
+        //             },
+
+        //             success: function(res) {
+
+        //                 if (res.status) {
+
+        //                     openCartSuccessModal(res.message || 'Order placed successfully');
+
+        //                 } else {
+
+        //                     AIZ.plugins.notify('danger', res.message);
+
+        //                 }
+
+        //             },
+
+        //             error: function() {
+
+        //                 AIZ.plugins.notify('danger', 'Something went wrong');
+
+        //             }
+
+        //         });
+        //     });
+
+        // });
+    </script>
+
+    <script>
         $(document).on('click', '#checkout-btn', function() {
 
             openCartConfirmModal('Confirm place order?', function() {
+
                 $.ajax({
-
                     url: "{{ route('seller.cart.checkout') }}",
-
                     type: "POST",
-
                     data: {
                         _token: "{{ csrf_token() }}"
                     },
@@ -371,7 +433,9 @@
 
                         if (res.status) {
 
-                            openCartSuccessModal(res.message || 'Order placed successfully');
+                            // ✅ redirect with order_id
+                            window.location.href =
+                                "{{ route('seller.payment.page') }}?order_id=" + res.order_id;
 
                         } else {
 
@@ -388,6 +452,7 @@
                     }
 
                 });
+
             });
 
         });

@@ -14,7 +14,8 @@
                         {{ translate('Bulk Action') }}
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="javascript:void(0)" onclick="order_bulk_export()">{{ translate('Export') }}</a>
+                        <a class="dropdown-item" href="javascript:void(0)"
+                            onclick="order_bulk_export()">{{ translate('Export') }}</a>
                     </div>
                 </div>
                 <div class="col-md-3 ml-auto">
@@ -58,7 +59,7 @@
                     </div>
                 </div>
             </div>
-        
+
 
             @if (count($orders) > 0)
                 <div class="card-body p-3">
@@ -131,35 +132,51 @@
                                         </td>
                                         <td>
                                             @if ($order->payment_status == 'paid')
-                                                <span class="badge badge-inline badge-success">{{ translate('Paid') }}</span>
+                                                <span
+                                                    class="badge badge-inline badge-success">{{ translate('Paid') }}</span>
                                             @else
-                                                <span class="badge badge-inline badge-danger">{{ translate('Unpaid') }}</span>
+                                                <span
+                                                    class="badge badge-inline badge-danger">{{ translate('Unpaid') }}</span>
                                             @endif
                                         </td>
-                                        
-                                        
+
+
                                         <td>
-                                            @if($order->seller_approval == 0)
-                                             <a href="{{ route('seller.orders.show', encrypt($order->id)) }}"
-                                                class="btn btn-success btn-sm "
-                                                title="{{ translate('Accept Order') }}">
-                                              {{ translate('Accept Order') }}
-                                            </a>
-                                            
+                                            @php
+                                                $currentSellerQueue = \App\Models\OrderSellerQueue::where(
+                                                    'order_id',
+                                                    $order->id,
+                                                )
+                                                    ->where('seller_id', Auth::id())
+                                                    ->first();
+                                                $canRespondToOrder =
+                                                    $order->status === 'pending_acceptance' &&
+                                                    (int) $order->seller_id === (int) Auth::id() &&
+                                                    optional($currentSellerQueue)->status === 'pending';
+                                            @endphp
+                                            @if ($canRespondToOrder)
+                                                {{-- <button type="button" class="btn btn-success btn-sm"
+                                                    onclick="submitSellerOrderAction('{{ route('seller.order.accept') }}', {{ $order->id }})">
+                                                    Accept Order
+                                                </button> --}}
+
+                                                <button type="button" class="btn btn-success btn-sm"
+                                                    onclick="openAcceptModal({{ $order->id }})">
+                                                    Accept Order
+                                                </button>
+                                                <button type="button" class="btn btn-info btn-sm"
+                                                    onclick="submitSellerOrderAction('{{ route('seller.order.reject') }}', {{ $order->id }})">
+                                                    Reject & Transfer Order
+                                                </button>
+                                            @else
                                                 <a href="{{ route('seller.orders.show', encrypt($order->id)) }}"
-                                                class="btn btn-info btn-sm "
-                                                title="{{ translate('Reject & Transfer Order') }}">
-                                              {{ translate('Reject & Transfer Order') }}
-                                            </a>
-                                            @else 
-                                              <a href="{{ route('seller.orders.show', encrypt($order->id)) }}"
-                                                class="btn btn-danger btn-sm "
-                                                title="{{ translate('Reject Order') }}">
-                                              {{ translate('Reject Order') }}
-                                            </a>
+                                                    class="btn btn-soft-info btn-sm"
+                                                    title="{{ translate('Order Details') }}">
+                                                    {{ translate('View Order') }}
+                                                </a>
                                             @endif
                                         </td>
-                                        
+
                                         <td class="text-right">
                                             @if (addon_is_activated('pos_system') && $order->order_from == 'pos')
                                                 <a class="btn btn-soft-success btn-icon btn-circle btn-sm"
@@ -192,11 +209,69 @@
         </form>
     </div>
 
+
+    {{-- <div class="modal fade" id="acceptOrderModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form method="POST" action="{{ route('seller.order.partial.accept') }}">
+                    @csrf
+                    <input type="hidden" name="order_id" id="modal_order_id">
+
+                    <div class="modal-header">
+                        <h5>Select Products to Accept</h5>
+                    </div>
+
+                    <div class="modal-body" id="product_list">
+                        <!-- Products will load here -->
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Accept Selected</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div> --}}
+
+    <div class="modal fade" id="acceptOrderModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+
+            <form method="POST" action="{{ route('seller.order.partial.accept') }}">
+                @csrf
+                <input type="hidden" name="order_id" id="modal_order_id">
+
+                <!-- Header -->
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Select Products to Accept</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body" id="product_list" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Products will load here -->
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success px-4">
+                        ✔ Accept Selected
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('script')
     <script type="text/javascript">
-
         $(document).on("change", ".check-all", function() {
             if (this.checked) {
                 // Iterate each checkbox
@@ -214,11 +289,45 @@
             $('#sort_orders').submit();
         }
 
-        function order_bulk_export (){
-            var url = '{{route('seller.order-bulk-export')}}';
+        function order_bulk_export() {
+            var url = '{{ route('seller.order-bulk-export') }}';
             $("#sort_orders").attr("action", url);
             $('#sort_orders').submit();
             $("#sort_orders").attr("action", '');
+        }
+
+        function submitSellerOrderAction(actionUrl, orderId) {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+
+            var csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            var orderInput = document.createElement('input');
+            orderInput.type = 'hidden';
+            orderInput.name = 'order_id';
+            orderInput.value = orderId;
+            form.appendChild(orderInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+
+    <script>
+        function openAcceptModal(orderId) {
+            $('#modal_order_id').val(orderId);
+
+            // AJAX call to fetch products
+            $.get("{{ url('seller/order-products') }}/" + orderId, function(data) {
+                $('#product_list').html(data);
+            });
+
+            $('#acceptOrderModal').modal('show');
         }
     </script>
 @endsection

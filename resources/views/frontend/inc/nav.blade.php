@@ -1,4 +1,3 @@
-
 <!-- Top Bar Banner -->
 @php
     $topbar_banner = get_setting('topbar_banner');
@@ -141,12 +140,12 @@
 </div>
 
 <!--show only in home page-->
-@if(request()->routeIs('home') or request()->routeIs('cart'))
+@if (request()->routeIs('home') or request()->routeIs('cart'))
     <div class="p-2">
         Service Available -
         <span id="service_available">
 
-            @if(session()->has('is_within_radius'))
+            @if (session()->has('is_within_radius'))
                 {{ session('is_within_radius') ? 'Yes' : 'No' }}
             @else
                 <i class="las la-spinner la-spin"></i> Checking...
@@ -154,8 +153,7 @@
 
         </span>
 
-        <button onclick="openLocationModal()"
-            class="btn btn-sm btn-outline-primary ml-2">
+        <button onclick="openLocationModal()" class="btn btn-sm btn-outline-primary ml-2">
             Set Location
         </button>
     </div>
@@ -186,20 +184,17 @@
 
             <div id="location_modal_actions">
 
-                <button class="btn btn-primary"
-                    onclick="requestUserLocation()">
+                <button class="btn btn-primary" onclick="requestUserLocation()">
                     Allow Location
                 </button>
 
-                <button class="btn btn-secondary"
-                    data-dismiss="modal">
+                <button class="btn btn-secondary" data-dismiss="modal">
                     Not Now
                 </button>
-                
-                    <button onclick="openAnotherLocationModal()"
-        class="btn btn-sm btn-outline-primary ml-2 mt-2 mt-md-0">
-        use different Location
-    </button>
+
+                <button onclick="openAnotherLocationModal()" class="btn btn-sm btn-outline-primary ml-2 mt-2 mt-md-0">
+                    use different Location
+                </button>
 
             </div>
 
@@ -215,21 +210,16 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4">
 
-     <div class="form-group mt-3 position-relative">
+            <div class="form-group mt-3 position-relative">
 
                 <h5 class="mb-2">Enter Delivery Location</h5>
-            
-    <input type="text"
-        id="address_input"
-        class="form-control"
-        placeholder="Type delivery address">
+
+                <input type="text" id="address_input" class="form-control" placeholder="Type delivery address">
 
 
-    <div id="address_suggestions"
-        class="list-group position-absolute w-100"
-        style="z-index:9999;"></div>
+                <div id="address_suggestions" class="list-group position-absolute w-100" style="z-index:9999;"></div>
 
-</div>
+            </div>
 
 
         </div>
@@ -239,237 +229,270 @@
 
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    let savedLat = localStorage.getItem("user_lat");
-    let savedLng = localStorage.getItem("user_lng");
-    let verified = localStorage.getItem("location_verified");
-    let cachedStatus = localStorage.getItem("service_status");
-
-
-    if (savedLat && savedLng && verified === "true") {
-
-        document.getElementById('service_available').textContent =
-            cachedStatus ?? "Yes";
-
-        return;
-    }
+        let savedLat = localStorage.getItem("user_lat");
+        let savedLng = localStorage.getItem("user_lng");
+        let verified = localStorage.getItem("location_verified");
+        let cachedStatus = localStorage.getItem("service_status");
 
 
-    if (savedLat && savedLng) {
-        sendLocation(savedLat, savedLng);
-        return;
-    }
-    
-    setTimeout(openLocationModal, 800);
-});
+        if (savedLat && savedLng && verified === "true") {
 
+            document.getElementById('service_available').textContent =
+                cachedStatus ?? "Yes";
 
-/* ==========================
-   OPEN MODAL
-==========================*/
-function openLocationModal() {
-    $('#locationModal').modal('show');
-}
-
-function openstoreFormModal() {
-    $('#storeForm').modal('show');
-}
-
-
-function openAnotherLocationModal() {
-        $('#locationModal').modal('hide');
-    $('#AnotherlocationModal').modal('show');
-}
-
-
-
-function openLocationModal() {
-    $('#locationModal').modal('show');
-}
-
-/* ==========================
-   REQUEST USER LOCATION
-==========================*/
-function requestUserLocation() {
-
-    if (!navigator.geolocation) {
-        updateModalMessage("Geolocation not supported ❌");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(function(position) {
-
-        let latitude = position.coords.latitude;
-        let longitude = position.coords.longitude;
-
-        // save locally
-        localStorage.setItem("user_lat", latitude);
-        localStorage.setItem("user_lng", longitude);
-
-        updateModalMessage("Location Accepted ✅");
-
-        sendLocation(latitude, longitude);
-
-        setTimeout(() => {
-            $('#locationModal').modal('hide');
-        }, 1200);
-
-    }, function(error) {
-
-        let msg = "";
-
-        switch(error.code) {
-            case error.PERMISSION_DENIED:
-                msg = "Location permission denied ❌<br>Enable from browser settings (🔒 icon near URL)";
-                break;
-
-            case error.POSITION_UNAVAILABLE:
-                msg = "Location unavailable. Please enable GPS.";
-                break;
-
-            case error.TIMEOUT:
-                msg = "Location request timed out. Try again.";
-                break;
-
-            default:
-                msg = "Unknown location error.";
+            return;
         }
 
-        updateModalMessage(msg);
-        showRetryButton();
 
-    }, {
-        enableHighAccuracy: true,
-        timeout: 10000
+        if (savedLat && savedLng) {
+            sendLocation(savedLat, savedLng);
+            return;
+        }
+
+        setTimeout(openLocationModal, 800);
     });
-}
+
+
+    /* ==========================
+       OPEN MODAL
+    ==========================*/
+    function openLocationModal() {
+        $('#locationModal').modal('show');
+    }
+
+    function openstoreFormModal() {
+        $('#storeForm').modal('show');
+    }
+
+
+    function openAnotherLocationModal() {
+        $('#locationModal').modal('hide');
+        $('#AnotherlocationModal').modal('show');
+    }
 
 
 
-function sendLocation(latitude, longitude) {
+    function openLocationModal() {
+        $('#locationModal').modal('show');
+    }
 
-    if(window.locationSending) return;
-    window.locationSending = true;
+    /* ==========================
+       REQUEST USER LOCATION
+    ==========================*/
+    function requestUserLocation() {
 
-    fetch('{{ route('store-location') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            latitude: latitude,
-            longitude: longitude
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
+        if (!navigator.geolocation) {
+            updateModalMessage("Geolocation not supported ❌");
+            return;
+        }
 
-        const status = data.is_within_radius ? "Yes" : "No";
+        navigator.geolocation.getCurrentPosition(function(position) {
 
-        document.getElementById('service_available').textContent = status;
-        localStorage.setItem("location_verified", "true");
-        localStorage.setItem("service_status", status);
+            let latitude = position.coords.latitude;
+            let longitude = position.coords.longitude;
 
-        window.locationSending = false;
-        document.reload();
-    })
-    .catch(error => {
-        console.error(error);
-        window.locationSending = false;
-    });
-}
+            // save locally
+            localStorage.setItem("user_lat", latitude);
+            localStorage.setItem("user_lng", longitude);
+
+            updateModalMessage("Location Accepted ✅");
+
+            sendLocation(latitude, longitude);
+
+            setTimeout(() => {
+                $('#locationModal').modal('hide');
+            }, 1200);
+
+        }, function(error) {
+
+            let msg = "";
+
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    msg = "Location permission denied ❌<br>Enable from browser settings (🔒 icon near URL)";
+                    break;
+
+                case error.POSITION_UNAVAILABLE:
+                    msg = "Location unavailable. Please enable GPS.";
+                    break;
+
+                case error.TIMEOUT:
+                    msg = "Location request timed out. Try again.";
+                    break;
+
+                default:
+                    msg = "Unknown location error.";
+            }
+
+            updateModalMessage(msg);
+            showRetryButton();
+
+        }, {
+            enableHighAccuracy: true,
+            timeout: 10000
+        });
+    }
 
 
-function updateModalMessage(message) {
-    document.getElementById('location_message').innerHTML = message;
-}
+
+    function sendLocation(latitude, longitude) {
+
+        if (window.locationSending) return;
+        window.locationSending = true;
+
+        fetch('{{ route('store-location') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                const status = data.is_within_radius ? "Yes" : "No";
+
+                document.getElementById('service_available').textContent = status;
+                localStorage.setItem("location_verified", "true");
+                localStorage.setItem("service_status", status);
+
+                window.locationSending = false;
+                document.reload();
+            })
+            .catch(error => {
+                console.error(error);
+                window.locationSending = false;
+            });
+    }
 
 
-function showRetryButton() {
+    function updateModalMessage(message) {
+        document.getElementById('location_message').innerHTML = message;
+    }
 
-    document.getElementById('location_modal_actions').innerHTML = `
+
+    function showRetryButton() {
+
+        document.getElementById('location_modal_actions').innerHTML = `
         <button class="btn btn-success"
             onclick="retryLocation()">
             Try Again
         </button>
     `;
-}
+    }
 
 
-function retryLocation() {
+    function retryLocation() {
 
-    localStorage.removeItem("user_lat");
-    localStorage.removeItem("user_lng");
-    localStorage.removeItem("location_verified");
-    localStorage.removeItem("service_status");
+        localStorage.removeItem("user_lat");
+        localStorage.removeItem("user_lng");
+        localStorage.removeItem("location_verified");
+        localStorage.removeItem("service_status");
 
-    location.reload();
-}
-
+        location.reload();
+    }
 </script>
 
 <script>
+    let debounceTimer;
 
-let debounceTimer;
+    document.getElementById("address_input")
+        .addEventListener("input", function() {
 
-document.getElementById("address_input")
-.addEventListener("input", function () {
+            clearTimeout(debounceTimer);
 
-    clearTimeout(debounceTimer);
+            let query = this.value;
 
-    let query = this.value;
+            if (query.length < 3) {
+                document.getElementById("address_suggestions").innerHTML = "";
+                return;
+            }
 
-    if(query.length < 3){
-        document.getElementById("address_suggestions").innerHTML = "";
-        return;
-    }
+            // debounce (important)
+            // debounceTimer = setTimeout(() => {
 
-    // debounce (important)
-    debounceTimer = setTimeout(() => {
+            //     fetch(
+            //             `https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=in&limit=5`)
+            //         .then(res => res.json())
+            //         .then(data => showSuggestions(data));
 
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=in&limit=5`)
-        .then(res => res.json())
-        .then(data => showSuggestions(data));
+            // }, 400);
 
-    }, 400);
-});
+            fetch(`{{ route('search-gram-panchayat') }}?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => showSuggestions(data));
+
+        });
 
 
 
-function showSuggestions(places) {
+    // function showSuggestions(places) {
 
+    //     let box = document.getElementById("address_suggestions");
+    //     box.innerHTML = "";
+
+    //     places.forEach(place => {
+
+    //         let item = document.createElement("a");
+    //         item.className = "list-group-item list-group-item-action";
+    //         item.innerText = place.display_name;
+
+    //         item.onclick = function() {
+
+    //             let lat = place.lat;
+    //             let lng = place.lon;
+
+    //             document.getElementById("address_input").value =
+    //                 place.display_name;
+
+    //             box.innerHTML = "";
+
+    //             // Save locally
+    //             localStorage.setItem("user_lat", lat);
+    //             localStorage.setItem("user_lng", lng);
+    //             localStorage.setItem("user_address", place.display_name);
+
+    //             // Your existing function
+    //             sendLocation(lat, lng);
+
+    //             $('#locationModal').modal('hide');
+    //             $('#AnotherlocationModal').modal('hide');
+    //         };
+
+    //         box.appendChild(item);
+    //     });
+    // }
+
+    function showSuggestions(places) {
     let box = document.getElementById("address_suggestions");
     box.innerHTML = "";
 
     places.forEach(place => {
-
         let item = document.createElement("a");
         item.className = "list-group-item list-group-item-action";
-        item.innerText = place.display_name;
+        item.innerText = place.city;
 
-        item.onclick = function () {
+        item.onclick = function() {
+            let lat = place.latitude;
+            let lng = place.longitude;
 
-            let lat = place.lat;
-            let lng = place.lon;
-
-            document.getElementById("address_input").value =
-                place.display_name;
-
+            document.getElementById("address_input").value = place.city;
             box.innerHTML = "";
 
-            // Save locally
             localStorage.setItem("user_lat", lat);
             localStorage.setItem("user_lng", lng);
-            localStorage.setItem("user_address", place.display_name);
+            localStorage.setItem("user_address", place.city);
 
-            // Your existing function
             sendLocation(lat, lng);
 
             $('#locationModal').modal('hide');
-              $('#AnotherlocationModal').modal('hide');
+            $('#AnotherlocationModal').modal('hide');
         };
 
         box.appendChild(item);

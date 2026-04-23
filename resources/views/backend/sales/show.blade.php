@@ -2,6 +2,13 @@
 
 @section('content')
 
+    @php
+        $displayOrderDetails = $order->orderDetails->filter(fn($detail) => $detail->product != null)->values();
+        $displaySubTotal = $displayOrderDetails->sum('price');
+        $displayTaxTotal = $displayOrderDetails->sum('tax');
+        $displayShippingTotal = $displayOrderDetails->sum('shipping_cost');
+    @endphp
+
     <div class="card">
         <div class="card-header">
             <h1 class="h2 fs-16 mb-0">{{ translate('Order Details') }}</h1>
@@ -199,7 +206,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($order->orderDetails as $key => $orderDetail)
+                            @foreach ($displayOrderDetails as $key => $orderDetail)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>
@@ -287,7 +294,7 @@
                                 <strong class="text-muted">{{ translate('Sub Total') }} :</strong>
                             </td>
                             <td>
-                                {{ single_price($order->orderDetails->sum('price')) }}
+                                {{ single_price($displaySubTotal) }}
                             </td>
                         </tr>
                         <tr>
@@ -295,7 +302,7 @@
                                 <strong class="text-muted">{{ translate('Tax') }} :</strong>
                             </td>
                             <td>
-                                {{ single_price($order->orderDetails->sum('tax')) }}
+                                {{ single_price($displayTaxTotal) }}
                             </td>
                         </tr>
                         <tr>
@@ -303,7 +310,7 @@
                                 <strong class="text-muted">{{ translate('Shipping') }} :</strong>
                             </td>
                             <td>
-                                {{ single_price($order->orderDetails->sum('shipping_cost')) }}
+                                {{ single_price($displayShippingTotal) }}
                             </td>
                         </tr>
                         <tr>

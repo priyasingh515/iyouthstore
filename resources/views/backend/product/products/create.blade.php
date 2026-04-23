@@ -645,10 +645,27 @@
                                         </div>
                                     </div>
 
+                                    <!-- Min Seller Purchase Limit -->
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-from-label">
+                                            {{ translate('Seller Min Purchase Limit') }}
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="number" name="seller_min_purchase_limit" class="form-control"
+                                                value="{{ old('seller_min_purchase_limit') }}" min="1"
+                                                placeholder="Example: 10">
+
+                                            <small class="text-muted">
+                                                Minimum quantity a customer can purchase for this product.
+                                                Leave empty for unlimited purchase.
+                                            </small>
+                                        </div>
+                                    </div>
+
                                     <!-- Seller Purchase Limit -->
                                     <div class="form-group row">
                                         <label class="col-md-3 col-from-label">
-                                            {{ translate('Seller Purchase Limit') }}
+                                            {{ translate('Seller Max Purchase Limit') }}
                                         </label>
                                         <div class="col-md-6">
                                             <input type="number" name="seller_purchase_limit" class="form-control"

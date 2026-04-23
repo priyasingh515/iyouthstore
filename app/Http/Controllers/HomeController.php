@@ -1074,4 +1074,59 @@ class HomeController extends Controller
         }
         return json_encode($response);
     }
+    // public function searchGramPanchayat(Request $request)
+    // {
+    //     $query = trim($request->q);
+
+    //     if (strlen($query) < 3) {
+    //         return response()->json([]);
+    //     }
+
+    //     $results = User::where('user_type', 'seller')
+    //         ->whereNotNull('city')
+    //         ->where('city', '!=', '')
+    //         ->where('city', 'like', '%' . $query . '%')
+    //         ->select('city')
+    //         ->distinct()
+    //         ->limit(10)
+    //         ->get();
+
+    //     return response()->json($results);
+    // }
+
+    public function searchGramPanchayat(Request $request)
+    {
+        $query = trim($request->q);
+
+        if (strlen($query) < 3) {
+            return response()->json([]);
+        }
+
+        $results = User::where('user_type', 'seller')
+            ->whereNotNull('city')
+            ->where('city', '!=', '')
+            ->whereRaw('LOWER(city) LIKE ?', ['%' . strtolower($query) . '%'])
+            ->with('shop')
+            ->get()
+            ->filter(function ($user) {
+                return $user->shop &&
+                    (
+                        ($user->shop->latitude !== null && $user->shop->longitude !== null)
+                    );
+            })
+            ->unique(function ($user) {
+                return strtolower(trim($user->city));
+            })
+            ->map(function ($user) {
+                return [
+                    'city' => $user->city,
+                    'latitude' => $user->shop->latitude ?? $user->shop->delivery_pickup_latitude,
+                    'longitude' => $user->shop->longitude ?? $user->shop->delivery_pickup_longitude,
+                ];
+            })
+            ->values()
+            ->take(10);
+
+        return response()->json($results);
+    }
 }

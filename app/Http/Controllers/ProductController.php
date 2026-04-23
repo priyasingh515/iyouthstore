@@ -10,10 +10,12 @@ use App\Models\ProductTranslation;
 use App\Models\Category;
 use App\Models\AttributeValue;
 use App\Models\Cart;
+use App\Models\OutOfStockRequest;
 use App\Models\ProductStock;
 use App\Models\ProductCategory;
 use App\Models\SellerProduct;
 use App\Models\Review;
+use App\Models\SellerProductAssignment;
 use App\Models\Shop;
 use DB;
 use App\Models\Wishlist;
@@ -226,10 +228,10 @@ class ProductController extends Controller
                     continue;
                 }
 
-                if ($product->current_stock < $item['quantity']) {
-                    $failedProducts[] = $item['product_id'];
-                    continue;
-                }
+                // if ($product->current_stock < $item['quantity']) {
+                //     $failedProducts[] = $item['product_id'];
+                //     continue;
+                // }
 
                 $product->decrement('current_stock', $item['quantity']);
 
@@ -245,6 +247,12 @@ class ProductController extends Controller
                     ($sellerProduct->stock ?? 0) + $item['quantity'];
 
                 $sellerProduct->save();
+
+                SellerProductAssignment::create([
+                    'seller_id' => $request->user_id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity']
+                ]);
 
                 $assignedProducts[] = $item['product_id'];
             }
@@ -768,5 +776,171 @@ class ProductController extends Controller
     public function setProductDiscount(Request $request)
     {
         return $this->productService->setCategoryWiseDiscount($request->except(['_token']));
+    }
+    // public function assignmentHistoryIndex()
+    // {
+    //     $sellers = Shop::join('users', 'users.id', '=', 'shops.user_id')
+    //         ->select(
+    //             'users.id as seller_id',
+    //             'users.name as seller_name',
+    //             'shops.shop_id'
+    //         )
+    //         ->get();
+
+    //     return view('backend.assignment_history.index', compact('sellers'));
+    // }
+
+    public function assignmentHistoryIndex(Request $request)
+    {
+        $query = Shop::join('users', 'users.id', '=', 'shops.user_id')
+            ->select(
+                'users.id as seller_id',
+                'users.name as seller_name',
+                'shops.shop_id'
+            );
+
+        if ($request->search) {
+            $query->where('users.name', 'like', '%' . $request->search . '%')
+                ->orWhere('shops.shop_id', 'like', '%' . $request->search . '%');
+        }
+
+        $sellers = $query->get();
+        return view('backend.assignment_history.index', compact('sellers'));
+    }
+    public function showAssignmentHistory($seller_id)
+    {
+        $seller = User::findOrFail($seller_id);
+
+        $history = SellerProductAssignment::join('products', 'products.id', '=', 'seller_product_assignments.product_id')
+            ->join('shops', 'shops.user_id', '=', 'seller_product_assignments.seller_id')
+            ->select(
+                'products.name as product_name',
+                'shops.shop_id',
+                'seller_product_assignments.quantity',
+                'seller_product_assignments.created_at'
+            )
+            ->where('seller_product_assignments.seller_id', $seller_id)
+            ->orderBy('seller_product_assignments.created_at', 'desc')
+            ->get();
+
+        return view('backend.assignment_history.show', compact('history', 'seller'));
+    }
+    // public function lowSellerStock(Request $request)
+    // {
+    //     $query = SellerProduct::join('users', 'users.id', '=', 'seller_products.seller_id')
+    //         ->join('products', 'products.id', '=', 'seller_products.product_id')
+    //         ->join('shops', 'shops.user_id', '=', 'seller_products.seller_id')
+    //         ->select(
+    //             'users.name as seller_name',
+    //             'shops.shop_id',
+    //             'products.name as product_name',
+    //             'seller_products.stock'
+    //         )
+    //         ->where('seller_products.stock', '<=', 5);
+
+    //     if ($request->seller_id) {
+    //         $query->where('users.name', 'like', '%' . $request->seller_name . '%');
+    //     }
+
+
+    //     if ($request->product_id) {
+    //         $query->where('products.name', 'like', '%' . $request->product_name . '%');
+    //     }
+
+    //     $lowStocks = $query->orderBy('seller_products.stock', 'asc')->get();
+    //     $sellers = User::where('user_type','seller')->pluck('name','id');
+    //     $products = Product::pluck('name','id');
+
+    //     return view('backend.stock.index', compact('lowStocks','sellers','products'));
+    // }
+
+    // public function lowSellerStock(Request $request)
+    // {
+    //     $query = SellerProduct::join('users', 'users.id', '=', 'seller_products.seller_id')
+    //         ->join('products', 'products.id', '=', 'seller_products.product_id')
+    //         ->join('shops', 'shops.user_id', '=', 'seller_products.seller_id')
+    //         ->select(
+    //             'users.name as seller_name',
+    //             'users.id as seller_id',
+    //             'shops.shop_id',
+    //             'products.name as product_name',
+    //             'products.id as product_id',
+    //             'seller_products.stock'
+    //         )
+    //         ->where('seller_products.stock', '<=', 5);
+
+
+    //     if ($request->seller_id) {
+    //         $query->where('users.id', $request->seller_id);
+    //     }
+
+    //     if ($request->product_id) {
+    //         $query->where('products.id', $request->product_id);
+    //     }
+
+    //     $lowStocks = $query->orderBy('seller_products.stock', 'asc')->get();
+
+    //     // dropdown data
+    //     $sellers = User::where('user_type', 'seller')->pluck('name', 'id');
+    //     $products = Product::pluck('name', 'id');
+
+    //     return view('backend.stock.index', compact('lowStocks', 'sellers', 'products'));
+    // }
+
+    public function lowSellerStock(Request $request)
+    {
+        $query = SellerProduct::join('users', 'users.id', '=', 'seller_products.seller_id')
+            ->join('products', 'products.id', '=', 'seller_products.product_id')
+            ->join('shops', 'shops.user_id', '=', 'seller_products.seller_id')
+            ->select(
+                'users.name as seller_name',
+                'users.id as seller_id',
+                'shops.shop_id',
+                'products.name as product_name',
+                'products.id as product_id',
+                'products.seller_purchase_limit', 
+                'products.seller_min_purchase_limit', 
+                'seller_products.stock'
+            )
+            ->where('seller_products.stock', '<=', 5);
+
+        if ($request->seller_id) {
+            $query->where('users.id', $request->seller_id);
+        }
+
+        if ($request->product_id) {
+            $query->where('products.id', $request->product_id);
+        }
+
+        $lowStocks = $query->orderBy('seller_products.stock', 'asc')->get();
+
+        $lowStocks = $lowStocks->map(function ($item) {
+
+            $max = $item->seller_purchase_limit ?? 0;
+            $stock = $item->stock ?? 0;
+
+            $item->remaining = max($max - $stock, 0);
+
+            return $item;
+        });
+
+        $totalRemaining = 0;
+        if ($request->product_id) {
+            $totalRemaining = $lowStocks->sum('remaining');
+        }
+
+        // dropdown data
+        $sellers = User::where('user_type', 'seller')->pluck('name', 'id');
+        $products = Product::pluck('name', 'id');
+
+        return view('backend.stock.index', compact('lowStocks', 'sellers', 'products', 'totalRemaining'));
+    }
+
+    public function OutOfStockRequests(){
+        $requests = OutOfStockRequest::with(['user','product'])
+        ->latest()
+        ->paginate();
+
+        return view('backend.out_of_stock.out_of_stock',compact('requests'));
     }
 }

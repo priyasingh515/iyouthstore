@@ -7,10 +7,12 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use App\Models\SellerPayments;
 use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class PurchaseController extends Controller
 {
@@ -257,13 +259,16 @@ class PurchaseController extends Controller
         $product = $cart->product;
 
         // Total stock available
-        $stock = $product->stocks->sum('qty');
+        // $stock = $product->stocks->sum('qty');
 
         // Seller purchase limit
-        $limit = $product->seller_purchase_limit;
+        // $limit = $product->seller_purchase_limit;
 
         // Final max allowed qty
-        $maxAllowed = $limit ? min($limit, $stock) : $stock;
+        // $maxAllowed = $limit ? min($limit, $stock) : $stock;
+
+        $limit = $product->seller_purchase_limit ?? 9999;
+        $maxAllowed = $limit;
 
         // Validate against max allowed
         if ($request->qty > $maxAllowed) {
@@ -315,17 +320,9 @@ class PurchaseController extends Controller
 
     public function checkout()
     {
-        $shop = Shop::where('user_id', auth()->id())->firstOrFail();
-        if ($shop->verification_status != 1 or $shop->registration_approval != 1) {
-
-            return response()->json([
-                'status' => false,
-                'message' => 'your account is not authorized to buy products now. Please contact admin.',
-            ]);
-        }
-
         try {
             DB::beginTransaction();
+
             $seller = Auth::user();
             $carts = Cart::where('user_id', $seller->id)->get();
 
@@ -335,23 +332,18 @@ class PurchaseController extends Controller
                     'message' => 'Cart is empty'
                 ]);
             }
+
             $total = 0;
             foreach ($carts as $cart) {
                 $total += $cart->price * $cart->quantity;
             }
 
             $combined_order_id = DB::table('combined_orders')->insertGetId([
-
                 'user_id' => $seller->id,
-
-                'shipping_address' => null,   // optional
-
+                'shipping_address' => null,
                 'grand_total' => $total,
-
                 'created_at' => now(),
-
                 'updated_at' => now()
-
             ]);
 
 
@@ -362,6 +354,7 @@ class PurchaseController extends Controller
             $order->shipping_type = "home_delivery";
             $order->order_from = "seller_panel";
             $order->pickup_point_id = 0;
+            $order->payment_type = "manual_payment";
             $order->payment_status = "unpaid";
             $order->delivery_status = "pending";
             $order->grand_total = $total;
@@ -370,15 +363,14 @@ class PurchaseController extends Controller
             $order->date = time();
             $order->save();
 
-            // ORDER DETAILS
-
             foreach ($carts as $cart) {
                 $detail = new OrderDetail();
                 $detail->order_id = $order->id;
                 $detail->seller_id = $cart->owner_id;
                 $detail->product_id = $cart->product_id;
                 $detail->variation = $cart->variation;
-                $detail->price = $cart->price;
+                // $detail->price = $cart->price;
+                $detail->price = $cart->price * $cart->quantity;
                 $detail->quantity = $cart->quantity;
                 $detail->tax = 0;
                 $detail->shipping_cost = 0;
@@ -387,24 +379,25 @@ class PurchaseController extends Controller
                 $detail->save();
             }
 
-            // Clear Cart
-
             Cart::where('user_id', $seller->id)->delete();
+
             DB::commit();
 
             return response()->json([
                 'status' => true,
-                'message' => 'Order placed successfully'
+                'message' => 'Order placed successfully',
+                'order_id' => $order->id
             ]);
         } catch (\Exception $e) {
-            DB::rollback();
+
+            DB::rollBack();
+
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()
             ]);
         }
     }
-
     public function myPurchases()
     {
         $orders = Order::where('user_id', Auth::id())
@@ -421,5 +414,138 @@ class PurchaseController extends Controller
             ->findOrFail(decrypt($id));
 
         return view('seller.buy_product.purchase_show', compact('order'));
+    }
+
+    public function ensureAuthorizedSeller($sellerId)
+    {
+        $shop = Shop::where('user_id', $sellerId)->firstOrFail();
+
+        if ($shop->verification_status != 1 || $shop->registration_approval != 1) {
+            throw new RuntimeException('your account is not authorized to buy products now. Please contact admin.');
+        }
+
+        return $shop;
+    }
+
+    public function createSellerPanelOrderForUser($seller)
+    {
+        $carts = Cart::where('user_id', $seller->id)->get();
+
+        if ($carts->isEmpty()) {
+            throw new RuntimeException('Cart is empty');
+        }
+
+        $total = $carts->sum(function ($cart) {
+            return $cart->price * $cart->quantity;
+        });
+
+        $combined_order_id = DB::table('combined_orders')->insertGetId([
+            'user_id' => $seller->id,
+            'shipping_address' => null,
+            'grand_total' => $total,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        $order = new Order();
+        $order->user_id = $seller->id;
+        $order->seller_id = $carts->first()->owner_id;
+        $order->combined_order_id = $combined_order_id;
+        $order->shipping_type = 'home_delivery';
+        $order->order_from = 'seller_panel';
+        $order->pickup_point_id = 0;
+        $order->payment_type = 'manual_payment';
+        $order->payment_status = 'unpaid';
+        $order->delivery_status = 'pending';
+        $order->grand_total = $total;
+        $order->coupon_discount = 0;
+        $order->code = date('YmdHis');
+        $order->date = time();
+        $order->save();
+
+        foreach ($carts as $cart) {
+            $detail = new OrderDetail();
+            $detail->order_id = $order->id;
+            $detail->seller_id = $cart->owner_id;
+            $detail->product_id = $cart->product_id;
+            $detail->variation = $cart->variation;
+            $detail->price = $cart->price;
+            $detail->quantity = $cart->quantity;
+            $detail->tax = 0;
+            $detail->shipping_cost = 0;
+            $detail->payment_status = 'unpaid';
+            $detail->delivery_status = 'pending';
+            $detail->save();
+        }
+
+        Cart::where('user_id', $seller->id)->delete();
+
+        return $order;
+    }
+
+    public function showPaymentDetails(Request $request)
+    {
+        $orderId = $request->order_id;
+
+        if (!$orderId) {
+            return redirect()->route('seller.cart')->with('error', 'Invalid access');
+        }
+
+        $order = Order::findOrFail($orderId);
+
+        return view('seller.buy_product.payment', compact('order', 'orderId'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'utr' => 'required|string|max:150',
+            'payment_date' => 'required|date',
+            'screenshot' => 'required|file|mimes:jpg,jpeg,png,pdf|max:4096',
+            'order_id' => 'required|exists:orders,id'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+
+            $screenshotPath = null;
+
+            if ($request->hasFile('screenshot')) {
+                $directory = public_path('uploads/all/seller-payments');
+
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0755, true);
+                }
+
+                $file = $request->file('screenshot');
+                $fileName = 'payment-' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($directory, $fileName);
+
+                $screenshotPath = 'uploads/all/seller-payments/' . $fileName;
+            }
+
+            SellerPayments::create([
+                'user_id' => Auth::id(),
+                'order_id' => $request->order_id,
+                'payment_method' => 'manual_payment',
+                'utr' => $request->utr,
+                'payment_date' => $request->payment_date,
+                'screenshot' => $screenshotPath,
+                'note' => $request->note,
+                'status' => 'pending',
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('seller.my-purchases')
+                ->with('success', 'Payment submitted successfully');
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

@@ -152,6 +152,7 @@ class ProductService
         ))->toArray();
 
         $data['seller_purchase_limit'] = $collection['seller_purchase_limit'] ?? null;
+        $data['seller_min_purchase_limit'] = $collection['seller_min_purchase_limit'] ?? null;
 
         return Product::create($data);
     }
@@ -300,6 +301,7 @@ class ProductService
         ))->toArray();
 
         $data['seller_purchase_limit'] = $collection['seller_purchase_limit'] ?? null;
+        $data['seller_min_purchase_limit'] = $collection['seller_min_purchase_limit'] ?? null;
 
         $product->update($data);
 

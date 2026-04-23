@@ -63,6 +63,7 @@ use App\Http\Controllers\Cybersource\CybersourceSettingController;
 use App\Http\Controllers\ElementController;
 use App\Http\Controllers\InactiveProductController;
 use App\Http\Controllers\ProfileUpdateRequestController;
+use App\Http\Controllers\Seller\PaymentController as SellerPaymentController;
 use App\Http\Controllers\SellerPurchaseController;
 
 /*
@@ -164,8 +165,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/set-product-discount', 'setProductDiscount')->name('set_product_discount');
         Route::get('/admin/assignment-history', 'assignmentHistoryIndex')->name('assignment.history.index');
         Route::get('/admin/assignment-history/show/{seller}', 'showAssignmentHistory')->name('assignment.history.show');
-        Route::get('/admin/low-seller-stock','lowSellerStock')->name('seller.low.stock');
-
+        Route::get('/admin/low-seller-stock', 'lowSellerStock')->name('seller.low.stock');
+        Route::get('out-of-stock', 'OutOfStockRequests')->name('out_of_stock');
     });
 
     // Digital Product
@@ -201,6 +202,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     });
 
     // Seller
+    Route::get('/sellers/bulk-upload', [SellerController::class, 'bulk_upload'])->name('sellers.bulk_upload');
+    Route::post('/sellers/bulk-store', [SellerController::class, 'bulk_store'])->name('sellers.bulk_store');
+    Route::get('/sellers/export', [SellerController::class, 'export'])->name('sellers.export');
     Route::resource('sellers', SellerController::class);
     Route::controller(SellerController::class)->group(function () {
         Route::get('/seller/stock', 'sellerInventory')->name('sellers.stock');
@@ -241,6 +245,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/withdraw_request/payment_modal', 'payment_modal')->name('withdraw_request.payment_modal');
         Route::post('/withdraw_request/message_modal', 'message_modal')->name('withdraw_request.message_modal');
     });
+
+    //payments 
+
+
+
 
     // Customer
     Route::resource('customers', CustomerController::class);
@@ -361,6 +370,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     Route::post('/seller/update-payment-status', [SellerPurchaseController::class, 'updatePaymentStatus'])
         ->name('seller.update.payment.status');
 
+
+    Route::get('/admin/payment/{order_id}', [SellerPurchaseController::class, 'showPayment'])
+        ->name('payment.view');
+
+    Route::post('/payment/{id}/approve', [SellerPurchaseController::class, 'approve']);
+    Route::post('/payment/{id}/reject', [SellerPurchaseController::class, 'reject']);
 
     // Language
     Route::resource('/languages', LanguageController::class);

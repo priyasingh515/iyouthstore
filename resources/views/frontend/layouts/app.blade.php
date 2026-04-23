@@ -590,11 +590,28 @@
             }
         }
 
-        $(".aiz-user-top-menu").on("mouseover", function (event) {
+        let userMenuTimer;
+
+        $("#nav-user-info, .hover-user-top-menu").on("mouseenter", function () {
+            clearTimeout(userMenuTimer);
             $(".hover-user-top-menu").addClass('active');
-        })
-        .on("mouseout", function (event) {
-            $(".hover-user-top-menu").removeClass('active');
+        }).on("mouseleave", function () {
+            userMenuTimer = setTimeout(function () {
+                $(".hover-user-top-menu").removeClass('active');
+            }, 200);
+        });
+
+        $("#nav-user-info").on("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            clearTimeout(userMenuTimer);
+            $(".hover-user-top-menu").toggleClass('active');
+        });
+
+        $(document).on("click", function (event) {
+            if (!$(event.target).closest("#nav-user-info, .hover-user-top-menu").length) {
+                $(".hover-user-top-menu").removeClass('active');
+            }
         });
 
         $(document).on("click", function(event){

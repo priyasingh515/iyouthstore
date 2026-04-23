@@ -503,6 +503,8 @@ Route::controller(BlogController::class)->group(function () {
 
 });
 
+Route::get('/search-gram-panchayat', [HomeController::class, 'searchGramPanchayat'])->name('search-gram-panchayat');
+
 Route::controller(PageController::class)->group(function () {
     //mobile app balnk page for webview
     Route::get('/mobile-page/{slug}', 'mobile_custom_page')->name('mobile.custom-pages');
@@ -515,5 +517,7 @@ Route::controller(ContactController::class)->group(function () {
 });
 
 Route::post('/store-location', [HomeController::class, 'store'])->name('store-location');
+
+
 
 

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\SellerPayments;
 use App\Models\SellerProduct;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -248,6 +248,51 @@ class SellerPurchaseController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Payment status updated successfully'
+        ]);
+    }
+
+
+    public function showPayment($order_id)
+    {
+        $payment = SellerPayments::where('order_id', $order_id)->first();
+
+        if (!$payment) {
+            return "<p>No payment found</p>";
+        }
+
+        return view('backend.sellers.purchase.modal', compact('payment'));
+    }
+
+    public function approve($id)
+    {
+        $payment = SellerPayments::findOrFail($id);
+
+        $payment->status = 'approved';
+        $payment->save();
+
+        $order = Order::find($payment->order_id);
+        if ($order) {
+            $order->payment_status = 'paid';
+            $order->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payment Approved'
+        ]);
+    }
+
+
+    public function reject($id)
+    {
+        $payment = SellerPayments::findOrFail($id);
+
+        $payment->status = 'rejected';
+        $payment->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payment Rejected'
         ]);
     }
 }

@@ -183,9 +183,7 @@
                                                 <div class="col-xxl-9">
                                                     <input type="number" lang="en"
                                                         class="form-control @error('min_qty') is-invalid @enderror"
-                                                        name="min_qty"
-                                                        value="{{$product->min_qty}}"
-                                                        min="1">
+                                                        name="min_qty" value="{{ $product->min_qty }}" min="1">
                                                     <small
                                                         class="text-muted">{{ translate('The minimum quantity needs to be purchased by your customer.') }}</small>
                                                 </div>
@@ -761,10 +759,27 @@
                                         $end_date = date('d-m-Y H:i:s', $product->discount_end_date);
                                     @endphp
 
+                                    <!-- Min Seller Purchase Limit -->
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-from-label">
+                                            {{ translate('Seller Min Purchase Limit') }}
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="number" name="seller_min_purchase_limit" class="form-control"
+                                                value="{{ $product->seller_min_purchase_limit }}" min="1"
+                                                placeholder="Example: 10">
+
+                                            <small class="text-muted">
+                                                Minimum quantity a customer can purchase for this product.
+                                                Leave empty for unlimited purchase.
+                                            </small>
+                                        </div>
+                                    </div>
+
                                     <!-- Seller Purchase Limit -->
                                     <div class="form-group row">
                                         <label class="col-md-3 col-from-label">
-                                            {{ translate('Seller Purchase Limit') }}
+                                            {{ translate('Seller Max Purchase Limit') }}
                                         </label>
 
                                         <div class="col-md-6">
@@ -780,6 +795,8 @@
 
                                         </div>
                                     </div>
+
+
 
 
                                     <!-- Discount Date Range -->
@@ -918,7 +935,9 @@
                                     <!--    <div class="col-md-9">-->
                                     <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
                                     <!--            <input type="radio" name="stock_visibility_state" value="quantity"-->
-                                    <!--                @if ($product->stock_visibility_state == 'quantity') checked @endif>-->
+                                    <!--                @if ($product->stock_visibility_state == 'quantity')
+    checked
+    @endif>-->
                                     <!--            <span></span>-->
                                     <!--        </label>-->
                                     <!--    </div>-->
@@ -930,7 +949,9 @@
                                     <!--    <div class="col-md-9">-->
                                     <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
                                     <!--            <input type="radio" name="stock_visibility_state" value="text"-->
-                                    <!--                @if ($product->stock_visibility_state == 'text') checked @endif>-->
+                                    <!--                @if ($product->stock_visibility_state == 'text')
+    checked
+    @endif>-->
                                     <!--            <span></span>-->
                                     <!--        </label>-->
                                     <!--    </div>-->
@@ -941,12 +962,14 @@
                                     <!--    <div class="col-md-9">-->
                                     <!--        <label class="aiz-switch aiz-switch-success mb-0">-->
                                     <!--            <input type="radio" name="stock_visibility_state" value="hide"-->
-                                    <!--                @if ($product->stock_visibility_state == 'hide') checked @endif>-->
+                                    <!--                @if ($product->stock_visibility_state == 'hide')
+    checked
+    @endif>-->
                                     <!--            <span></span>-->
                                     <!--        </label>-->
                                     <!--    </div>-->
                                     <!--</div>-->
-                                                                                    <input type="hidden" name="stock_visibility_state" value="hide">
+                                    <input type="hidden" name="stock_visibility_state" value="hide">
                                 </div>
                             </div>
                         </div>
@@ -1391,18 +1414,19 @@
                 success: function(data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                    <div class="form-group row">\
-                        <div class="col-md-3">\
-                            <input type="hidden" name="choice_no[]" value="' + i + '">\
-                            <input type="text" class="form-control" name="choice[]" value="' + name +
+                        <div class="form-group row">\
+                            <div class="col-md-3">\
+                                <input type="hidden" name="choice_no[]" value="' + i + '">\
+                                <input type="text" class="form-control" name="choice[]" value="' + name +
                         '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                        </div>\
-                        <div class="col-md-8">\
-                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" data-selected-text-format="count" multiple>\
-                                ' + obj + '\
-                            </select>\
-                        </div>\
-                    </div>');
+                            </div>\
+                            <div class="col-md-8">\
+                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' +
+                        i + '[]" data-selected-text-format="count" multiple>\
+                                    ' + obj + '\
+                                </select>\
+                            </div>\
+                        </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1617,7 +1641,7 @@
                         $('.refund-block').addClass('d-none');
                         $note.text(
                                 '{{ translate('Selected main category has no refund. Select a refundable category.') }}'
-                                )
+                            )
                             .removeClass('d-none');
                     }
                 },
