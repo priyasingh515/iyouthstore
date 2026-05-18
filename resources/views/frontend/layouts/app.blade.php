@@ -186,6 +186,29 @@
     background:#fff;
     cursor:pointer;
 }
+
+
+
+.whatsapp_button{ 
+position: fixed;
+    height: 50px;
+    width: 50px;
+    bottom: 10%;
+    right: 5%;
+    background: green;
+    z-index: 9999;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ }
+.whatsapp_button i{  
+color:white;
+font-size:28px;
+}
+.whatsapp_button:hover{
+     background: rgb(6, 71, 6);
+}
     </style>
 
 @if (get_setting('google_analytics') == 1)
@@ -420,19 +443,14 @@
 
     {{-- WhatsaApp Chat --}}
     @if (get_setting('whatsapp_chat') == 1)
-        <script type="text/javascript">
-            (function () {
-                var options = {
-                    whatsapp: "{{ env('WHATSAPP_NUMBER') }}",
-                    call_to_action: "{{ translate('Message us') }}",
-                    position: "right", // Position may be 'right' or 'left'
-                };
-                var proto = document.location.protocol, host = "getbutton.io", url = proto + "//static." + host;
-                var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = url + '/widget-send-button/js/init.js';
-                s.onload = function () { WhWidgetSendButton.init(host, proto, options); };
-                var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x);
-            })();
-        </script>
+
+  <a 
+href="https://wa.me/917509066690?text=Namaste%2C%20mujhe%20iYouth%20franchise%20ki%20jaankari%20chahiye." 
+target="_blank" 
+class="whatsapp_button 
+">
+<i class="lab la-whatsapp"></i>
+</a>
     @endif
 
     <style>
