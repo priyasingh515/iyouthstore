@@ -208,7 +208,7 @@ class AuthController extends Controller
                     }
 
                 } else {
-                    return response()->json(['result' => false, 'message' => translate('Unauthorized'), 'user' => null], 401);
+                    return response()->json(['result' => false, 'message' => translate('Invalid Email/Phone or Password'), 'user' => null], 401);
                 }
             } else {
                 return response()->json(['result' => false, 'message' => translate('User is banned'), 'user' => null], 401);
