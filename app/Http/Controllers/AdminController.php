@@ -139,6 +139,34 @@ class AdminController extends Controller
             ->orderBy('total', 'desc')
             ->limit(6)
             ->get();
+        $sellerLocationBaseQuery = User::query()
+            ->join('shops', function ($join) {
+                $join->on('shops.user_id', '=', 'users.id')
+                    ->where('shops.registration_approval', 1);
+            })
+            ->where('users.user_type', 'seller');
+        $data['seller_blocks_covered'] = (clone $sellerLocationBaseQuery)
+            ->whereNotNull('users.block')
+            ->distinct('users.block')
+            ->count('users.block');
+        $data['seller_subdistricts_covered'] = (clone $sellerLocationBaseQuery)
+            ->whereNotNull('users.sub_district')
+            ->distinct('users.sub_district')
+            ->count('users.sub_district');
+        $data['top_seller_blocks'] = (clone $sellerLocationBaseQuery)
+            ->join('blocks', 'blocks.id', '=', 'users.block')
+            ->select('blocks.name', DB::raw('COUNT(users.id) as total'))
+            ->groupBy('blocks.id', 'blocks.name')
+            ->orderByDesc('total')
+            ->limit(4)
+            ->get();
+        $data['top_seller_subdistricts'] = (clone $sellerLocationBaseQuery)
+            ->join('sub_districts', 'sub_districts.id', '=', 'users.sub_district')
+            ->select('sub_districts.name', DB::raw('COUNT(users.id) as total'))
+            ->groupBy('sub_districts.id', 'sub_districts.name')
+            ->orderByDesc('total')
+            ->limit(4)
+            ->get();
         $data['total_order'] = Order::count();
         $data['total_placed_order'] = Order::where('delivery_status', '!=', 'cancelled')->count();
         $data['total_pending_order'] = Order::where('delivery_status', 'pending')->count();

@@ -12,6 +12,21 @@
                     {{ $route == 'all_seller_route' ? translate('All Sellers') : translate('Sellers Review & Followers ') }}
                 </h1>
             </div>
+            <div class="dropdown mb-2 mb-md-0">
+                <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
+                    {{ translate('Bulk Action') }}
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    @can('delete_seller')
+                        <a class="dropdown-item confirm-alert" href="javascript:void(0)"
+                            data-target="#bulk-delete-modal">{{ translate('Delete selection') }}</a>
+                    @endcan
+                    @can('seller_commission_configuration')
+                        <a class="dropdown-item confirm-alert"
+                            onclick="set_bulk_commission()">{{ translate('Set Bulk Commission') }}</a>
+                    @endcan
+                </div>
+            </div>
             @if (auth()->user()->can('add_seller') && $route == 'all_seller_route')
                 <div class="col text-right">
                     <a href="{{ route('sellers.create') }}" class="btn btn-circle btn-info">
@@ -37,7 +52,7 @@
                     </h5>
                 </div>
                 @if ($route == 'all_seller_route')
-                    <div class="dropdown mb-2 mb-md-0">
+                    {{-- <div class="dropdown mb-2 mb-md-0">
                         <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
                             {{ translate('Bulk Action') }}
                         </button>
@@ -51,7 +66,7 @@
                                     onclick="set_bulk_commission()">{{ translate('Set Bulk Commission') }}</a>
                             @endcan
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-lg-2 ml-auto">
                         <select class="form-control aiz-selectpicker" name="verification_status" onchange="sort_sellers()"
                             data-selected="{{ $verification_status }}">
@@ -73,6 +88,34 @@
                         </select>
                     </div>
                 @endif
+                <div class="col-lg-2">
+                    <select class="form-control aiz-selectpicker" name="block_id" onchange="sort_sellers()"
+                        data-live-search="true">
+
+                        <option value="">{{ translate('Block') }}</option>
+
+                        @foreach (\App\Models\Block::where('status', 1)->get() as $block)
+                            <option value="{{ $block->id }}" {{ request('block_id') == $block->id ? 'selected' : '' }}>
+                                {{ $block->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+                    <select class="form-control aiz-selectpicker" name="sub_district_id" onchange="sort_sellers()"
+                        data-live-search="true">
+
+                        <option value="">{{ translate('Subdistrict') }}</option>
+
+                        @foreach (\App\Models\SubDistrict::where('status', 1)->get() as $sub)
+                            <option value="{{ $sub->id }}"
+                                {{ request('sub_district_id') == $sub->id ? 'selected' : '' }}>
+                                {{ $sub->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="col-md-3">
                     <div class="form-group mb-0">
                         <input type="text" class="form-control" id="search"

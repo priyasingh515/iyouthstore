@@ -248,9 +248,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
 
     //payments 
 
-
-
-
     // Customer
     Route::resource('customers', CustomerController::class);
     Route::controller(CustomerController::class)->group(function () {

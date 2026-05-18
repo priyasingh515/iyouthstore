@@ -63,6 +63,8 @@ class SellerController extends Controller
         $sort_search = $request->search ?? null;
         $approved = $request->approved_status ?? null;
         $verification_status =  $request->verification_status ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
 
         $shops = Shop::where('registration_approval', 1)->whereIn('user_id', function ($query) {
             $query->select('id')
@@ -70,7 +72,10 @@ class SellerController extends Controller
                 ->where('user_type', 'seller');
         })->latest();
 
-        if ($sort_search != null || $verification_status != null) {
+        if (
+            $sort_search != null || $verification_status != null || $block_id != null ||
+            $sub_district_id != null
+        ) {
             $user_ids = User::where('user_type', 'seller');
             if ($sort_search != null) {
                 $user_ids = $user_ids->where(function ($user) use ($sort_search) {
@@ -82,6 +87,13 @@ class SellerController extends Controller
             if ($verification_status != null) {
                 $user_ids = $verification_status == 'verified' ? $user_ids->where('email_verified_at', '!=', null) : $user_ids->where('email_verified_at', null);
             }
+            if ($block_id != null) {
+                $user_ids = $user_ids->where('block', $block_id);
+            }
+
+            if ($sub_district_id != null) {
+                $user_ids = $user_ids->where('sub_district', $sub_district_id);
+            }
             $user_ids = $user_ids->pluck('id')->toArray();
             $shops = $shops->where(function ($shops) use ($user_ids) {
                 $shops->whereIn('user_id', $user_ids);
@@ -91,7 +103,7 @@ class SellerController extends Controller
             $shops = $shops->where('verification_status', $approved);
         }
         $shops = $shops->paginate(15);
-        return view('backend.sellers.index', compact('shops', 'sort_search', 'approved', 'verification_status'));
+        return view('backend.sellers.index', compact('shops', 'sort_search', 'approved', 'verification_status','block_id','sub_district_id'));
     }
 
     /**

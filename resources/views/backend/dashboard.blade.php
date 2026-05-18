@@ -1,9 +1,7 @@
 @extends('backend.layouts.app')
 
 @section('content')
-    @if (auth()->user()->can('smtp_settings') &&
-            env('MAIL_USERNAME') == null &&
-            env('MAIL_PASSWORD') == null)
+    @if (auth()->user()->can('smtp_settings') && env('MAIL_USERNAME') == null && env('MAIL_PASSWORD') == null)
         <div class="">
             <div class="alert alert-info d-flex align-items-center">
                 {{ translate('Please Configure SMTP Setting to work all email sending functionality') }},
@@ -135,7 +133,10 @@
                                                     $badge = 'badge-primary';
                                                 }
                                                 $lang = App::getLocale();
-                                                $category = App\Models\CategoryTranslation::where('category_id', $top_category->id)
+                                                $category = App\Models\CategoryTranslation::where(
+                                                    'category_id',
+                                                    $top_category->id,
+                                                )
                                                     ->where('lang', $lang)
                                                     ->first();
                                             @endphp
@@ -670,11 +671,112 @@
 
                         </div>
                     </div>
+                    @if (get_setting('vendor_system_activation') == 1)
+                        <div class="col-lg-12">
+                            <div class="dashboard-box bg-white mb-2rem overflow-hidden p-4">
+
+                                <!-- Header -->
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div>
+                                        <h2 class="fs-18 fw-700 text-dark mb-1">
+                                            {{ translate('Seller Coverage Analytics') }}
+                                        </h2>
+                                        <p class="fs-13 text-secondary mb-0">
+                                            {{ translate('Coverage across blocks and subdistricts') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Stats -->
+                                <div class="row gutters-16 mb-4">
+
+                                    <div class="col-md-3">
+                                        <div class="bg-soft-info rounded-2 p-4 text-center h-100">
+                                            <h2 class="fs-30 fw-700 text-info mb-1">
+                                                {{ $seller_blocks_covered }}
+                                            </h2>
+                                            <div class="fs-13 fw-600 text-dark">
+                                                {{ translate('Blocks Covered') }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="bg-soft-primary rounded-2 p-4 text-center h-100">
+                                            <h2 class="fs-30 fw-700 text-primary mb-1">
+                                                {{ $seller_subdistricts_covered }}
+                                            </h2>
+                                            <div class="fs-13 fw-600 text-dark">
+                                                {{ translate('Subdistricts Covered') }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- Top Lists -->
+                                <div class="row gutters-16">
+
+                                    <!-- Top Blocks -->
+                                    <div class="col-md-6">
+                                        <div class="border rounded-2 p-4 h-100">
+                                            <h3 class="fs-15 fw-700 text-dark mb-3">
+                                                {{ translate('Top Seller Blocks') }}
+                                            </h3>
+
+                                            @forelse ($top_seller_blocks as $block)
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <div class="fs-13 fw-600 text-dark">
+                                                        {{ $block->name }}
+                                                    </div>
+
+                                                    <span class="badge badge-inline badge-info px-3 py-2">
+                                                        {{ $block->total }} Sellers
+                                                    </span>
+                                                </div>
+                                            @empty
+                                                <div class="text-secondary fs-13">
+                                                    {{ translate('No block data found') }}
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+
+                                    <!-- Top Subdistricts -->
+                                    <div class="col-md-6">
+                                        <div class="border rounded-2 p-4 h-100">
+                                            <h3 class="fs-15 fw-700 text-dark mb-3">
+                                                {{ translate('Top Seller Subdistricts') }}
+                                            </h3>
+
+                                            @forelse ($top_seller_subdistricts as $subdistrict)
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <div class="fs-13 fw-600 text-dark">
+                                                        {{ $subdistrict->name }}
+                                                    </div>
+
+                                                    <span class="badge badge-inline badge-primary px-3 py-2">
+                                                        {{ $subdistrict->total }} Sellers
+                                                    </span>
+                                                </div>
+                                            @empty
+                                                <div class="text-secondary fs-13">
+                                                    {{ translate('No subdistrict data found') }}
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @endif
         </div>
     @endcan
-    
+
 @endsection
 @section('script')
     <!-- dashboard script -->
