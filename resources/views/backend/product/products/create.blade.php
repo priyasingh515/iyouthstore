@@ -645,6 +645,18 @@
                                         </div>
                                     </div>
 
+                                      <!-- seller selling price -->
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-from-label">{{ translate('Seller Selling Price') }} <span
+                                                class="text-danger">*</span></label>
+                                        <div class="col-md-6">
+                                            <input type="number" lang="en" min="0" value="0"
+                                                step="0.01" placeholder="{{ translate('Seller selling price') }}"
+                                                name="seller_selling_price"
+                                                class="form-control @error('seller_selling_price') is-invalid @enderror">
+                                        </div>
+                                    </div>
+
                                     <!-- Min Seller Purchase Limit -->
                                     <div class="form-group row">
                                         <label class="col-md-3 col-from-label">

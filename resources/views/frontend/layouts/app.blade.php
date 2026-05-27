@@ -26,6 +26,11 @@
 
     @yield('meta')
 
+
+  <meta name="theme-color" content="#0d6efd">
+<link rel="manifest" href="{{ asset('/manifest.json') }}">
+
+
     @if (!isset($detailedProduct) && !isset($customer_product) && !isset($shop) && !isset($page) && !isset($blog))
         @php
             $meta_image = uploaded_asset(get_setting('meta_image'));

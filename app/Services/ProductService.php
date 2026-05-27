@@ -151,6 +151,7 @@ class ProductService
             'published',
         ))->toArray();
 
+        $data['seller_selling_price'] = $collection['seller_selling_price'] ?? null;
         $data['seller_purchase_limit'] = $collection['seller_purchase_limit'] ?? null;
         $data['seller_min_purchase_limit'] = $collection['seller_min_purchase_limit'] ?? null;
 
@@ -302,6 +303,8 @@ class ProductService
 
         $data['seller_purchase_limit'] = $collection['seller_purchase_limit'] ?? null;
         $data['seller_min_purchase_limit'] = $collection['seller_min_purchase_limit'] ?? null;
+                $data['seller_selling_price'] = $collection['seller_selling_price'] ?? null;
+
 
         $product->update($data);
 

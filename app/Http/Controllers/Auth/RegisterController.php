@@ -197,8 +197,10 @@ class RegisterController extends Controller
             } catch (\Exception $e) {}
         }
 
-        return $this->registered($request, $user)
-            ?: redirect($this->redirectPath());
+        // return $this->registered($request, $user)
+        //     ?: redirect($this->redirectPath());
+            //   return redirect()->route('verification');
+             return redirect()->route('email/verify');
     }
 
     protected function registered(Request $request, $user)
