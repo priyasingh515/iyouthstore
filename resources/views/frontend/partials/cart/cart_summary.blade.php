@@ -74,7 +74,7 @@
                     <!-- Tax -->
                     <tr class="cart-tax">
                         <th class="pl-0 fs-14 fw-400 pt-0 pb-2 text-dark border-top-0">{{ translate('Tax') }}</th>
-                        <td class="text-right pr-0 fs-14 pt-0 pb-2 text-dark border-top-0">{{ single_price($tax) }}</td>
+                        <td class="text-right pr-0 fs-14 pt-0 pb-2 text-dark border-top-0">{{ translate(' included') }}</td>
                     </tr>
                     @if ($proceed != 1)
                     <!-- Total Shipping -->
@@ -154,8 +154,8 @@
                 @endif
             @endif
 
-      @if(Request::is('cart'))
-            @if ($proceed == 1 && session('is_within_radius'))
+   
+            @if ($proceed == 1)
             <!-- Continue to Shipping -->
             <div class="mt-4">
                 
@@ -163,11 +163,9 @@
                     {{ translate('Proceed to Checkout')}} ({{ sprintf("%02d", count($carts)) }})
                 </a>
             </div>
-            @else 
-            
-            <p class="bg-warning p-1">Service Not available in your location...</p>
+       
             @endif
-            @endif
+      
 
         </div>
     </div>

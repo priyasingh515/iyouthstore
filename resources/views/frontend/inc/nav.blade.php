@@ -157,6 +157,10 @@
             Set Location
         </button>
     </div>
+
+     <div class="p-2">
+           <span id="shopDetails"></span>
+    </div>
 @endif
 
 <!-- Modal -->
@@ -176,7 +180,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4">
 
-            <h5 class="mb-2">📍 Delivery Location</h5>
+            <h5 class="mb-2">📍 Location availability </h5>
 
             <p id="location_message">
                 We need your location to check service availability.
@@ -185,7 +189,7 @@
             <div id="location_modal_actions">
 
                 <button class="btn btn-primary" onclick="requestUserLocation()">
-                    Allow Location
+                    Detect My Location
                 </button>
 
                 <button class="btn btn-secondary" data-dismiss="modal">
@@ -193,7 +197,7 @@
                 </button>
 
                 <button onclick="openAnotherLocationModal()" class="btn btn-sm btn-outline-primary ml-2 mt-2 mt-md-0">
-                    use different Location
+                    Set Location Manually
                 </button>
 
             </div>
@@ -212,7 +216,7 @@
 
             <div class="form-group mt-3 position-relative">
 
-                <h5 class="mb-2">Enter Delivery Location</h5>
+                <h5 class="mb-2"> Set Location Manually</h5>
 
                 <input type="text" id="address_input" class="form-control" placeholder="Type delivery address">
 
@@ -251,7 +255,7 @@
             return;
         }
 
-        setTimeout(openLocationModal, 800);
+        // setTimeout(openLocationModal, 800);
     });
 
 

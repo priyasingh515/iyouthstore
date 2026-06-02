@@ -50,15 +50,15 @@
                                     @endphp
                                     <select name="user_id" class="form-control aiz-selectpicker pos-customer" data-live-search="true" onchange="getShippingAddressUpdateCartData()" data-selected="{{ $userID }}">
                                         <option value="">{{translate('Walk In Customer')}}</option>
-                                        @foreach ($customers as $key => $customer)
+                                        {{-- @foreach ($customers as $key => $customer)
                                             <option value="{{ $customer->id }}" data-contact="{{ $customer->email }}">
                                                 {{ $customer->name }}
                                             </option>
-                                        @endforeach
+                                        @endforeach --}}
                                     </select>
                                 </div>
                                 <button type="button" class="btn btn-icon btn-soft-dark ml-3 mr-0" data-target="#new-customer" data-toggle="modal">
-                                    <i class="las la-truck"></i>
+                                    <i class="las la-users"></i>
                                 </button>
                             </div>
                         
@@ -501,7 +501,7 @@
                                 <div class="text-truncate fw-600 fs-14 mb-2">${data.data[i].name}</div>
                                 <div class="">
                                     ${data.data[i].price != data.data[i].base_price
-                                        ? `<del class="mr-2 ml-0">${data.data[i].base_price}</del><span>${data.data[i].price}</span>`
+                                        ? `<del class="mr-2 ml-0">${data.data[i].base_price}</del><span>${data.data[i].seller_selling_price}</span>`
                                         : `<span>${data.data[i].base_price}</span>`
                                     }
                                 </div>

@@ -67,6 +67,8 @@
     </div>
 </div>
 
+
+ @if($payment->status != 'approved')
     <div class="text-right">
         <button class="btn btn-success btn-sm approve-btn" data-id="{{ $payment->id }}">
             Approve
@@ -76,5 +78,6 @@
             Reject
         </button>
     </div>
+    @endif
 
 </div>

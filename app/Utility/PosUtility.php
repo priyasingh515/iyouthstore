@@ -255,6 +255,7 @@ class PosUtility
                 $order->date            = strtotime('now');
                 $order->payment_status  = $data['payment_type'] != 'cash_on_delivery' ? 'paid' : 'unpaid';
                 $order->payment_details = $data['payment_type'];
+                $order->delivery_status = 'delivered';
                 $order->order_from      = 'pos';
 
                 if ($data['payment_type'] == 'offline_payment') {
@@ -296,6 +297,7 @@ class PosUtility
                         $order_detail->product_id       = $product->id;
                         $order_detail->payment_status   = $data['payment_type'] != 'cash_on_delivery' ? 'paid' : 'unpaid';
                         $order_detail->variation        = $product_variation;
+                        $order_detail->delivery_status  = 'delivered';
                         $order_detail->price            = $cartItem['price'] * $cartItem['quantity'];
                         $order_detail->tax              = $cartItem['tax'] * $cartItem['quantity'];
                         $order_detail->quantity         = $cartItem['quantity'];

@@ -203,7 +203,7 @@
                                 <a href="{{ route('poin-of-sales.seller_index') }}"
                                     class="aiz-side-nav-link {{ areActiveRoutes(['poin-of-sales.seller_index']) }}">
                                     <i class="las la-fax aiz-side-nav-icon"></i>
-                                    <span class="aiz-side-nav-text">{{ translate('POS Manager') }}</span>
+                                    <span class="aiz-side-nav-text">{{ translate('Offline Store') }}</span>
                                 </a>
                             </li>
                             <li class="aiz-side-nav-item">
@@ -283,7 +283,7 @@
                     <a href="{{ route('seller.orders.index') }}"
                         class="aiz-side-nav-link {{ areActiveRoutes(['seller.orders.index', 'seller.orders.show']) }}">
                         <i class="las la-money-bill aiz-side-nav-icon"></i>
-                        <span class="aiz-side-nav-text">{{ translate('Orders') }}</span>
+                        <span class="aiz-side-nav-text">{{ translate('Customer Orders') }}</span>
                     </a>
                 </li>
 

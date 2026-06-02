@@ -117,7 +117,7 @@
                                                 <span class="fs-12 text-secondary">{{ translate('Price')}}</span>
                                                 <span class="fw-700 fs-14 mb-2">{{ cart_product_price($cartItem, $product, true, false) }}</span>
                                                 <span>
-                                                    <span class="opacity-90 fs-12">{{ translate('Tax')}}: {{ cart_product_tax($cartItem, $product) }}</span>
+                                                    <span class="opacity-90 fs-12">{{ translate('Tax Included')}}</span>
                                                 </span>
                                             </div>
                                             <!-- Quantity & Total -->

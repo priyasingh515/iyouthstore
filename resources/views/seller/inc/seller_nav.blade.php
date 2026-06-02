@@ -17,6 +17,8 @@
                             <i class="las la-globe"></i>
                         </a>
                     </div>
+
+                   
                 </div>
             </div>
 
@@ -27,6 +29,18 @@
 
             <!-- Seller Cart -->
             <div class="aiz-topbar-item mr-3">
+
+
+                 <div>
+                        <button id="langToggleBtn" class="translate-btn" onclick="toggleTranslate()">
+                            🌐 हिंदी
+                        </button>
+
+                        <!-- Hidden Google Translate -->
+                        <div id="google_translate_element" style="display:none;"></div>
+                    </div>
+
+
                 <div class="d-flex align-items-center">
 
                     <a href="{{ route('seller.cart.index') }}"

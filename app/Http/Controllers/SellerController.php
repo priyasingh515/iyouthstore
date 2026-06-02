@@ -820,7 +820,7 @@ class SellerController extends Controller
     public function pendingSellers(Request $request)
     {
         $sort_search = $request->search ?? null;
-        $shops = Shop::where('registration_approval', 0)->with('user');
+        $shops = Shop::where('registration_approval', 0)->with('user')->orderBy('created_at', 'desc');
 
         if ($sort_search != null) {
             $user_ids = User::where('user_type', 'seller')

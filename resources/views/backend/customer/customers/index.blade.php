@@ -36,6 +36,40 @@
                     <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal">{{translate('Delete selection')}}</a>
                 </div>
             </div>
+
+
+             <div class="col-lg-2 my-2">
+                    <select class="form-control aiz-selectpicker" name="district_id" onchange="sort_customers()"
+                        data-live-search="true">
+
+                        <option value="">{{ translate('District') }}</option>
+
+                        @foreach (\App\Models\City::where('status', 1)->get() as $district)
+                            <option value="{{ $district->id }}"
+                                {{ request('district_id') == $district->id ? 'selected' : '' }}>
+                                {{ $district->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2 my-2">
+                    <select class="form-control aiz-selectpicker" name="block_id" onchange="sort_customers()"
+                        data-live-search="true">
+
+                        <option value="">{{ translate('Block') }}</option>
+
+                        {{-- @foreach (\App\Models\Block::where('status', 1)->get() as $block) --}}
+                        @foreach (\App\Models\Block::where('status', 1)->when(request('district_id'), function ($q) {
+                $q->where('district_id', request('district_id'));
+            })->get() as $block)
+                            <option value="{{ $block->id }}" {{ request('block_id') == $block->id ? 'selected' : '' }}>
+                                {{ $block->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
             <div class="col-lg-2 ml-auto">
                 <select class="form-control aiz-selectpicker" name="verification_status" onchange="sort_customers()" data-selected="{{ $verification_status }}">
                     <option value="">{{ translate('Filter by Verification Status') }}</option>

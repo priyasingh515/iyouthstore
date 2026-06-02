@@ -80,43 +80,65 @@ class HomeController extends Controller
 
 
 
-    public function store(Request $request)
-    { {
-            $request->validate([
-                'latitude'  => 'required|numeric',
-                'longitude' => 'required|numeric',
-            ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'latitude'  => 'required|numeric',
+        'longitude' => 'required|numeric',
+    ]);
 
-            $userLat = $request->latitude;
-            $userLng = $request->longitude;
+    $userLat = $request->latitude;
+    $userLng = $request->longitude;
 
-            // 📍 Bilaspur center point
-            $targetLat = 22.0808;
-            $targetLng = 82.1406;
+    $isWithinRadius = false;
+    $nearestShop = null;
+    $nearestDistance = null;
 
-            // calculate distance
-            $distance = $this->calculateDistance(
-                $userLat,
-                $userLng,
-                $targetLat,
-                $targetLng
-            );
 
-            $isWithinRadius = $distance <= 200;
+    $shops = Shop::whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->get();
 
-            session([
-                'user_latitude'   => $userLat,
-                'user_longitude'  => $userLng,
-                'is_within_radius' => $isWithinRadius
-            ]);
+    foreach ($shops as $shop) {
 
-            return response()->json([
-                'status' => 'Location stored',
-                'distance_km' => round($distance, 2),
-                'is_within_radius' => $isWithinRadius
-            ]);
+        
+        $distance = $this->calculateDistance(
+            $userLat,
+            $userLng,
+            $shop->latitude,
+            $shop->longitude
+        );
+
+
+        if ($nearestDistance === null || $distance < $nearestDistance) {
+            $nearestDistance = $distance;
+            $nearestShop = $shop;
+        }
+
+
+        if ($distance <= 10) {
+            $isWithinRadius = true;
         }
     }
+    
+    session([
+        'user_latitude'    => $userLat,
+        'user_longitude'   => $userLng,
+        'is_within_radius' => $isWithinRadius
+    ]);
+
+    return response()->json([
+        'status' => 'Location stored successfully',
+        'is_within_radius' => $isWithinRadius,
+        'nearest_distance_km' => round($nearestDistance, 2),
+        'nearest_shop' => $nearestShop ? [
+            'id' => $nearestShop->id,
+            'name' => $nearestShop->name,
+            'latitude' => $nearestShop->latitude,
+            'longitude' => $nearestShop->longitude,
+        ] : null
+    ]);
+}
 
     public function load_todays_deal_section()
     {

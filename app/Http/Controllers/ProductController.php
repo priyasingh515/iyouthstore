@@ -800,11 +800,14 @@ class ProductController extends Controller
             );
 
         if ($request->search) {
-            $query->where('users.name', 'like', '%' . $request->search . '%')
-                ->orWhere('shops.shop_id', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('users.name', 'like', '%' . $request->search . '%')
+                    ->orWhere('shops.shop_id', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $sellers = $query->get();
+        $sellers = $query->paginate(10)->withQueryString();
+
         return view('backend.assignment_history.index', compact('sellers'));
     }
     public function showAssignmentHistory($seller_id)
@@ -898,8 +901,8 @@ class ProductController extends Controller
                 'shops.shop_id',
                 'products.name as product_name',
                 'products.id as product_id',
-                'products.seller_purchase_limit', 
-                'products.seller_min_purchase_limit', 
+                'products.seller_purchase_limit',
+                'products.seller_min_purchase_limit',
                 'seller_products.stock'
             )
             ->where('seller_products.stock', '<=', 5);
@@ -936,11 +939,12 @@ class ProductController extends Controller
         return view('backend.stock.index', compact('lowStocks', 'sellers', 'products', 'totalRemaining'));
     }
 
-    public function OutOfStockRequests(){
-        $requests = OutOfStockRequest::with(['user','product'])
-        ->latest()
-        ->paginate();
+    public function OutOfStockRequests()
+    {
+        $requests = OutOfStockRequest::with(['user', 'product'])
+            ->latest()
+            ->paginate();
 
-        return view('backend.out_of_stock.out_of_stock',compact('requests'));
+        return view('backend.out_of_stock.out_of_stock', compact('requests'));
     }
 }
