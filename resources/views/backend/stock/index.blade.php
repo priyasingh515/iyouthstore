@@ -13,8 +13,9 @@
                 <div class="row">
 
                     <!-- SELLER DROPDOWN -->
-                    <div class="col-md-4">
-                        <select name="seller_id" class="form-control aiz-selectpicker" data-live-search="true">
+                    <div class="col-md-3">
+                        <select name="seller_id" class="form-control aiz-selectpicker" data-live-search="true"
+                            onchange="this.form.submit()">
                             <option value="">All Sellers</option>
                             @foreach ($sellers as $id => $name)
                                 <option value="{{ $id }}" {{ request('seller_id') == $id ? 'selected' : '' }}>
@@ -25,8 +26,9 @@
                     </div>
 
                     <!-- PRODUCT DROPDOWN -->
-                    <div class="col-md-4">
-                        <select name="product_id" class="form-control aiz-selectpicker" data-live-search="true">
+                    <div class="col-md-3">
+                        <select name="product_id" class="form-control aiz-selectpicker" data-live-search="true"
+                            onchange="this.form.submit()">
                             <option value="">All Products</option>
                             @foreach ($products as $id => $name)
                                 <option value="{{ $id }}" {{ request('product_id') == $id ? 'selected' : '' }}>
@@ -36,16 +38,75 @@
                         </select>
                     </div>
 
-                    <!-- BUTTONS -->
+                    <!-- DISTRICT -->
                     <div class="col-md-2">
-                        <button class="btn btn-primary w-100">Filter</button>
+
+                        <select name="district_id" class="form-control aiz-selectpicker" data-live-search="true"
+                            onchange="this.form.submit()">
+
+                            <option value="">
+                                District
+                            </option>
+
+                            @foreach (\App\Models\City::where('status', 1)->get() as $district)
+                                <option value="{{ $district->id }}"
+                                    {{ request('district_id') == $district->id ? 'selected' : '' }}>
+
+                                    {{ $district->name }}
+
+                                </option>
+                            @endforeach
+
+                        </select>
+
                     </div>
 
+                    <!-- BLOCK -->
                     <div class="col-md-2">
-                        <a href="{{ route('seller.low.stock') }}" class="btn btn-secondary w-100">
-                            Reset
-                        </a>
+
+                        <select name="block_id" class="form-control aiz-selectpicker" data-live-search="true"
+                            onchange="this.form.submit()">
+
+                            <option value="">
+                                Block
+                            </option>
+
+                            @foreach (\App\Models\Block::where('status', 1)->get() as $block)
+                                <option value="{{ $block->id }}" {{ request('block_id') == $block->id ? 'selected' : '' }}>
+
+                                    {{ $block->name }}
+
+                                </option>
+                            @endforeach
+
+                        </select>
+
                     </div>
+
+                    <!-- SUBDISTRICT -->
+                    {{-- <div class="col-md-2">
+
+                        <select name="sub_district_id" class="form-control aiz-selectpicker" data-live-search="true"
+                            onchange="this.form.submit()">
+
+                            <option value="">
+                                Subdistrict
+                            </option>
+
+                            @foreach (\App\Models\SubDistrict::where('status', 1)->get() as $sub)
+                                <option value="{{ $sub->id }}"
+                                    {{ request('sub_district_id') == $sub->id ? 'selected' : '' }}>
+
+                                    {{ $sub->name }}
+
+                                </option>
+                            @endforeach
+
+                        </select>
+
+                    </div> --}}
+
+
 
                 </div>
             </form>
@@ -59,7 +120,7 @@
                         <th>Shop ID</th>
                         <th>Product</th>
                         <th>Stock</th>
-                        <th>Remaining</th> <!-- ✅ NEW -->
+                        <th>Low Stock</th> 
                     </tr>
                 </thead>
 
@@ -110,7 +171,7 @@
                     <tfoot>
                         <tr>
                             <td colspan="5" class="text-right">
-                                <strong>Total Remaining:</strong>
+                                <strong>Total low stock:</strong>
                             </td>
                             <td>
                                 <span class="badge badge-primary">

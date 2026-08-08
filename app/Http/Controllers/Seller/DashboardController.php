@@ -53,6 +53,59 @@ class DashboardController extends Controller
                                 ->select(DB::raw("sum(grand_total) as total, DATE_FORMAT(created_at, '%d %b') as date"))
                                 ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m-%d')"))
                                 ->get()->pluck('total', 'date');  
+        $data['total_order'] = Order::where('seller_id', $authUserId)->count();
+        $data['total_placed_order'] = Order::where('seller_id', $authUserId)
+                                ->where('delivery_status', '!=', 'cancelled')
+                                ->count();
+        $data['total_confirmed_order'] = Order::where('seller_id', $authUserId)
+                                ->where('delivery_status', 'confirmed')
+                                ->count();
+        $data['total_picked_up_order'] = Order::where('seller_id', $authUserId)
+                                ->where('delivery_status', 'picked_up')
+                                ->count();
+        $data['total_shipped_order'] = Order::where('seller_id', $authUserId)
+                                ->where('delivery_status', 'on_the_way')
+                                ->count();
+        $data['total_cancelled_order'] = Order::where('seller_id', $authUserId)
+                                ->where('delivery_status', 'cancelled')
+                                ->count();
+        $data['total_products'] = Product::where('user_id', $authUserId)->count();
+        $data['top_selling_products'] = Product::select(
+            'products.id',
+            'products.name',
+            'products.slug',
+            'products.thumbnail_img',
+            DB::raw('SUM(order_details.quantity) as total_quantity'),
+            DB::raw('SUM(order_details.price * order_details.quantity) as total_sale')
+        )
+            ->join('order_details', 'order_details.product_id', '=', 'products.id')
+            ->join('orders', 'orders.id', '=', 'order_details.order_id')
+            ->where('orders.seller_id', $authUserId)
+            ->where('orders.delivery_status', 'delivered')
+            ->where('products.approved', 1)
+            ->where('products.published', 1)
+            ->groupBy('products.id', 'products.name', 'products.slug', 'products.thumbnail_img')
+            ->orderByDesc('total_quantity')
+            ->limit(5)
+            ->get();
+        $latestOrderIds = OrderDetail::query()
+                                ->join('orders', 'orders.id', '=', 'order_details.order_id')
+                                ->where('order_details.seller_id', $authUserId)
+                                ->where(function ($query) {
+                                    $query->whereNull('orders.order_from')
+                                        ->orWhereIn('orders.order_from', ['web', 'app', 'pos']);
+                                })
+                                ->orderByDesc('order_details.created_at')
+                                ->distinct()
+                                ->limit(5)
+                                ->pluck('order_details.order_id');
+
+        $data['latest_orders'] = $latestOrderIds->isEmpty()
+            ? collect()
+            : Order::with('user')
+                ->whereIn('id', $latestOrderIds)
+                ->orderByRaw('FIELD(id, ' . $latestOrderIds->implode(',') . ')')
+                ->get();
 
         return view('seller.dashboard', $data);
     }

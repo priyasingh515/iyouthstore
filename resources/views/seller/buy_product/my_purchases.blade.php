@@ -9,6 +9,35 @@
     <div class="card">
         <div class="card-body">
 
+            <form method="GET" action="{{ route('seller.my-purchases') }}" class="mb-3">
+
+                <div class="row">
+
+                    <div class="col-md-4">
+
+                        <div class="input-group">
+
+                            <input type="text" name="search" class="form-control" placeholder="Search Order Code..."
+                                value="{{ request('search') }}">
+
+                            <div class="input-group-append">
+
+                                <button class="btn btn-primary" type="submit">
+
+                                    <i class="las la-search"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
             @if ($orders->count() == 0)
                 <div class="text-center p-5">
                     <h5>No purchases found</h5>
@@ -18,6 +47,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Order Code</th>
                                 <th>Total</th>
                                 <th>Payment Status</th>
@@ -31,6 +61,9 @@
 
                             @foreach ($orders as $order)
                                 <tr>
+                                    <td>
+                                        {{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
+                                    </td>
                                     <td>{{ $order->code }}</td>
                                     <td>₹ {{ number_format($order->grand_total, 2) }}</td>
                                     <td>

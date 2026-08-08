@@ -177,7 +177,9 @@ class SellerPurchaseController extends Controller
 
         $oldStatus = $order->delivery_status;
 
-        DB::transaction(function () use ($request, $order, $oldStatus) {
+        $message = 'Delivery status updated successfully';
+
+        DB::transaction(function () use ($request, $order, $oldStatus, &$message) {
 
             // Update order status
             $order->delivery_status = $request->status;
@@ -217,12 +219,13 @@ class SellerPurchaseController extends Controller
                     // Add stock
                     $sellerProduct->increment('stock', $detail->quantity);
                 }
+                $message = 'Order delivered and stock added successfully';
             }
         });
 
         return response()->json([
             'status' => true,
-            'message' => 'Delivery status updated and stock added successfully'
+            'message' => $message
         ]);
     }
 

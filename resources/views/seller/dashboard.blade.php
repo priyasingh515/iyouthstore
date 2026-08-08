@@ -28,6 +28,272 @@
 </div>
     @php $authUser = auth()->user(); @endphp
     <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow-none mb-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h3 class="fw-700 mb-1">{{ translate('Latest Orders') }}</h3>
+                            <p class="text-secondary mb-0">{{ translate('Recent customer orders from your shop') }}</p>
+                        </div>
+                        <a href="{{ route('seller.orders.index') }}" class="btn btn-soft-primary">
+                            {{ translate('View Orders') }}
+                        </a>
+                    </div>
+                    <div class="d-flex flex-wrap flex-lg-nowrap gutters-10 mb-4">
+                        <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                            <div class="rounded-2 bg-soft-primary p-3 h-100">
+                                <div class="fs-12 text-primary fw-600 mb-1">{{ translate('Order Placed') }}</div>
+                                <div class="fs-22 fw-700 text-dark">{{ $total_placed_order }}</div>
+                            </div>
+                        </div>
+                        <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                            <div class="rounded-2 bg-soft-success p-3 h-100">
+                                <div class="fs-12 text-success fw-600 mb-1">{{ translate('Confirmed') }}</div>
+                                <div class="fs-22 fw-700 text-dark">{{ $total_confirmed_order }}</div>
+                            </div>
+                        </div>
+                        <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                            <div class="rounded-2 bg-soft-danger p-3 h-100">
+                                <div class="fs-12 text-danger fw-600 mb-1">{{ translate('Processed') }}</div>
+                                <div class="fs-22 fw-700 text-dark">{{ $total_picked_up_order }}</div>
+                            </div>
+                        </div>
+                        <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                            <div class="rounded-2 bg-soft-warning p-3 h-100">
+                                <div class="fs-12 text-warning fw-600 mb-1">{{ translate('Shipped') }}</div>
+                                <div class="fs-22 fw-700 text-dark">{{ $total_shipped_order }}</div>
+                            </div>
+                        </div>
+                        <div class="flex-fill mb-3 mb-lg-0">
+                            <div class="rounded-2 bg-light p-3 h-100">
+                                <div class="fs-12 text-secondary fw-600 mb-1">{{ translate('Cancelled') }}</div>
+                                <div class="fs-22 fw-700 text-dark">{{ $total_cancelled_order }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ translate('Customer') }}</th>
+                                    <th>{{ translate('Order') }}</th>
+                                    <th>{{ translate('Amount') }}</th>
+                                    <th>{{ translate('Status') }}</th>
+                                    <th>{{ translate('Date') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($latest_orders as $order)
+                                    <tr>
+                                        <td>{{ optional($order->user)->name ?? data_get(json_decode($order->shipping_address), 'name', '-') }}</td>
+                                        <td>#{{ $order->code }}</td>
+                                        <td><span class="badge badge-inline badge-success">{{ single_price($order->grand_total) }}</span></td>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $order->delivery_status)) }}</td>
+                                        <td>{{ date('d M Y', strtotime($order->created_at)) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">{{ translate('No orders found') }}</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-none mb-0 h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
+                    @if ($authUser->shop?->verification_status == 0)
+                        <div class="my-n4 py-1">
+                            <img src="{{ static_asset('assets/img/non_verified.png') }}" alt=""
+                                class="w-xxl-130px w-90px d-block mx-auto">
+                            <a href="{{ route('seller.shop.verify') }}"
+                                class="btn btn-sm btn-primary mt-3">{{ translate('Verify Now') }}</a>
+                        </div>
+                    @else
+                        <div class="my-2 py-1">
+                            <img src="{{ static_asset('assets/img/verified.png') }}" alt=""
+                                class="w-xxl-130px w-90px d-block mx-auto">
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow-none mb-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h3 class="fw-700 mb-1">{{ translate('Product Analysis') }}</h3>
+                            <p class="text-secondary mb-0">
+                                {{ translate('Top selling products & product performance') }}
+                            </p>
+                        </div>
+
+                        <a href="{{ route('seller.products') }}" class="btn btn-soft-primary">
+                            {{ translate('View Products') }}
+                        </a>
+                    </div>
+
+                    <div class="row text-center mb-4">
+                        <div class="col-md-12">
+                            <h2 class="fw-700 text-primary">
+                                {{ $total_products }}
+                            </h2>
+                            <div class="text-secondary">
+                                {{ translate('Total Products') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="min-height: 260px;">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ translate('Product') }}</th>
+                                    <th>{{ translate('Sold') }}</th>
+                                    <th>{{ translate('Sales') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($top_selling_products as $product)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="text-dark fw-600">{{ $product->name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-inline badge-success">
+                                                {{ $product->total_quantity }} pcs
+                                            </span>
+                                        </td>
+                                        <td>{{ single_price($product->total_sale) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">
+                                            {{ translate('No products found') }}
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 mb-4">
+            <div class="dashboard-box bg-soft-primary mb-4 overflow-hidden p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="fw-700 mb-1">{{ translate('Total Sales') }}</h3>
+                        <p class="text-secondary mb-0">
+                            {{ translate('Overall sales performance') }}
+                        </p>
+                    </div>
+
+                    <a href="{{ route('seller.orders.index') }}" class="btn btn-soft-primary">
+                        {{ translate('View Orders') }}
+                    </a>
+                </div>
+
+                @php
+                    $orderDetails = \App\Models\OrderDetail::where('seller_id', $authUser->id)->get();
+                    $total = 0;
+                    foreach ($orderDetails as $key => $orderDetail) {
+                        if ($orderDetail->order != null && $orderDetail->order->payment_status == 'paid') {
+                            $total += $orderDetail->price;
+                        }
+                    }
+                @endphp
+
+                <div class="row text-center">
+                    <div class="col-12 mb-3">
+                        <h2 class="fw-700 text-dark">
+                            {{ single_price($total) }}
+                        </h2>
+                        <div class="text-secondary">
+                            {{ translate('Total Sales') }}
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="rounded-2 bg-white p-3">
+                            <div class="fs-12 fw-600 text-primary mb-1">{{ translate('Sales This Month') }}</div>
+                            <div class="fs-22 fw-700 text-dark">{{ single_price($this_month_sold_amount) }}</div>
+                            <div class="fs-12 text-secondary mt-1">
+                                {{ translate('Last Month') }}: {{ single_price($previous_month_sold_amount) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow-none h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h3 class="fw-700 mb-1">{{ translate('Category wise product count') }}</h3>
+                            <p class="text-secondary mb-0">{{ translate('Products grouped by category') }}</p>
+                        </div>
+                        <a href="{{ route('seller.products') }}" class="btn btn-soft-primary">
+                            {{ translate('View Products') }}
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ translate('Category') }}</th>
+                                    <th class="text-end">{{ translate('Products') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $categoryFound = false;
+                                @endphp
+                                @foreach (\App\Models\Category::all() as $key => $category)
+                                    @php
+                                        $cat_products = \App\Models\Product::where('user_id', $authUser->id)->where('category_id', $category->id)->count();
+                                    @endphp
+                                    @if ($cat_products > 0)
+                                        @php
+                                            $categoryFound = true;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $category->getTranslation('name') }}</td>
+                                            <td class="text-end">
+                                                <span class="badge badge-inline badge-success">{{ $cat_products }}</span>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                                @if (! $categoryFound)
+                                    <tr>
+                                        <td colspan="2" class="text-center py-4 text-secondary">
+                                            {{ translate('No categories found') }}
+                                        </td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @if(false)
         <div class="col-sm-6 col-md-6 col-xxl-3">
             <div class="card shadow-none mb-4 bg-primary ">
                 <div class="card-body">
@@ -234,7 +500,67 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
+
+    @if(false)
+
+    <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow-none mb-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h3 class="fw-700 mb-1">{{ translate('Latest Orders') }}</h3>
+                            <p class="text-secondary mb-0">
+                                {{ translate('Recent customer orders from your shop') }}
+                            </p>
+                        </div>
+
+                        <a href="{{ route('seller.orders.index') }}" class="btn btn-soft-primary">
+                            {{ translate('View Orders') }}
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ translate('Customer') }}</th>
+                                    <th>{{ translate('Order') }}</th>
+                                    <th>{{ translate('Amount') }}</th>
+                                    <th>{{ translate('Status') }}</th>
+                                    <th>{{ translate('Date') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($latest_orders as $order)
+                                    <tr>
+                                        <td>
+                                            {{ optional($order->user)->name ?? data_get(json_decode($order->shipping_address), 'name', '-') }}
+                                        </td>
+                                        <td>#{{ $order->code }}</td>
+                                        <td>
+                                            <span class="badge badge-inline badge-success">
+                                                {{ single_price($order->grand_total) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $order->delivery_status)) }}</td>
+                                        <td>{{ date('d M Y', strtotime($order->created_at)) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">
+                                            {{ translate('No orders found') }}
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <div class="row">
         <div class="col-sm-6 col-md-6 col-lg-3 mb-4">
@@ -497,50 +823,11 @@
         </div>
     </div>
 
+    </div>
+    @endif
+
     <div class="row">
 
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <div class="card-title text-primary">
-                <h6 class="mb-0">{{ translate('Top 12 Products') }}</h6>
-            </div>
-            <div class="aiz-carousel gutters-10 half-outside-arrow" data-items="6" data-xl-items="5" data-lg-items="4"
-                data-md-items="3" data-sm-items="2" data-arrows='true'>
-                @foreach ($products as $key => $product)
-                    <div class="carousel-box">
-                        <div
-                            class="aiz-card-box border border-light rounded shadow-sm hov-shadow-md mb-2 has-transition bg-white">
-                            <div class="position-relative">
-                                <a href="{{ route('product', $product->slug) }}" class="d-block">
-                                    <img class="img-fit lazyload mx-auto h-210px"
-                                        src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                        data-src="{{ uploaded_asset($product->thumbnail_img) }}"
-                                        alt="{{ $product->getTranslation('name') }}"
-                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                </a>
-                            </div>
-                            <div class="p-md-3 p-2 text-left">
-                                <div class="fs-15">
-                                    @if (home_base_price($product) != home_discounted_base_price($product))
-                                        <del class="fw-600 opacity-50 mr-1">{{ home_base_price($product) }}</del>
-                                    @endif
-                                    <span class="fw-700 text-primary">{{ home_discounted_base_price($product) }}</span>
-                                </div>
-                                <div class="rating rating-sm mt-1">
-                                    {{ renderStarRating($product->rating) }}
-                                </div>
-                                <h3 class="fw-600 fs-13 text-truncate-2 lh-1-4 mb-0">
-                                    <a href="{{ route('product', $product->slug) }}"
-                                        class="d-block text-reset">{{ $product->getTranslation('name') }}</a>
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
     </div>
 
 @endsection

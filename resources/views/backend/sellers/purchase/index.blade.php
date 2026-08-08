@@ -56,6 +56,7 @@
                             <th>Delivery Status</th>
                             <th>Payment Method</th>
                             <th>Payment Status</th>
+                            <th>Date</th>
                             <th width="15%" class="text-right">Options</th>
                         </tr>
                     </thead>
@@ -100,6 +101,10 @@
                                     @else
                                         <span class="badge badge-inline badge-danger">Unpaid</span>
                                     @endif
+                                </td>
+
+                                 <td>
+                                    {{ date('d-m-Y', strtotime($order->created_at)) }}
                                 </td>
 
                                 <td class="text-right">

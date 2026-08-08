@@ -10,48 +10,114 @@
     </div>
 
     <div class="card">
-        <div class="card-header">
+
+        <form id="sort_requests" method="GET">
+            {{-- <div class="card-header">
             <h5 class="mb-0 h6">{{ translate('Requests') }}</h5>
-        </div>
+        </div> --}}
 
-        <div class="card-body">
-            <table class="table aiz-table mb-0">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>{{ translate('Seller') }}</th>
-                        <th>{{ translate('Status') }}</th>
-                        <th width="25%">{{ translate('Options') }}</th>
-                    </tr>
-                </thead>
+            <div class="card-header row gutters-5">
 
-                <tbody>
-                    @forelse($requests as $key => $req)
+                <div class="col">
+                    <h5 class="mb-0 h6">
+                        {{ translate('Requests') }}
+                    </h5>
+                </div>
+
+                <div class="col-lg-2">
+                    <select class="form-control aiz-selectpicker" name="district_id" onchange="sort_requests()">
+
+                        <option value="">District</option>
+
+                        @foreach (\App\Models\City::where('status', 1)->get() as $district)
+                            <option value="{{ $district->id }}"
+                                {{ request('district_id') == $district->id ? 'selected' : '' }}>
+
+                                {{ $district->name }}
+
+                            </option>
+                        @endforeach
+
+                    </select>
+                </div>
+
+                <div class="col-lg-2">
+
+                    <select class="form-control aiz-selectpicker" name="block_id" onchange="sort_requests()">
+
+                        <option value="">Block</option>
+
+                        @foreach (\App\Models\Block::where('status', 1)->get() as $block)
+                            <option value="{{ $block->id }}" {{ request('block_id') == $block->id ? 'selected' : '' }}>
+
+                                {{ $block->name }}
+
+                            </option>
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+                <div class="col-lg-2">
+
+                    <select class="form-control aiz-selectpicker" name="sub_district_id" onchange="sort_requests()">
+
+                        <option value="">Subdistrict</option>
+
+                        @foreach (\App\Models\SubDistrict::where('status', 1)->get() as $sub)
+                            <option value="{{ $sub->id }}"
+                                {{ request('sub_district_id') == $sub->id ? 'selected' : '' }}>
+
+                                {{ $sub->name }}
+
+                            </option>
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+                <table class="table aiz-table mb-0">
+                    <thead>
                         <tr>
+                            <th>#</th>
+                            <th>{{ translate('Seller') }}</th>
+                            <th>{{ translate('Status') }}</th>
+                            <th width="25%">{{ translate('Options') }}</th>
+                        </tr>
+                    </thead>
 
-                            <td>{{ $key + 1 }}</td>
+                    <tbody>
+                        @forelse($requests as $key => $req)
+                            <tr>
 
-                            <td>
-                                <strong>{{ $req->user->name }}</strong>
-                            </td>
+                                <td>{{ $key + 1 }}</td>
 
-                            <td>
-                                @if ($req->status == 'pending')
-                                    <span class="badge badge-inline badge-warning">Pending</span>
-                                @elseif($req->status == 'approved')
-                                    <span class="badge badge-inline badge-success">Approved</span>
-                                @else
-                                    <span class="badge badge-inline badge-danger">Rejected</span>
-                                @endif
-                            </td>
+                                <td>
+                                    <strong>{{ $req->user->name }}</strong>
+                                </td>
 
-                            <td>
+                                <td>
+                                    @if ($req->status == 'pending')
+                                        <span class="badge badge-inline badge-warning">Pending</span>
+                                    @elseif($req->status == 'approved')
+                                        <span class="badge badge-inline badge-success">Approved</span>
+                                    @else
+                                        <span class="badge badge-inline badge-danger">Rejected</span>
+                                    @endif
+                                </td>
 
-                                <button class="btn btn-info btn-sm" onclick="viewRequest({{ $req->id }})">
-                                    <i class="las la-eye"></i> View
-                                </button>
+                                <td>
 
-                                {{-- @if ($req->status == 'pending')
+                                    <button type="button" class="btn btn-info btn-sm" onclick="viewRequest({{ $req->id }})">
+                                        <i class="las la-eye"></i> View
+                                    </button>
+
+                                    {{-- @if ($req->status == 'pending')
                                     <button type="button" class="btn btn-success btn-sm"
                                         onclick="confirmApprove({{ $req->id }})">
                                         <i class="las la-check"></i>
@@ -62,42 +128,43 @@
                                         <i class="las la-times"></i>
                                     </button>
                                 @endif --}}
-                                @if ($req->status == 'pending')
-                                    <button type="button" class="btn btn-success btn-sm"
-                                        onclick="confirmApprove({{ $req->id }})">
-                                        <i class="las la-check"></i>
-                                    </button>
+                                    @if ($req->status == 'pending')
+                                        <button type="button" class="btn btn-success btn-sm"
+                                            onclick="confirmApprove({{ $req->id }})">
+                                            <i class="las la-check"></i>
+                                        </button>
 
-                                    <button type="button" class="btn btn-danger btn-sm"
-                                        onclick="confirmReject({{ $req->id }})">
-                                        <i class="las la-times"></i>
-                                    </button>
-                                @else
-                                    {{-- DELETE ONLY IF APPROVED OR REJECTED --}}
-                                    <button type="button" class="btn btn-outline-danger btn-sm"
-                                        onclick="confirmDelete({{ $req->id }})">
-                                        <i class="las la-trash"></i>
-                                    </button>
-                                @endif
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            onclick="confirmReject({{ $req->id }})">
+                                            <i class="las la-times"></i>
+                                        </button>
+                                    @else
+                                        {{-- DELETE ONLY IF APPROVED OR REJECTED --}}
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                            onclick="confirmDelete({{ $req->id }})">
+                                            <i class="las la-trash"></i>
+                                        </button>
+                                    @endif
 
 
-                            </td>
+                                </td>
 
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center">
-                                No Requests Found
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            <div class="aiz-pagination mt-3">
-                {{ $requests->links() }}
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    No Requests Found
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+                <div class="aiz-pagination mt-3">
+                    {{ $requests->links() }}
+                </div>
+
             </div>
-
-        </div>
+        </form>
     </div>
 
     {{-- VIEW MODAL --}}
@@ -230,6 +297,10 @@
             });
 
             $('#confirmActionModal').modal('show');
+        }
+
+        function sort_requests() {
+            $('#sort_requests').submit();
         }
     </script>
 @endsection

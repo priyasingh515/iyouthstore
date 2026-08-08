@@ -202,7 +202,7 @@
 
                         @foreach ($order->orderDetails as $key => $detail)
                             @php
-                                $total = $detail->price * $detail->quantity;
+                                $total = $detail->price;
                                 $subTotal += $total;
                                 $taxTotal += $detail->tax;
                                 $shippingTotal += $detail->shipping_cost;
@@ -221,7 +221,7 @@
                                 </td>
 
                                 <td>
-                                    {{ single_price($detail->price) }}
+                                   {{ single_price($detail->product->seller_price) }}
                                 </td>
 
                                 <td class="text-right font-weight-bold">

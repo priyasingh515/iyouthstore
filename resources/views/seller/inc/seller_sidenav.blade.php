@@ -186,9 +186,9 @@
                 @endif
 
 
-                    @if (addon_is_activated('pos_system') &&
+                    {{-- @if (addon_is_activated('pos_system') &&
                         get_setting('pos_activation_for_seller') != null &&
-                        get_setting('pos_activation_for_seller') != 0)
+                        get_setting('pos_activation_for_seller') != 0) --}}
                     <li class="aiz-side-nav-item">
                         <a href="#" class="aiz-side-nav-link">
                             <i class="las la-tasks aiz-side-nav-icon"></i>
@@ -213,7 +213,7 @@
                             </li>
                         </ul>
                     </li>
-                @endif
+                {{-- @endif --}}
 
                 <li class="aiz-side-nav-item">
                     <a href="#" class="aiz-side-nav-link">
