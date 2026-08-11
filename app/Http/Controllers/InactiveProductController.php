@@ -15,6 +15,11 @@ class InactiveProductController extends Controller
             'to_date' => ['nullable', 'date'],
         ]);
 
+
+        $district_id = $request->district_id ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
+
         // Default range: last 2 months to today
         $fromDate = $request->input('from_date', now()->subMonths(2)->toDateString());
         $toDate = $request->input('to_date', now()->toDateString());
@@ -28,6 +33,9 @@ class InactiveProductController extends Controller
             sp.seller_id,
             u.name AS seller_name,
             s.shop_id,
+            u.district,
+            u.block,
+            u.sub_district,
             COUNT(DISTINCT sp.product_id) AS unsold_products_count
 
         FROM seller_products sp
@@ -55,6 +63,7 @@ class InactiveProductController extends Controller
             AND last_sales.product_id = sp.product_id
 
         WHERE
+        (
             (
                 last_sales.last_sold_date IS NULL
                 AND DATE(sp.created_at) <= ?
@@ -63,16 +72,42 @@ class InactiveProductController extends Controller
             (
                 DATE(last_sales.last_sold_date) < ?
             )
+                )
+            AND (? IS NULL OR u.district = ?)
+
+AND (? IS NULL OR u.block = ?)
+
+AND (? IS NULL OR u.sub_district = ?)
 
         GROUP BY
             sp.seller_id,
             u.name,
             s.shop_id
 
-        ORDER BY u.name
-        ", [$toDate, $toDate, $fromDate]);
 
-        return view('backend.inactive_products.index', compact('sellers', 'fromDate', 'toDate'));
+        ORDER BY u.name
+        ", [
+            $toDate,
+            $toDate,
+            $fromDate,
+            $district_id,
+            $district_id,
+
+            $block_id,
+            $block_id,
+
+            $sub_district_id,
+            $sub_district_id
+        ]);
+
+        return view('backend.inactive_products.index', compact(
+            'sellers',
+            'fromDate',
+            'toDate',
+            'district_id',
+            'block_id',
+            'sub_district_id'
+        ));
     }
 
 

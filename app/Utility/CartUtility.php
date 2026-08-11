@@ -28,24 +28,29 @@ class CartUtility
         return $str;
     }
 
+    // public static function get_price($product, $product_stock, $quantity)
+    // {
+    //     $price = $product_stock->price;
+    //     if ($product->auction_product == 1) {
+    //         $price = $product->bids->max('amount');
+    //     }
+
+    //     if ($product->wholesale_product) {
+    //         $wholesalePrice = $product_stock->wholesalePrices->where('min_qty', '<=', $quantity)
+    //             ->where('max_qty', '>=', $quantity)
+    //             ->first();
+    //         if ($wholesalePrice) {
+    //             $price = $wholesalePrice->price;
+    //         }
+    //     }
+
+    //     $price = self::discount_calculation($product, $price);
+    //     return $price;
+    // }
+
     public static function get_price($product, $product_stock, $quantity)
     {
-        $price = $product_stock->price;
-        if ($product->auction_product == 1) {
-            $price = $product->bids->max('amount');
-        }
-
-        if ($product->wholesale_product) {
-            $wholesalePrice = $product_stock->wholesalePrices->where('min_qty', '<=', $quantity)
-                ->where('max_qty', '>=', $quantity)
-                ->first();
-            if ($wholesalePrice) {
-                $price = $wholesalePrice->price;
-            }
-        }
-
-        $price = self::discount_calculation($product, $price);
-        return $price;
+        return $product->seller_selling_price ?? 0;
     }
 
     public static function discount_calculation($product, $price)
@@ -84,11 +89,11 @@ class CartUtility
         return $tax;
     }
 
-    public static function save_cart_data($cart, $product, $price, $tax, $quantity)
+    public static function save_cart_data($cart, $product, $price, $tax, $quantity, $ownerId = null)
     {
         $cart->quantity = $quantity;
         $cart->product_id = $product->id;
-        $cart->owner_id = $product->user_id;
+        $cart->owner_id = $ownerId ?? $product->user_id;
         $cart->price = $price;
         $cart->tax = $tax;
         $cart->product_referral_code = null;

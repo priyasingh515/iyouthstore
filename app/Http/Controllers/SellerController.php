@@ -103,7 +103,7 @@ class SellerController extends Controller
             $shops = $shops->where('verification_status', $approved);
         }
         $shops = $shops->paginate(15);
-        return view('backend.sellers.index', compact('shops', 'sort_search', 'approved', 'verification_status','block_id','sub_district_id'));
+        return view('backend.sellers.index', compact('shops', 'sort_search', 'approved', 'verification_status', 'block_id', 'sub_district_id'));
     }
 
     /**
@@ -112,19 +112,108 @@ class SellerController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function sellerInventory()
+    // public function sellerInventory()
+    // {
+
+
+    //     $shops = SellerProduct::join('shops', 'seller_products.seller_id', '=', 'shops.user_id')
+    //         ->select(
+    //             'shops.name as shop_name',
+    //             'seller_products.seller_id',
+    //             DB::raw('SUM(seller_products.stock) as total_stock')
+    //         )
+    //         ->groupBy('shops.user_id', 'shops.name')
+    //         ->get();
+    //     return view('backend.sellers.inventory', compact('shops'));
+    // }
+
+
+    public function sellerInventory(Request $request)
     {
+        $sort_search = $request->search ?? null;
 
+        $district_id = $request->district_id ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
 
-        $shops = SellerProduct::join('shops', 'seller_products.seller_id', '=', 'shops.user_id')
+        $shops = SellerProduct::join(
+            'shops',
+            'seller_products.seller_id',
+            '=',
+            'shops.user_id'
+        )
             ->select(
                 'shops.name as shop_name',
                 'seller_products.seller_id',
-                DB::raw('SUM(seller_products.stock) as total_stock')
+                DB::raw(
+                    'SUM(seller_products.stock) as total_stock'
+                )
+            );
+
+        if (
+            $sort_search != null ||
+            $district_id != null ||
+            $block_id != null ||
+            $sub_district_id != null
+        ) {
+
+            $user_ids = User::where(
+                'user_type',
+                'seller'
+            );
+
+            if ($sort_search != null) {
+                $user_ids = $user_ids->where(
+                    'name',
+                    'like',
+                    '%' . $sort_search . '%'
+                );
+            }
+
+            if ($district_id != null) {
+                $user_ids = $user_ids->where(
+                    'district',
+                    $district_id
+                );
+            }
+
+            if ($block_id != null) {
+                $user_ids = $user_ids->where(
+                    'block',
+                    $block_id
+                );
+            }
+
+            if ($sub_district_id != null) {
+                $user_ids = $user_ids->where(
+                    'sub_district',
+                    $sub_district_id
+                );
+            }
+
+            $shops = $shops->whereIn(
+                'seller_products.seller_id',
+                $user_ids->pluck('id')
+            );
+        }
+
+        $shops = $shops
+            ->groupBy(
+                'shops.user_id',
+                'shops.name'
             )
-            ->groupBy('shops.user_id', 'shops.name')
             ->get();
-        return view('backend.sellers.inventory', compact('shops'));
+
+        return view(
+            'backend.sellers.inventory',
+            compact(
+                'shops',
+                'sort_search',
+                'district_id',
+                'block_id',
+                'sub_district_id'
+            )
+        );
     }
 
     public function sellerInventoryDetail($id)
@@ -817,26 +906,85 @@ class SellerController extends Controller
         return back();
     }
 
+    // public function pendingSellers(Request $request)
+    // {
+    //     $sort_search = $request->search ?? null;
+    //     $shops = Shop::where('registration_approval', 0)->with('user');
+
+    //     if ($sort_search != null) {
+    //         $user_ids = User::where('user_type', 'seller')
+    //             ->where(function ($query) use ($sort_search) {
+    //                 $query->where('name', 'like', '%' . $sort_search . '%')
+    //                     ->orWhere('email', 'like', '%' . $sort_search . '%')
+    //                     ->orWhere('phone', 'like', '%' . $sort_search . '%');
+    //             })
+    //             ->pluck('id')
+    //             ->toArray();
+    //         $shops = $shops->whereIn('user_id', $user_ids);
+    //     }
+
+    //     $shops = $shops->paginate(15);
+
+    //     return view('backend.sellers.pending_seller', compact('shops', 'sort_search'));
+    // }
+
+
     public function pendingSellers(Request $request)
     {
         $sort_search = $request->search ?? null;
+<<<<<<< Updated upstream
         $shops = Shop::where('registration_approval', 0)->with('user')->orderBy('created_at', 'desc');
+=======
+
+        $district_id = $request->district_id ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
+
+        $shops = Shop::where('registration_approval', 0);
+
+        $user_ids = User::where('user_type', 'seller');
+>>>>>>> Stashed changes
 
         if ($sort_search != null) {
-            $user_ids = User::where('user_type', 'seller')
-                ->where(function ($query) use ($sort_search) {
-                    $query->where('name', 'like', '%' . $sort_search . '%')
-                        ->orWhere('email', 'like', '%' . $sort_search . '%')
-                        ->orWhere('phone', 'like', '%' . $sort_search . '%');
-                })
-                ->pluck('id')
-                ->toArray();
-            $shops = $shops->whereIn('user_id', $user_ids);
+            $user_ids = $user_ids->where(function ($query) use ($sort_search) {
+                $query->where('name', 'like', '%' . $sort_search . '%')
+                    ->orWhere('email', 'like', '%' . $sort_search . '%')
+                    ->orWhere('phone', 'like', '%' . $sort_search . '%');
+            });
         }
 
-        $shops = $shops->paginate(15);
+        if ($district_id != null) {
+            $districtName = City::where('id', $district_id)->value('name');
+            $user_ids = $user_ids->where('district', $districtName);
+        }
 
-        return view('backend.sellers.pending_seller', compact('shops', 'sort_search'));
+        if ($block_id != null) {
+            $blockName = Block::where('id', $block_id)->value('name');
+            $user_ids = $user_ids->where('block', $blockName);
+        }
+
+        if ($sub_district_id != null) {
+            $subDistrictName = SubDistrict::where('id', $sub_district_id)->value('name');
+            $user_ids = $user_ids->where('sub_district', $subDistrictName);
+        }
+
+        $shops = $shops->whereIn(
+            'user_id',
+            $user_ids->pluck('id')
+        );
+
+        $shops = $shops->with('user')->paginate(15);
+
+        return view(
+            'backend.sellers.pending_seller',
+            compact(
+                'shops',
+                'sort_search',
+                'district_id',
+                'block_id',
+                'sub_district_id'
+            )
+        );
     }
 
     public function UpdateSellerRegistration(Request $request)
@@ -1001,6 +1149,17 @@ class SellerController extends Controller
             ->where('seller_products.stock', '<=', 5)
             ->paginate(15);
 
+
+        $purchase_orders = collect();
+
+        if ($tab == 'purchase_history') {
+
+            $purchase_orders = Order::where('user_id', $shop->user_id)
+                ->where('order_from', 'seller_panel')
+                ->latest()
+                ->paginate(15);
+        }
+
         $inactive_products = collect();
 
         $fromDate = $request->input('from_date', now()->subMonths(2)->toDateString());
@@ -1068,7 +1227,8 @@ class SellerController extends Controller
             'low_stock',
             'inactive_products',
             'toDate',
-            'fromDate'
+            'fromDate',
+            'purchase_orders'
         ))->render();
         return response()->json(['html' => $html]);
     }

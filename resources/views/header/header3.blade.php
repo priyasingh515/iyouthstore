@@ -5,7 +5,6 @@
 @endphp
 
 <style>
-  
     .logo-box {
         width: 40px;
 
@@ -290,6 +289,18 @@
                     </div>
                 </div>
 
+                <div class="d-none d-lg-flex align-items-center ml-4">
+
+                    <a href="javascript:void(0)" onclick="openLocationModal()" class="text-dark fw-600 mr-4"
+                        id="current_location" style="text-decoration:none;">
+                        Service Available - Checking...
+                    </a>
+                    <a href="" class="text-dark fw-600" style="text-decoration:none;">
+                        🚚 Track Order
+                    </a>
+
+                </div>
+
                 @if (Auth::check() && auth()->user()->user_type == 'customer')
                     <!-- Compare -->
                     <div class="d-none d-lg-block ml-3 mr-0">
@@ -473,7 +484,8 @@
 
                         <div class="hover-user-top-menu position-absolute z-3">
                             <div class="position-static float-right">
-                                <div class="aiz-user-top-menu bg-white rounded-0 border-top shadow-sm" style="width:220px;">
+                                <div class="aiz-user-top-menu bg-white rounded-0 border-top shadow-sm"
+                                    style="width:220px;">
                                     <ul class="list-unstyled no-scrollbar mb-0 text-left">
                                         @if (isAdmin())
                                             <li class="user-top-nav-element border border-top-0" data-id="1">
@@ -548,8 +560,8 @@
                                                 <li class="user-top-nav-element border border-top-0" data-id="1">
                                                     <a href="{{ route('preorder.order_list') }}"
                                                         class="text-truncate text-dark px-4 fs-14 d-flex align-items-center hov-column-gap-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16.002"
-                                                            viewBox="0 0 16 16.002">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                            height="16.002" viewBox="0 0 16 16.002">
                                                             <path id="Union_63" data-name="Union 63"
                                                                 d="M14072,894a8,8,0,1,1,8,8A8.011,8.011,0,0,1,14072,894Zm1,0a7,7,0,1,0,7-7A7.007,7.007,0,0,0,14073,894Zm10.652,3.674-3.2-2.781a1,1,0,0,1-.953-1.756V889.5a.5.5,0,1,1,1,0v3.634a1,1,0,0,1,.5.863c0,.015,0,.029,0,.044l3.311,2.876a.5.5,0,0,1,.05.7.5.5,0,0,1-.708.049Z"
                                                                 transform="translate(-14072 -885.998)" fill="#b5b5bf" />
@@ -564,8 +576,8 @@
                                                 <li class="user-top-nav-element border border-top-0" data-id="1">
                                                     <a href="{{ route('conversations.index') }}"
                                                         class="text-truncate text-dark px-4 fs-14 d-flex align-items-center hov-column-gap-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                            viewBox="0 0 16 16">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                            height="16" viewBox="0 0 16 16">
                                                             <g id="Group_25263" data-name="Group 25263"
                                                                 transform="translate(1053.151 256.688)">
                                                                 <path id="Path_3012" data-name="Path 3012"
@@ -617,8 +629,8 @@
                                             <li class="user-top-nav-element border border-top-0" data-id="1">
                                                 <a href="{{ route('support_ticket.index') }}"
                                                     class="text-truncate text-dark px-4 fs-14 d-flex align-items-center hov-column-gap-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16.001"
-                                                        viewBox="0 0 16 16.001">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                        height="16.001" viewBox="0 0 16 16.001">
                                                         <g id="Group_25259" data-name="Group 25259"
                                                             transform="translate(-316 -1066)">
                                                             <path id="Subtraction_184" data-name="Subtraction 184"
@@ -626,7 +638,8 @@
                                                                 transform="translate(-16096 180)" fill="#b5b5bf" />
                                                             <path id="Union_12" data-name="Union 12"
                                                                 d="M16414,895a1,1,0,1,1,1,1A1,1,0,0,1,16414,895Zm.5-2.5V891h.5a2,2,0,1,0-2-2h-1a3,3,0,1,1,3.5,2.958v.54a.5.5,0,1,1-1,0Zm-2.5-3.5h1a.5.5,0,1,1-1,0Z"
-                                                                transform="translate(-16090.998 183.001)" fill="#b5b5bf" />
+                                                                transform="translate(-16090.998 183.001)"
+                                                                fill="#b5b5bf" />
                                                         </g>
                                                     </svg>
                                                     <span
@@ -648,9 +661,9 @@
                                                                 d="M12052.535,2920a8,8,0,0,1-4.569-14.567l.721.72a7,7,0,1,0,7.7,0l.721-.72a8,8,0,0,1-4.567,14.567Z"
                                                                 transform="translate(-11803.999 -2367)" fill="#d43533" />
                                                         </g>
-                                                        <rect id="Rectangle_19022" data-name="Rectangle 19022" width="1"
-                                                            height="8" rx="0.5" transform="translate(31.5 377)"
-                                                            fill="#d43533" />
+                                                        <rect id="Rectangle_19022" data-name="Rectangle 19022"
+                                                            width="1" height="8" rx="0.5"
+                                                            transform="translate(31.5 377)" fill="#d43533" />
                                                     </g>
                                                 </svg>
                                                 <span
@@ -725,6 +738,18 @@
                                         </a>
                                     </li>
                                 @endforeach
+                                <li class="list-inline-item mr-0">
+                                    <a href="javascript:void(0)" onclick="openLocationModal()"
+                                        class="fs-13 px-3 py-3 d-inline-block fw-700 header_menu_links"
+                                        id="current_location">
+                                        📍 Location
+                                    </a>
+                                </li>
+                                <li class="list-inline-item mr-0">
+                                    <a href="{{route('orders.track')}}" class="fs-13 px-3 py-3 d-inline-block fw-700 header_menu_links">
+                                        🚚 Track Order
+                                    </a>
+                                </li>
                             @endif
                         </ul>
                     </div>
@@ -764,3 +789,21 @@
         </div>
     </div>
 </header>
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+
+    let status = localStorage.getItem("service_status");
+
+    let text = "Service Available - Checking...";
+
+    if(status === "Yes"){
+        text = "Service Available - Yes";
+    }
+    else if(status === "No"){
+        text = "Service Available - No";
+    }
+
+    document.getElementById("current_location").innerHTML = text;
+
+});
+</script>

@@ -409,10 +409,21 @@ class PurchaseController extends Controller
     }
     public function myPurchases()
     {
+        // $orders = Order::where('user_id', Auth::id())
+        //     ->where('order_from', 'seller_panel')
+        //     ->latest()
+        //     ->paginate(15);
+
         $orders = Order::where('user_id', Auth::id())
             ->where('order_from', 'seller_panel')
+
+            ->when(request('search'), function ($query) {
+                $query->where('code', 'like', '%' . request('search') . '%');
+            })
+
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->appends(request()->query());
 
         return view('seller.buy_product.my_purchases', compact('orders'));
     }
@@ -422,7 +433,12 @@ class PurchaseController extends Controller
             ->where('user_id', auth()->id())
             ->findOrFail(decrypt($id));
 
-        return view('seller.buy_product.purchase_show', compact('order'));
+        $payment = SellerPayments::where('order_id', $order->id)
+            ->latest()
+            ->first();
+
+
+        return view('seller.buy_product.purchase_show', compact('order', 'payment'));
     }
 
     public function ensureAuthorizedSeller($sellerId)

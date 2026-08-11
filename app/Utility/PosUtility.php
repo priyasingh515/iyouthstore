@@ -15,63 +15,47 @@ use Session;
 use Mail;
 use App\Mail\InvoiceEmailManager;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class PosUtility
 {
-    // public static function product_search($request_data): object
-    // {
-    //     $product_query = ProductStock::query()->join('products', 'product_stocks.product_id', '=', 'products.id');
-
-    //     if (auth()->user()->user_type == 'seller') {
-    //         $product_query->where('products.user_id', auth()->user()->id);
-    //     } else {
-    //         $product_query->where('products.added_by', 'admin');
-    //     }
-    //     $products = $product_query->where('products.auction_product', 0)
-    //         ->where('products.wholesale_product', 0)
-    //         ->where('products.published', 1)
-    //         ->where('products.approved', 1)
-    //         ->select('products.*', 'product_stocks.id as stock_id', 'product_stocks.variant', 'product_stocks.price as stock_price', 'product_stocks.qty as stock_qty', 'product_stocks.image as stock_image')
-    //         ->orderBy('products.created_at', 'desc');
-
-
-    //     if ($request_data['category'] != null) {
-    //         $arr = explode('-', $request_data['category']);
-    //         if ($arr[0] == 'category') {
-    //             $category_ids = CategoryUtility::children_ids($arr[1]);
-    //             $category_ids[] = $arr[1];
-    //             $products = $products->whereIn('products.category_id', $category_ids);
-    //         }
-    //     }
-
-    //     if ($request_data['brand'] != null) {
-    //         $products = $products->where('products.brand_id', $request_data['brand']);
-    //     }
-
-    //     if ($request_data['keyword'] != null) {
-    //         $products = $products->where('products.name', 'like', '%' . $request_data['keyword'] . '%')->orWhere('products.barcode', $request_data['keyword']);
-    //     }
-
-    //     return $products->paginate(16);
-    // }
-
-
-
-
-     public static function product_search($request_data): object
+    protected static function getPosOwnerId($product)
     {
-        $product_query = ProductStock::query()->join('products', 'product_stocks.product_id', '=', 'products.id');
+        if (auth()->check() && auth()->user()->user_type == 'seller') {
+            return auth()->id();
+        }
 
+        return $product->user_id;
+    }
+
+    public static function product_search($request_data): object
+    {
+        $product_query = ProductStock::query()->join('products', 'product_stocks.product_id', '=', 'products.id')->join('seller_products', 'products.id', '=', 'seller_products.product_id');
         if (auth()->user()->user_type == 'seller') {
-            $product_query->where('products.user_id', auth()->user()->id);
+
+            $product_query->where(
+                'seller_products.seller_id',
+                auth()->user()->id
+            );
         } else {
             $product_query->where('products.added_by', 'admin');
         }
+
+        //  $product_query->where('seller_products.seller_id', Auth::user()->id)->get();
+
+        //     $product_query = Product::join('seller_products', 'products.id', '=', 'seller_products.product_id')
+        //     ->where('seller_products.seller_id', Auth::user()->id)
+        //     ->select('products.*', 'seller_products.stock')
+        //     ->with('categories')
+        //     ->latest()
+        //     ->get();
+
+
         $products = $product_query->where('products.auction_product', 0)
             ->where('products.wholesale_product', 0)
             ->where('products.published', 1)
             ->where('products.approved', 1)
-            ->select('products.*', 'product_stocks.id as stock_id', 'product_stocks.variant', 'product_stocks.price as stock_price', 'product_stocks.qty as stock_qty', 'product_stocks.image as stock_image')
+            ->select('products.*', 'product_stocks.id as stock_id', 'product_stocks.variant', 'product_stocks.price as stock_price', 'seller_products.stock as stock_qty', 'product_stocks.image as stock_image')
             ->orderBy('products.created_at', 'desc');
 
 
@@ -125,9 +109,18 @@ class PosUtility
     {
         $productStock   = ProductStock::find($stockId);
         $product        = $productStock->product;
+        $ownerId        = self::getPosOwnerId($product);
+        $sellerProduct = DB::table('seller_products')
+            ->where('seller_id', auth()->id())
+            ->where('product_id', $product->id)
+            ->first();
         $quantity       = $product->min_qty;
 
-        if ($productStock->qty < $product->min_qty && $product->digital == 0) {
+        if (
+            (!$sellerProduct ||
+                $sellerProduct->stock < $product->min_qty)
+            && $product->digital == 0
+        ) {
             return array(
                 'success' => 0,
                 'message' => translate("This product doesn't have enough stock for minimum purchase quantity ") . $product->min_qty
@@ -138,6 +131,7 @@ class PosUtility
             'variation' => $productStock->variant,
             'user_id' => $userID,
             'temp_user_id' => $temUserId,
+            'owner_id' => $ownerId,
             'product_id' => $product->id
         ]);
 
@@ -149,7 +143,10 @@ class PosUtility
                 );
             } else {
                 $quantity = $cart->quantity + 1;
-                if ($productStock->qty < $quantity) {
+                if (
+                    !$sellerProduct ||
+                    $sellerProduct->stock < $quantity
+                ) {
                     return array(
                         'success' => 0,
                         'message' => translate("This product doesn't have more stock.")
@@ -160,7 +157,7 @@ class PosUtility
 
         $price = CartUtility::get_price($product, $productStock, $quantity);
         $tax = CartUtility::tax_calculation($product, $price);
-        CartUtility::save_cart_data($cart, $product, $price, $tax, $quantity);
+        CartUtility::save_cart_data($cart, $product, $price, $tax, $quantity, $ownerId);
         return array('success' => 1, 'message' => 'Added to cart successfully');
     }
 
@@ -168,8 +165,15 @@ class PosUtility
     {
         $product = Product::find($cart->product_id);
         $product_stock = $product->stocks->where('variant', $cart->variation)->first();
+        $sellerProduct = DB::table('seller_products')
+            ->where('seller_id', auth()->id())
+            ->where('product_id', $product->id)
+            ->first();
 
-        if ($product_stock->qty < $data['quantity']) {
+        if (
+            !$sellerProduct ||
+            $sellerProduct->stock < $data['quantity']
+        ) {
             $response['success'] = 0;
             $response['message'] = translate("This product doesn't have more stock.");
         } else {
@@ -217,7 +221,12 @@ class PosUtility
     public static function updatePosUserCartData($carts, $userID, $tempUsderID)
     {
         foreach ($carts as $cartItem) {
-            $userCartItem = Cart::where('user_id', $userID)->where('temp_user_id', $tempUsderID)->where('product_id', $cartItem->product_id)->where('variation', $cartItem->variation)->first();
+            $userCartItem = Cart::where('owner_id', $cartItem->owner_id)
+                ->where('user_id', $userID)
+                ->where('temp_user_id', $tempUsderID)
+                ->where('product_id', $cartItem->product_id)
+                ->where('variation', $cartItem->variation)
+                ->first();
             if ($userCartItem) {
                 $quantity = $userCartItem->quantity + $cartItem->quantity;
                 $product_qty = $cartItem->product->stocks()->where('variant', $cartItem->$cartItem)->first();
@@ -281,19 +290,38 @@ class PosUtility
                         $subtotal += $cartItem['price'] * $cartItem['quantity'];
                         $tax += $cartItem['tax'] * $cartItem['quantity'];
 
-                        if ($product->digital == 0) {
-                            if ($cartItem['quantity'] > $product_stock->qty) {
-                                $order->delete();
-                                return array('success' => 0, 'message' => $product->name . ' (' . $product_variation . ') ' . translate(" just stock outs."));
-                            } else {
-                                $product_stock->qty -= $cartItem['quantity'];
-                                $product_stock->save();
-                            }
+                        $sellerProduct = DB::table('seller_products')
+                            ->where('seller_id', auth()->id())
+                            ->where('product_id', $product->id)
+                            ->first();
+                        if (
+                            !$sellerProduct ||
+                            $cartItem['quantity'] > $sellerProduct->stock
+                        ) {
+
+                            $order->delete();
+
+                            return array(
+                                'success' => 0,
+                                'message' => translate(
+                                    "This product doesn't have more stock."
+                                )
+                            );
+                        } else {
+
+                            DB::table('seller_products')
+                                ->where('seller_id', auth()->id())
+                                ->where('product_id', $product->id)
+                                ->decrement(
+                                    'stock',
+                                    $cartItem['quantity']
+                                );
                         }
 
                         $order_detail                   = new OrderDetail;
                         $order_detail->order_id         = $order->id;
-                        $order_detail->seller_id        = $product->user_id;
+                        // $order_detail->seller_id        = $product->user_id;
+                        $order_detail->seller_id = auth()->id();
                         $order_detail->product_id       = $product->id;
                         $order_detail->payment_status   = $data['payment_type'] != 'cash_on_delivery' ? 'paid' : 'unpaid';
                         $order_detail->variation        = $product_variation;
@@ -322,7 +350,8 @@ class PosUtility
                         $order->coupon_discount = $data['discount'];
                     }
 
-                    $order->seller_id = $product->user_id;
+                    // $order->seller_id = $product->user_id;
+                    $order->seller_id = auth()->id();
                     $order->save();
 
                     $array['view']      = 'emails.invoice';

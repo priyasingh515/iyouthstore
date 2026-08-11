@@ -50,7 +50,7 @@ class PosController extends Controller
         return array(
             'success' => $response['success'],
             'message' => $response['message'],
-            'view' => view('backend.pos.cart')->render()
+            'view' => view('seller.pos.cart')->render()
         );
     }
 
@@ -60,14 +60,14 @@ class PosController extends Controller
         $cart = Cart::find($request->cartId);
         $response = PosUtility::updateCartItemQuantity($cart, $request->only(['cartId', 'quantity']));
 
-        return array('success' => $response['success'], 'message' => $response['message'], 'view' => view('backend.pos.cart')->render());
+        return array('success' => $response['success'], 'message' => $response['message'], 'view' => view('seller.pos.cart')->render());
     }
 
     //removes from Cart
     public function removeFromCart(Request $request)
     {
         Cart::where('id', $request->id)->delete();
-        return view('backend.pos.cart');
+        return view('seller.pos.cart');
     }
 
     //Shipping Address for seller
@@ -89,7 +89,7 @@ class PosController extends Controller
     // Update user Cart data when user is changed 
     public function updateSessionUserCartData(Request $request){
         PosUtility::updateCartOnUserChange($request->only(['userId']));
-        return view('backend.pos.cart');
+        return view('seller.pos.cart');
     }
 
     //set Discount
@@ -97,7 +97,7 @@ class PosController extends Controller
         if($request->discount >= 0){
             Session::put('pos.discount', $request->discount);
         }
-        return view('backend.pos.cart');
+        return view('seller.pos.cart');
     }
 
     //set Shipping Cost
@@ -105,7 +105,7 @@ class PosController extends Controller
         if($request->shipping != null){
             Session::put('pos.shipping', $request->shipping);
         }
-        return view('backend.pos.cart');
+        return view('seller.pos.cart');
     }
 
     //order summary

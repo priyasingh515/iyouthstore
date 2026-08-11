@@ -3,24 +3,27 @@
 @section('panel_content')
 
     <div class="aiz-titlebar mt-2 mb-4">
-      <div class="row align-items-center">
-        <div class="col-md-6">
-            <h1 class="h3">{{ translate('Products') }}</h1>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="h3">{{ translate('Products') }}</h1>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="row gutters-10 justify-content-center">
         @if (addon_is_activated('seller_subscription'))
-            <div class="col-md-4 mx-auto mb-3" >
+            <div class="col-md-4 mx-auto mb-3">
                 <div class="bg-grad-1 text-white rounded-lg overflow-hidden">
-                  <span class="size-30px rounded-circle mx-auto bg-soft-primary d-flex align-items-center justify-content-center mt-3">
-                      <i class="las la-upload la-2x text-white"></i>
-                  </span>
-                  <div class="px-3 pt-3 pb-3">
-                      <div class="h4 fw-700 text-center">{{ max(0, auth()->user()->shop->product_upload_limit - auth()->user()->products()->count()) }}</div>
-                      <div class="opacity-50 text-center">{{  translate('Remaining Uploads') }}</div>
-                  </div>
+                    <span
+                        class="size-30px rounded-circle mx-auto bg-soft-primary d-flex align-items-center justify-content-center mt-3">
+                        <i class="las la-upload la-2x text-white"></i>
+                    </span>
+                    <div class="px-3 pt-3 pb-3">
+                        <div class="h4 fw-700 text-center">
+                            {{ max(0, auth()->user()->shop->product_upload_limit - auth()->user()->products()->count()) }}
+                        </div>
+                        <div class="opacity-50 text-center">{{ translate('Remaining Uploads') }}</div>
+                    </div>
                 </div>
             </div>
         @endif
@@ -37,21 +40,23 @@
         </div> --}}
 
         @if (addon_is_activated('seller_subscription'))
-        @php
-            $seller_package = \App\Models\SellerPackage::find(Auth::user()->shop->seller_package_id);
-        @endphp
-        <div class="col-md-4">
-            <a href="{{ route('seller.seller_packages_list') }}" class="text-center bg-white shadow-sm hov-shadow-lg text-center d-block p-3 rounded">
-                @if($seller_package != null)
-                    <img src="{{ uploaded_asset($seller_package->logo) }}" height="44" class="mw-100 mx-auto">
-                    <span class="d-block sub-title mb-2">{{ translate('Current Package')}}: {{ $seller_package->getTranslation('name') }}</span>
-                @else
-                    <i class="la la-frown-o mb-2 la-3x"></i>
-                    <div class="d-block sub-title mb-2">{{ translate('No Package Found')}}</div>
-                @endif
-                <div class="btn btn-outline-primary py-1">{{ translate('Upgrade Package')}}</div>
-            </a>
-        </div>
+            @php
+                $seller_package = \App\Models\SellerPackage::find(Auth::user()->shop->seller_package_id);
+            @endphp
+            <div class="col-md-4">
+                <a href="{{ route('seller.seller_packages_list') }}"
+                    class="text-center bg-white shadow-sm hov-shadow-lg text-center d-block p-3 rounded">
+                    @if ($seller_package != null)
+                        <img src="{{ uploaded_asset($seller_package->logo) }}" height="44" class="mw-100 mx-auto">
+                        <span class="d-block sub-title mb-2">{{ translate('Current Package') }}:
+                            {{ $seller_package->getTranslation('name') }}</span>
+                    @else
+                        <i class="la la-frown-o mb-2 la-3x"></i>
+                        <div class="d-block sub-title mb-2">{{ translate('No Package Found') }}</div>
+                    @endif
+                    <div class="btn btn-outline-primary py-1">{{ translate('Upgrade Package') }}</div>
+                </a>
+            </div>
         @endif
 
     </div>
@@ -65,15 +70,18 @@
 
                 <div class="dropdown mb-2 mb-md-0">
                     <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
-                        {{translate('Bulk Action')}}
+                        {{ translate('Bulk Action') }}
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item confirm-alert" href="javascript:void(0)"  data-target="#bulk-delete-modal"> {{translate('Delete selection')}}</a>
+                        <a class="dropdown-item confirm-alert" href="javascript:void(0)" data-target="#bulk-delete-modal">
+                            {{ translate('Delete selection') }}</a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" id="search" name="search" @isset($search) value="{{ $search }}" @endisset placeholder="{{ translate('Search product') }}">
+                        <input type="text" class="form-control" id="search" name="search"
+                            @isset($search) value="{{ $search }}" @endisset
+                            placeholder="{{ translate('Search product') }}">
                     </div>
                 </div>
             </div>
@@ -91,32 +99,33 @@
                                     </div>
                                 </div>
                             </th>
-                            <th >{{ translate('Name')}}</th>
+                            <th>{{ translate('Name') }}</th>
                             <th>Image</th>
-                            <th data-breakpoints="md">{{ translate('Current Qty')}}</th>
-                            
+                            <th data-breakpoints="md">{{ translate('Current Qty') }}</th>
+
                             <th data-breakpoints="md">Category</th>
                             <th data-breakpoints="md">SKU</th>
-                            <th>{{ translate('Base Price')}}</th>
-                           
-                           
+                            <th>{{ translate('Base Price') }}</th>
+
+
                         </tr>
                     </thead>
 
                     <tbody>
-                      
-                        @foreach($products as $product)
-                    
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $product->product->getTranslation('name') }}</td>
-                            <td>
-                                <img src="{{ uploaded_asset($product->product->thumbnail_img) }}" height="44" class="mw-100 mx-auto">
-                            </td>
-                            <td>{{ $product->stock }}</td>
-                        </tr>
 
-
+                        @foreach ($products as $product)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $product->product->getTranslation('name') }}</td>
+                                <td>
+                                    <img src="{{ uploaded_asset($product->product->thumbnail_img) }}" height="44"
+                                        class="mw-100 mx-auto">
+                                </td>
+                                <td>{{ $product->stock }}</td>
+                                <td>
+                                    {{ $product->categories->first()->name ?? 'N/A' }}
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -138,19 +147,18 @@
 
 @section('script')
     <script type="text/javascript">
-
         $(document).on("change", ".check-all", function() {
-            if(this.checked) {
+            if (this.checked) {
                 // Iterate each checkbox
                 $('.check-one:checkbox').each(function() {
-                    this.checked = true;                        
+                    this.checked = true;
                 });
             } else {
                 $('.check-one:checkbox').each(function() {
-                    this.checked = false;                       
+                    this.checked = false;
                 });
             }
-          
+
         });
 
         // function update_featured(el){
@@ -199,7 +207,7 @@
         //         headers: {
         //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         //         },
-        //         url: "{{route('seller.products.bulk-delete')}}",
+        //         url: "{{ route('seller.products.bulk-delete') }}",
         //         type: 'POST',
         //         data: data,
         //         cache: false,
@@ -212,6 +220,5 @@
         //         }
         //     });
         // }
-
     </script>
 @endsection

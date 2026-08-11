@@ -15,15 +15,76 @@ class ProfileUpdateRequestController extends Controller
         $this->middleware(['permission:view_profile_update_request'])->only('index');
     }
 
-    public function index()
-    {
-        $requests = ProfileUpdateRequest::with('user')
-    ->has('user') 
-    ->latest()
-    ->paginate(10);
-        return view('backend.profile_update.index', compact('requests'));
+    // public function index()
+    // {
+    //     $requests = ProfileUpdateRequest::with('user')
+    // ->has('user') 
+    // ->latest()
+    // ->paginate(10);
+    //     return view('backend.profile_update.index', compact('requests'));
 
-        return view('backend.profile_update.index', compact('requests'));
+    // }
+
+    public function index(Request $request)
+    {
+        $district_id = $request->district_id ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
+
+        $requests = ProfileUpdateRequest::with('user')
+            ->has('user');
+
+        if (
+            $district_id != null ||
+            $block_id != null ||
+            $sub_district_id != null
+        ) {
+
+            $user_ids = User::where(
+                'user_type',
+                'seller'
+            );
+
+            if ($district_id != null) {
+                $user_ids = $user_ids->where(
+                    'district',
+                    $district_id
+                );
+            }
+
+            if ($block_id != null) {
+                $user_ids = $user_ids->where(
+                    'block',
+                    $block_id
+                );
+            }
+
+            if ($sub_district_id != null) {
+                $user_ids = $user_ids->where(
+                    'sub_district',
+                    $sub_district_id
+                );
+            }
+
+            $requests = $requests->whereIn(
+                'user_id',
+                $user_ids->pluck('id')
+            );
+        }
+
+        $requests = $requests
+            ->latest()
+            ->paginate(10);
+
+        return view(
+            'backend.profile_update.index',
+            compact(
+                'requests',
+                'district_id',
+                'block_id',
+                'sub_district_id'
+            )
+        );
     }
 
     public function details($id)

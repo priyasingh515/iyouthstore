@@ -20,7 +20,7 @@
 
             <form action="{{ route('product.assign.store') }}" method="POST">
                 @csrf
-
+                {{-- 
                 <div class="mb-3">
                     <label>Select Seller</label>
                     <select name="user_id" class="form-control" required>
@@ -31,10 +31,26 @@
                             </option>
                         @endforeach
                     </select>
+                </div> --}}
+
+                <div class="mb-3">
+                    <label>Select Seller</label>
+
+                    <select name="user_id" class="form-control aiz-selectpicker" data-live-search="true" required>
+
+                        <option value="">Select Seller</option>
+
+                        @foreach ($shops as $shop)
+                            <option value="{{ $shop->user_id }}">
+                                {{ $shop->name }}
+                            </option>
+                        @endforeach
+
+                    </select>
                 </div>
 
                 <div class="row">
-                    <div class="col-md-5">
+                    {{-- <div class="col-md-5">
                         <label>Select Product</label>
                         <select id="product_id" class="form-control">
                             <option value="">Select Product</option>
@@ -45,6 +61,26 @@
                                     {{ $product->name }}
                                 </option>
                             @endforeach
+                        </select>
+                    </div> --}}
+
+                    <div class="col-md-5">
+                        <label>Select Product</label>
+
+                        <select id="product_id" class="form-control aiz-selectpicker" data-live-search="true">
+
+                            <option value="">Select Product</option>
+
+                            @foreach ($products as $product)
+                                <option value="{{ $product->id }}"
+                                    data-min="{{ $product->seller_min_purchase_limit ?? 1 }}"
+                                    data-max="{{ $product->seller_purchase_limit ?? 9999 }}">
+
+                                    {{ $product->name }}
+
+                                </option>
+                            @endforeach
+
                         </select>
                     </div>
 
@@ -218,5 +254,12 @@
         function removeRow(id) {
             document.getElementById('row' + id).remove();
         }
+        $(document).ready(function() {
+
+            $('.aiz-selectpicker').selectpicker();
+
+            $('.aiz-selectpicker').selectpicker('refresh');
+
+        });
     </script>
 @endsection

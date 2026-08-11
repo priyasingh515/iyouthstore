@@ -9,15 +9,18 @@ class PosProductCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'id' => $data->id,
                     'stock_id' => $data->stock_id,
                     'name' => $data->name,
                     'thumbnail_image' => ($data->stock_image == null)  ? uploaded_asset($data->thumbnail_img) : uploaded_asset($data->stock_image),
-                    'price' => home_discounted_base_price_by_stock_id($data->stock_id),
-                    'base_price' => home_base_price_by_stock_id($data->stock_id),
+                    // 'price' => home_discounted_base_price_by_stock_id($data->stock_id),
+                    // 'base_price' => home_base_price_by_stock_id($data->stock_id),
+                    'price' => single_price($data->seller_selling_price),
+                    'base_price' => single_price($data->seller_selling_price),
                     'qty' => $data->stock_qty,
+                    'stock_qty' => $data->stock_qty,
                     'variant' => $data->variant,
                     'digital' => $data->digital,
                 ];

@@ -21,10 +21,12 @@
                         <a class="dropdown-item confirm-alert" href="javascript:void(0)"
                             data-target="#bulk-delete-modal">{{ translate('Delete selection') }}</a>
                     @endcan
-                    @can('seller_commission_configuration')
-                        <a class="dropdown-item confirm-alert"
-                            onclick="set_bulk_commission()">{{ translate('Set Bulk Commission') }}</a>
-                    @endcan
+                    <!--@can('seller_commission_configuration')
+        -->
+                        <!--    <a class="dropdown-item confirm-alert"-->
+                        <!--        onclick="set_bulk_commission()">{{ translate('Set Bulk Commission') }}</a>-->
+                        <!--
+    @endcan-->
                 </div>
             </div>
             @if (auth()->user()->can('add_seller') && $route == 'all_seller_route')
@@ -61,10 +63,10 @@
                                 <a class="dropdown-item confirm-alert" href="javascript:void(0)"
                                     data-target="#bulk-delete-modal">{{ translate('Delete selection') }}</a>
                             @endcan
-                            @can('seller_commission_configuration')
-                                <a class="dropdown-item confirm-alert"
-                                    onclick="set_bulk_commission()">{{ translate('Set Bulk Commission') }}</a>
-                            @endcan
+                            <!--@can('seller_commission_configuration')-->
+                            <!--    <a class="dropdown-item confirm-alert"-->
+                            <!--        onclick="set_bulk_commission()">{{ translate('Set Bulk Commission') }}</a>-->
+                            <!--@endcan-->
                         </div>
                     </div> --}}
                     <div class="col-lg-2 ml-auto">
@@ -75,7 +77,7 @@
                             <option value="un_verified">{{ translate('Unverified') }}</option>
                         </select>
                     </div>
-                    <div class="col-md-2 ml-auto">
+                    <div class="col-md-2 ml-auto my-2">
                         <select class="form-control aiz-selectpicker" name="approved_status" id="approved_status"
                             onchange="sort_sellers()">
                             <option value="">{{ translate('Filter by Approval') }}</option>
@@ -88,13 +90,32 @@
                         </select>
                     </div>
                 @endif
-                <div class="col-lg-2">
+
+                <div class="col-lg-2 my-2">
+                    <select class="form-control aiz-selectpicker" name="district_id" onchange="sort_sellers()"
+                        data-live-search="true">
+
+                        <option value="">{{ translate('District') }}</option>
+
+                        @foreach (\App\Models\City::where('status', 1)->get() as $district)
+                            <option value="{{ $district->id }}"
+                                {{ request('district_id') == $district->id ? 'selected' : '' }}>
+                                {{ $district->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-lg-2 my-2">
                     <select class="form-control aiz-selectpicker" name="block_id" onchange="sort_sellers()"
                         data-live-search="true">
 
                         <option value="">{{ translate('Block') }}</option>
 
-                        @foreach (\App\Models\Block::where('status', 1)->get() as $block)
+                        {{-- @foreach (\App\Models\Block::where('status', 1)->get() as $block) --}}
+                        @foreach (\App\Models\Block::where('status', 1)->when(request('district_id'), function ($q) {
+                $q->where('district_id', request('district_id'));
+            })->get() as $block)
                             <option value="{{ $block->id }}" {{ request('block_id') == $block->id ? 'selected' : '' }}>
                                 {{ $block->name }}
                             </option>
@@ -102,7 +123,7 @@
                     </select>
                 </div>
 
-                <div class="col-lg-2">
+                {{-- <div class="col-lg-2 my-2">
                     <select class="form-control aiz-selectpicker" name="sub_district_id" onchange="sort_sellers()"
                         data-live-search="true">
 
@@ -115,8 +136,8 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
-                <div class="col-md-3">
+                </div> --}}
+                <div class="col-md-3 my-2">
                     <div class="form-group mb-0">
                         <input type="text" class="form-control" id="search"
                             name="search"@isset($sort_search) value="{{ $sort_search }}" @endisset
@@ -624,5 +645,13 @@
                     ' {{ translate('this seller?') }}'
             });
         }
+    </script>
+    <script>
+        $('#search').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $('#sort_sellers').submit();
+            }
+        });
     </script>
 @endsection

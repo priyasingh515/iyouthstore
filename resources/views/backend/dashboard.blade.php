@@ -16,54 +16,34 @@
             <div class="col-lg-6">
                 <div class="row gutters-16">
                     <!-- Total Customer -->
-                    <div class="col-sm-6">
-                        <div class="dashboard-box bg-white h-220px mb-2rem overflow-hidden">
-                            <div class="d-flex flex-column justify-content-between h-100">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h1 class="fs-30 fw-600 text-dark mb-1">
-                                            {{ $total_customers }}
-                                        </h1>
-                                        <h3 class="fs-13 fw-600 text-secondary mb-0">{{ translate('Total Customer') }}</h3>
-                                    </div>
-                                    <div class="mt-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                            viewBox="0 0 32 32">
-                                            <path id="Path_41567" data-name="Path 41567"
-                                                d="M21,13.75a1.25,1.25,0,0,0,2.5,0,7.508,7.508,0,0,0-4.068-6.667,4.375,4.375,0,1,0-6.865,0A7.508,7.508,0,0,0,8.5,13.75a1.25,1.25,0,0,0,2.5,0,5,5,0,0,1,10,0ZM14.125,4.375A1.875,1.875,0,1,1,16,6.25,1.877,1.877,0,0,1,14.125,4.375ZM10.932,24.083a4.375,4.375,0,1,0-6.865,0A7.508,7.508,0,0,0,0,30.75a1.25,1.25,0,0,0,2.5,0,5,5,0,0,1,10,0,1.25,1.25,0,0,0,2.5,0A7.508,7.508,0,0,0,10.932,24.083ZM5.625,21.375A1.875,1.875,0,1,1,7.5,23.25,1.877,1.877,0,0,1,5.625,21.375Zm22.307,2.708a4.375,4.375,0,1,0-6.865,0A7.508,7.508,0,0,0,17,30.75a1.25,1.25,0,0,0,2.5,0,5,5,0,0,1,10,0,1.25,1.25,0,0,0,2.5,0A7.508,7.508,0,0,0,27.932,24.083Zm-5.307-2.708A1.875,1.875,0,1,1,24.5,23.25,1.877,1.877,0,0,1,22.625,21.375Zm0,0"
-                                                fill="#d5d6db" />
-                                        </svg>
-                                    </div>
-                                </div>
+
+
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div>
-                                    <h3 class="fs-13 fw-600 mb-1">
-                                        <span class="badge badge-md badge-dot badge-circle badge-danger mr-2"></span>
-                                        {{ translate('Top Customers') }}
-                                    </h3>
-                                    <div class="symbol-group">
-                                        @foreach ($top_customers as $top_customer)
-                                            <div class="symbol size-40px rounded-content overflow-hidden"
-                                                title="{{ $top_customer->name }}">
-                                                <img src="{{ uploaded_asset($top_customer->avatar_original) }}"
-                                                    alt="{{ translate('customer') }}" class="h-100 img-fit lazyload"
-                                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                            </div>
-                                        @endforeach
-                                    </div>
+                                    <h3 class="fw-700 mb-1">Customer Analytics</h3>
+                                    <p class="text-secondary mb-0">
+                                        Customer overview & latest registrations
+                                    </p>
                                 </div>
+
+                                <a href="{{ route('customers.index') }}" class="btn btn-soft-primary">
+                                    View Customers
+                                </a>
                             </div>
-                        </div>
-                    </div>
-                    <!-- Total Products -->
-                    <div class="col-sm-6">
-                        <div class="dashboard-box bg-white h-220px mb-2rem overflow-hidden">
-                            <div class="d-flex flex-column justify-content-between h-100">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h1 class="fs-30 fw-600 text-dark mb-1">{{ $total_products }}</h1>
-                                        <h3 class="fs-13 fw-600 text-secondary mb-0">{{ translate('Total Products') }}</h3>
+
+                            <div class="row text-center mb-4">
+
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-primary">
+                                        {{ $total_customers }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Total Customers
                                     </div>
-                                    <div class="mt-2">
+                                    {{-- <div class="mt-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="27.429"
                                             viewBox="0 0 32 27.429">
                                             <g id="Layer_2" data-name="Layer 2" transform="translate(-2 -4)">
@@ -75,6 +55,451 @@
                                                     transform="translate(1.429 1.429)" fill="#d5d6dc" />
                                             </g>
                                         </svg>
+                                    </div> --}}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-success">
+                                        {{ $total_customers - ($blocked_customers ?? 0) }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Active Customers
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-danger">
+                                        {{ $blocked_customers ?? 0 }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Blocked Customers
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="table-responsive" style="min-height: 260px;">
+                                <table class="table table-hover">
+
+                                    <thead>
+                                        <tr>
+                                            <th width="55%">Customer</th>
+                                            <th width="20%">Orders</th>
+                                            <th width="25%">Joined</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        @forelse ($top_customers as $customer)
+                                            <tr>
+
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        {{-- 
+                                                        <div class="symbol size-40px rounded-content overflow-hidden mr-3">
+                                                            <img src="{{ uploaded_asset($customer->avatar_original) }}"
+                                                                alt="{{ $customer->name }}" class="h-100 img-fit"
+                                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                        </div> --}}
+
+                                                        <div>
+                                                            <div class="fw-600 text-dark">
+                                                                {{ $customer->name }}
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <span class="badge badge-inline badge-success">
+                                                        {{ $customer->total_orders }} Orders
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    {{ date('d M Y', strtotime($customer->created_at)) }}
+                                                </td>
+
+                                            </tr>
+
+                                        @empty
+
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4 text-muted">
+                                                    No top customers found
+                                                </td>
+                                            </tr>
+                                        @endforelse
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="fw-700 mb-1">Latest Orders</h3>
+                                    <p class="text-secondary mb-0">
+                                        Recent customer orders
+                                    </p>
+                                </div>
+
+                                <a href="{{ route('all_orders.index') }}" class="btn btn-soft-info">
+                                    View Orders
+                                </a>
+                            </div>
+
+                            <div class="d-flex flex-wrap flex-lg-nowrap gutters-10 mb-4">
+                                <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                                    <div class="rounded-2 bg-soft-primary p-3 h-100">
+                                        <div class="fs-12 text-primary fw-600 mb-1">Order Placed</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ $total_placed_order }}</div>
+                                    </div>
+                                </div>
+                                <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                                    <div class="rounded-2 bg-soft-success p-3 h-100">
+                                        <div class="fs-12 text-success fw-600 mb-1">Confirmed</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ $total_confirmed_order }}</div>
+                                    </div>
+                                </div>
+                                <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                                    <div class="rounded-2 bg-soft-danger p-3 h-100">
+                                        <div class="fs-12 text-danger fw-600 mb-1">Processed</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ $total_picked_up_order }}</div>
+                                    </div>
+                                </div>
+                                <div class="flex-fill mb-3 mb-lg-0 mr-lg-3">
+                                    <div class="rounded-2 bg-soft-warning p-3 h-100">
+                                        <div class="fs-12 text-warning fw-600 mb-1">Shipped</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ $total_shipped_order }}</div>
+                                    </div>
+                                </div>
+                                <div class="flex-fill mb-3 mb-lg-0">
+                                    <div class="rounded-2 bg-light p-3 h-100">
+                                        <div class="fs-12 text-secondary fw-600 mb-1">Cancelled</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ $total_cancelled_order }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Order</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        @forelse ($latest_orders as $order)
+                                            <tr>
+
+                                                <td>
+                                                    {{ optional($order->user)->name ?? data_get(json_decode($order->shipping_address), 'name', '-') }}
+                                                </td>
+
+                                                <td>
+                                                    #{{ $order->code }}
+                                                </td>
+
+                                                <td>
+                                                    <span class="badge badge-inline badge-success">
+                                                        {{ single_price($order->grand_total) }}
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    {{ date('d M Y', strtotime($order->created_at)) }}
+                                                </td>
+
+                                            </tr>
+
+                                        @empty
+
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4 text-muted">
+                                                    No orders found
+                                                </td>
+                                            </tr>
+                                        @endforelse
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="fw-700 mb-1">Seller Orders</h3>
+                                    <p class="text-secondary mb-0">
+                                        Orders sellers place to admin for products
+                                    </p>
+                                </div>
+
+                                <a href="{{ route('seller-purchases.index') }}" class="btn btn-soft-warning">
+                                    View Seller Orders
+                                </a>
+                            </div>
+
+                            <div class="row text-center mb-4">
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-warning">
+                                        {{ $total_seller_orders }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Total Seller Orders
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-primary">
+                                        {{ $total_seller_pending_orders }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Pending
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-success">
+                                        {{ $total_seller_confirmed_orders }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Confirmed
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Seller</th>
+                                            <th>Order</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($latest_seller_orders as $order)
+                                            <tr>
+                                                <td>{{ optional($order->user)->name ?? '-' }}</td>
+                                                <td>#{{ $order->code }}</td>
+                                                <td>
+                                                    <span class="badge badge-inline badge-success">
+                                                        {{ single_price($order->grand_total) }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ ucfirst(str_replace('_', ' ', $order->delivery_status)) }}</td>
+                                                <td>{{ date('d M Y', strtotime($order->created_at)) }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center py-4 text-muted">
+                                                    No seller orders found
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {{-- <div class="mt-3">
+                                <a href="{{ route('seller-purchases.index') }}"
+                                    class="btn btn-md btn-soft-warning btn-block rounded-2">
+                                    View All Seller Orders
+                                </a>
+                            </div> --}}
+                        </div>
+                    </div>
+                    @if (get_setting('vendor_system_activation') == 1)
+                        {{-- Seller coverage placed below seller orders --}}
+                        <div class="col-lg-12">
+                            <div class="dashboard-box bg-white mb-2rem overflow-hidden p-4">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div>
+                                        <h2 class="fs-18 fw-700 text-dark mb-1">
+                                            {{ translate('Seller Coverage Analytics') }}
+                                        </h2>
+                                        <p class="fs-13 text-secondary mb-0">
+                                            {{ translate('Coverage across blocks and subdistricts') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="row gutters-16 mb-4">
+                                    <div class="col-md-3">
+                                        <div class="bg-soft-info rounded-2 p-4 text-center h-100">
+                                            <h2 class="fs-30 fw-700 text-info mb-1">
+                                                {{ $seller_blocks_covered }}
+                                            </h2>
+                                            <div class="fs-13 fw-600 text-dark">
+                                                {{ translate('Blocks Covered') }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="bg-soft-primary rounded-2 p-4 text-center h-100">
+                                            <h2 class="fs-30 fw-700 text-primary mb-1">
+                                                {{ $seller_subdistricts_covered }}
+                                            </h2>
+                                            <div class="fs-13 fw-600 text-dark">
+                                                {{ translate('Subdistricts Covered') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row gutters-16">
+                                    <div class="col-md-6">
+                                        <div class="border rounded-2 p-4 h-100">
+                                            <h3 class="fs-15 fw-700 text-dark mb-3">
+                                                {{ translate('Top Seller Blocks') }}
+                                            </h3>
+
+                                            @forelse ($top_seller_blocks as $block)
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <div class="fs-13 fw-600 text-dark">
+                                                        {{ $block->name }}
+                                                    </div>
+                                                    <span class="badge badge-inline badge-info px-3 py-2">
+                                                        {{ $block->total }} Sellers
+                                                    </span>
+                                                </div>
+                                            @empty
+                                                <div class="text-secondary fs-13">
+                                                    {{ translate('No block data found') }}
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="border rounded-2 p-4 h-100">
+                                            <h3 class="fs-15 fw-700 text-dark mb-3">
+                                                {{ translate('Top Seller Districts') }}
+                                            </h3>
+
+                                            @forelse ($top_seller_districts as $district)
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <div class="fs-13 fw-600 text-dark">
+                                                        {{ $district->name }}
+                                                    </div>
+                                                    <span class="badge badge-inline badge-primary px-3 py-2">
+                                                        {{ $district->total }} Sellers
+                                                    </span>
+                                                </div>
+                                            @empty
+                                                <div class="text-secondary fs-13">
+                                                    {{ translate('No district data found') }}
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="fw-700 mb-1">Catalog Insights</h3>
+                                    <p class="text-secondary mb-0">
+                                        Categories, brands, top sellers, and latest reviews
+                                    </p>
+                                </div>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="{{ route('categories.index') }}" class="btn btn-soft-primary">
+                                        All Categories
+                                    </a>
+                                    <a href="{{ route('brands.index') }}" class="btn btn-soft-success">
+                                        All Brands
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="row text-center mb-4">
+                                <div class="col-md-6 col-12 mb-3 mb-md-0">
+                                    <div class="rounded-2 bg-soft-primary p-4 h-100">
+                                        <h2 class="fw-700 text-dark mb-1">{{ $total_categories }}</h2>
+                                        <div class="text-secondary">Total Categories</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-12">
+                                    <div class="rounded-2 bg-soft-success p-4 h-100">
+                                        <h2 class="fw-700 text-dark mb-1">{{ $total_brands }}</h2>
+                                        <div class="text-secondary">Total Brands</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row gutters-16">
+                                <div class="col-md-6 col-12 mb-3 mb-md-0">
+                                    <div class="border rounded-2 p-3 h-100">
+                                        <h4 class="fs-15 fw-700 text-dark mb-3">Top Categories</h4>
+                                        @forelse ($top_categories as $top_category)
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div class="fs-13 fw-600 text-dark">
+                                                    {{ $top_category->name ?? translate('Not Found') }}
+                                                </div>
+                                                <div class="fs-13 fw-600 text-dark">
+                                                    {{ single_price($top_category->total) }}
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="text-secondary fs-13">{{ translate('No category data found') }}</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-12 mb-3 mb-md-0">
+                                    <div class="border rounded-2 p-3 h-100">
+                                        <h4 class="fs-15 fw-700 text-dark mb-3">Top Brands</h4>
+                                        @forelse ($top_brands as $top_brand)
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div class="fs-13 fw-600 text-dark">
+                                                    {{ $top_brand->name ?? translate('Not Found') }}
+                                                </div>
+                                                <div class="fs-13 fw-600 text-dark">
+                                                    {{ single_price($top_brand->total) }}
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="text-secondary fs-13">{{ translate('No brand data found') }}</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Products -->
+                    {{-- <div class="col-sm-6">
+                        <div class="dashboard-box bg-white h-220px mb-2rem overflow-hidden">
+                            <div class="d-flex flex-column justify-content-between h-100">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h1 class="fs-30 fw-600 text-dark mb-1">{{ $total_products }}</h1>
+                                        <h3 class="fs-13 fw-600 text-secondary mb-0">{{ translate('Total Products') }}</h3>
                                     </div>
                                 </div>
                                 <div>
@@ -101,24 +526,15 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <!-- Total Category -->
-                    <div class="col-sm-6">
+                    {{-- <div class="col-sm-6">
                         <div class="dashboard-box bg-white h-220px mb-2rem overflow-hidden">
                             <div class="d-flex flex-column justify-content-between h-100">
                                 <div class="d-flex justify-content-between">
                                     <div>
                                         <h1 class="fs-30 fw-600 text-dark mb-1">{{ $total_categories }}</h1>
                                         <h3 class="fs-13 fw-600 text-secondary mb-0">{{ translate('Total Category') }}</h3>
-                                    </div>
-                                    <div class="mt-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                            viewBox="0 0 32 32">
-                                            <path id="_137b5e1009c61a91dc419a2998502736"
-                                                data-name="137b5e1009c61a91dc419a2998502736"
-                                                d="M27.144,17.266A4.922,4.922,0,0,1,32,22.207h0v4.836A4.937,4.937,0,0,1,27.144,32H22.407a4.922,4.922,0,0,1-4.841-4.957h0V22.207a4.892,4.892,0,0,1,4.841-4.942h4.737Zm-20.343,0a1.3,1.3,0,0,1,1.247.619,1.358,1.358,0,0,1,0,1.415,1.3,1.3,0,0,1-1.247.619H4.856A2.281,2.281,0,0,0,2.6,22.208h0v4.775a2.326,2.326,0,0,0,2.257,2.289H9.622a2.219,2.219,0,0,0,1.6-.665,2.313,2.313,0,0,0,.662-1.624h0v-7.17l-.02-.178a1.342,1.342,0,0,1,.606-1.19,1.285,1.285,0,0,1,1.462.043,1.348,1.348,0,0,1,.506,1.4h0v7.14a4.907,4.907,0,0,1-4.856,4.957H4.856A5.012,5.012,0,0,1,0,27.028H0v-4.82a4.994,4.994,0,0,1,1.423-3.5,4.791,4.791,0,0,1,3.433-1.442H6.8Zm20.343,2.653H22.407a2.266,2.266,0,0,0-2.242,2.289h0v4.836a2.3,2.3,0,0,0,.652,1.623,2.2,2.2,0,0,0,1.59.666h4.737a2.2,2.2,0,0,0,1.59-.666,2.3,2.3,0,0,0,.652-1.623h0V22.207a2.313,2.313,0,0,0-.657-1.619,2.219,2.219,0,0,0-1.585-.67ZM27.144,0a5.013,5.013,0,0,1,4.841,4.957h0v4.82a5,5,0,0,1-1.376,3.512A4.794,4.794,0,0,1,27.2,14.78h-1.96a1.337,1.337,0,0,1,0-2.653h1.9a2.235,2.235,0,0,0,1.6-.691,2.33,2.33,0,0,0,.645-1.644h0V4.957a2.3,2.3,0,0,0-2.242-2.289H22.407a2.266,2.266,0,0,0-2.242,2.289h0v7.231l-.015.166a1.33,1.33,0,0,1-1.321,1.137,1.28,1.28,0,0,1-.91-.413,1.335,1.335,0,0,1-.352-.951h0V4.957a5,5,0,0,1,1.413-3.5A4.791,4.791,0,0,1,22.407,0h4.737ZM9.593,0a4.922,4.922,0,0,1,4.856,4.957h0V9.793a4.994,4.994,0,0,1-1.423,3.5,4.791,4.791,0,0,1-3.433,1.442H4.856A4.922,4.922,0,0,1,0,9.793H0V4.957A4.937,4.937,0,0,1,4.856,0H9.593Zm0,2.668H4.856a2.218,2.218,0,0,0-1.614.654,2.313,2.313,0,0,0-.672,1.635h0V9.793a2.314,2.314,0,0,0,.656,1.664,2.218,2.218,0,0,0,1.63.67H9.593a2.235,2.235,0,0,0,1.6-.691,2.33,2.33,0,0,0,.645-1.644h0V4.957A2.281,2.281,0,0,0,9.593,2.668Z"
-                                                fill="#d5d6dc" />
-                                        </svg>
                                     </div>
                                 </div>
                                 <div>
@@ -155,25 +571,14 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Total Brands -->
-                    <div class="col-sm-6">
+                    <!-- Total Brands --> --}}
+                    {{-- <div class="col-sm-6">
                         <div class="dashboard-box bg-white h-220px mb-2rem overflow-hidden">
                             <div class="d-flex flex-column justify-content-between h-100">
                                 <div class="d-flex justify-content-between">
                                     <div>
                                         <h1 class="fs-30 fw-600 text-dark mb-1">{{ $total_brands }}</h1>
                                         <h3 class="fs-13 fw-600 text-secondary mb-0">{{ translate('Total Brands') }}</h3>
-                                    </div>
-                                    <div class="mt-2">
-                                        <svg id="Layer_51" data-name="Layer 51" xmlns="http://www.w3.org/2000/svg"
-                                            width="31.994" height="32" viewBox="0 0 31.994 32">
-                                            <path id="Path_41568" data-name="Path 41568"
-                                                d="M22.534,33.9a3.963,3.963,0,0,1-2.813-1.139L3.175,16.112A4.02,4.02,0,0,1,2.037,12.49L3.175,6.854A3.952,3.952,0,0,1,6.056,3.768l6.377-1.754a4.1,4.1,0,0,1,3.906,1.139L32.783,19.6a4.031,4.031,0,0,1,0,5.694l-7.368,7.47A3.986,3.986,0,0,1,22.534,33.9Zm8.677-12.686L14.722,4.724a1.788,1.788,0,0,0-1.3-.524,1.492,1.492,0,0,0-.444.057L6.592,5.965A1.72,1.72,0,0,0,5.339,7.286L4.257,12.912a1.788,1.788,0,0,0,.49,1.628L21.327,31.1a1.765,1.765,0,0,0,1.207.524,1.663,1.663,0,0,0,1.207-.5l7.5-7.47A1.742,1.742,0,0,0,31.212,21.213Z"
-                                                transform="translate(-1.966 -1.901)" fill="#d5d6dc" />
-                                            <path id="Path_41569" data-name="Path 41569"
-                                                d="M20.246,26A1.139,1.139,0,0,1,18.629,24.4L24.824,18.2a1.139,1.139,0,1,1,1.606,1.617Zm-7.983-9.953a4.316,4.316,0,1,1,4.293-4.339A4.339,4.339,0,0,1,12.263,16.052Zm1.355-6.229a2,2,0,0,0-1.435-.6,1.947,1.947,0,0,0-1.446.569,1.981,1.981,0,0,0-.581,1.412,2.129,2.129,0,0,0,.649,1.435,2.016,2.016,0,0,0,2.847,0,1.925,1.925,0,0,0,.569-1.412,2.027,2.027,0,0,0-.6-1.4Z"
-                                                transform="translate(-1.557 -1.135)" fill="#d5d6dc" />
-                                        </svg>
                                     </div>
                                 </div>
                                 <div>
@@ -207,147 +612,433 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
 
             <!-- Sales & sellers -->
             <div class="col-lg-6">
                 <div class="row gutters-16">
-                    <!-- Total Sales -->
-                    <div class="col-sm-6">
-                        <div class="dashboard-box bg-soft-primary mb-2rem overflow-hidden" style="height: 470px;">
-                            <div class="d-flex flex-column justify-content-between h-100">
-                                <!-- Total Sales -->
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div>
-                                    <h1 class="fs-30 fw-600 text-primary mb-1">
-                                        {{ number_format_short($total_sale) }}
-                                    </h1>
-                                    <h3 class="fs-13 fw-600 text-primary mb-0">{{ translate('Total Sales') }}</h3>
+                                    <h3 class="fw-700 mb-1">Seller Analytics</h3>
+                                    <p class="text-secondary mb-0">
+                                        Seller overview & latest registrations
+                                    </p>
                                 </div>
-                                <!-- Sales this month -->
-                                <div
-                                    class="d-flex align-items-center justify-content-between p-3 rounded-2 bg-primary text-white mr-2">
-                                    <h3 class="fs-13 fw-600 mb-0">
-                                        {{ translate('Sales this month') }}
-                                    </h3>
-                                    <h3 class="fs-13 fw-600 mb-0">
-                                        {{ single_price($sale_this_month) }}
-                                    </h3>
-                                </div>
-                                <!-- Sales Stat -->
-                                <div>
-                                    <h3 class="fs-13 fw-600 text-primary mb-0">{{ translate('Sales Stat') }}</h3>
-                                </div>
-                                <canvas id="graph-3" class="w-100" height="140"></canvas>
-                                <!-- Sales -->
-                                <div>
-                                    <!-- In-house Sales -->
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <h3 class="fs-13 fw-600 mb-0">
-                                            <span
-                                                class="badge badge-md badge-dot badge-circle badge-info text-truncate mr-2"></span>
-                                            {{ translate('In-house Sales') }}
-                                        </h3>
-                                        <h3 class="fs-13 fw-600 mb-0">
-                                            {{ single_price($admin_sale_this_month->total_sale) }}
-                                        </h3>
+
+                                <a href="{{ route('sellers.index') }}" class="btn btn-soft-primary">
+                                    View Sellers
+                                </a>
+                                <a href="{{ route('sellers.index', ['verification_status' => '', 'approved_status' => 0, 'district_id' => '', 'block_id' => '', 'search' => '']) }}"
+                                    class="btn btn-soft-warning">
+                                    Pending Sellers
+                                </a>
+                            </div>
+
+                            <div class="row text-center mb-4">
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-primary">
+                                        {{ $total_sellers }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Total Sellers
                                     </div>
-                                    <!-- Sellers Sales -->
-                                    <div class="d-flex justify-content-between">
-                                        <h3 class="fs-13 fw-600 mb-0">
-                                            <span
-                                                class="badge badge-md badge-dot badge-circle badge-success text-truncate mr-2"></span>
-                                            {{ translate('Sellers Sales') }}
-                                        </h3>
-                                        <h3 class="fs-13 fw-600 mb-0">
-                                            {{ single_price($seller_sale_this_month->total_sale) }}
-                                        </h3>
+                                    {{-- <div class="mt-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                            viewBox="0 0 32 32">
+                                            <path id="_137b5e1009c61a91dc419a2998502736"
+                                                data-name="137b5e1009c61a91dc419a2998502736"
+                                                d="M27.144,17.266A4.922,4.922,0,0,1,32,22.207h0v4.836A4.937,4.937,0,0,1,27.144,32H22.407a4.922,4.922,0,0,1-4.841-4.957h0V22.207a4.892,4.892,0,0,1,4.841-4.942h4.737Zm-20.343,0a1.3,1.3,0,0,1,1.247.619,1.358,1.358,0,0,1,0,1.415,1.3,1.3,0,0,1-1.247.619H4.856A2.281,2.281,0,0,0,2.6,22.208h0v4.775a2.326,2.326,0,0,0,2.257,2.289H9.622a2.219,2.219,0,0,0,1.6-.665,2.313,2.313,0,0,0,.662-1.624h0v-7.17l-.02-.178a1.342,1.342,0,0,1,.606-1.19,1.285,1.285,0,0,1,1.462.043,1.348,1.348,0,0,1,.506,1.4h0v7.14a4.907,4.907,0,0,1-4.856,4.957H4.856A5.012,5.012,0,0,1,0,27.028H0v-4.82a4.994,4.994,0,0,1,1.423-3.5,4.791,4.791,0,0,1,3.433-1.442H6.8Zm20.343,2.653H22.407a2.266,2.266,0,0,0-2.242,2.289h0v4.836a2.3,2.3,0,0,0,.652,1.623,2.2,2.2,0,0,0,1.59.666h4.737a2.2,2.2,0,0,0,1.59-.666,2.3,2.3,0,0,0,.652-1.623h0V22.207a2.313,2.313,0,0,0-.657-1.619,2.219,2.219,0,0,0-1.585-.67ZM27.144,0a5.013,5.013,0,0,1,4.841,4.957h0v4.82a5,5,0,0,1-1.376,3.512A4.794,4.794,0,0,1,27.2,14.78h-1.96a1.337,1.337,0,0,1,0-2.653h1.9a2.235,2.235,0,0,0,1.6-.691,2.33,2.33,0,0,0,.645-1.644h0V4.957a2.3,2.3,0,0,0-2.242-2.289H22.407a2.266,2.266,0,0,0-2.242,2.289h0v7.231l-.015.166a1.33,1.33,0,0,1-1.321,1.137,1.28,1.28,0,0,1-.91-.413,1.335,1.335,0,0,1-.352-.951h0V4.957a5,5,0,0,1,1.413-3.5A4.791,4.791,0,0,1,22.407,0h4.737ZM9.593,0a4.922,4.922,0,0,1,4.856,4.957h0V9.793a4.994,4.994,0,0,1-1.423,3.5,4.791,4.791,0,0,1-3.433,1.442H4.856A4.922,4.922,0,0,1,0,9.793H0V4.957A4.937,4.937,0,0,1,4.856,0H9.593Zm0,2.668H4.856a2.218,2.218,0,0,0-1.614.654,2.313,2.313,0,0,0-.672,1.635h0V9.793a2.314,2.314,0,0,0,.656,1.664,2.218,2.218,0,0,0,1.63.67H9.593a2.235,2.235,0,0,0,1.6-.691,2.33,2.33,0,0,0,.645-1.644h0V4.957A2.281,2.281,0,0,0,9.593,2.668Z"
+                                                fill="#d5d6dc" />
+                                        </svg>
+                                    </div> --}}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-success">
+                                        {{ $approved_sellers }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Approved Sellers
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-warning">
+                                        {{ $pending_sellers }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Pending Sellers
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <select id="sellerDistrictFilter" class="form-control aiz-selectpicker"
+                                        data-live-search="true">
+                                        <option value="">All Districts</option>
+                                        @foreach ($districts as $district)
+                                            <option value="{{ $district->id }}">{{ $district->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <select id="sellerBlockFilter" class="form-control aiz-selectpicker"
+                                        data-live-search="true">
+                                        <option value="">All Blocks</option>
+                                        @foreach ($blocks as $block)
+                                            <option value="{{ $block->id }}" data-district="{{ $block->district_id }}">
+                                                {{ $block->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive" style="min-height: 260px;">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Seller</th>
+                                            <th>Orders</th>
+                                            <th>Joined</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sellerTable">
+
+                                        @forelse ($top_sellers as $seller)
+                                            <tr data-district="{{ $seller->dashboard_district_id }}"
+                                                data-block="{{ $seller->dashboard_block_id }}">
+
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        {{-- <div class="symbol size-40px rounded-content overflow-hidden mr-3">
+                                                            <img src="{{ uploaded_asset($seller->avatar_original) }}"
+                                                                class="h-100 img-fit"
+                                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                        </div> --}}
+
+                                                        <span class="text-dark fw-600">
+                                                            {{ $seller->name }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <span class="badge badge-inline badge-success">
+                                                        {{ $seller->total_orders }} Orders
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    {{ date('d M Y', strtotime($seller->created_at)) }}
+                                                </td>
+
+                                            </tr>
+
+                                        @empty
+                                        @endforelse
+
+                                        <tr id="noSellerRow" class="{{ count($top_sellers) > 0 ? 'd-none' : '' }}">
+                                            <td colspan="3" class="text-center py-4 text-muted">
+                                                No sellers found
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="fw-700 mb-1">Product Analysis</h3>
+                                    <p class="text-secondary mb-0">
+                                        Top selling products & product performance
+                                    </p>
+                                </div>
+
+                                <a href="{{ route('products.admin') }}" class="btn btn-soft-primary">
+                                    View Products
+                                </a>
+                            </div>
+
+                            <div class="row text-center mb-4">
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-primary">
+                                        {{ $total_products }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Total Products
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h2 class="fw-700 text-success">
+                                        {{ $total_inhouse_products }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        In-house Products
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive" style="min-height: 260px;">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Sold</th>
+                                            <th>Sales</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($top_selling_products as $product)
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        {{-- <div class="symbol size-40px rounded-content overflow-hidden mr-3">
+                                                            <img src="{{ uploaded_asset($product->thumbnail_img) }}"
+                                                                class="h-100 img-fit"
+                                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                        </div> --}}
+
+                                                        <span class="text-dark fw-600">
+                                                            {{ $product->name }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+
+                                                <td>
+                                                    <span class="badge badge-inline badge-success">
+                                                        {{ $product->total_quantity }} pcs
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    {{ single_price($product->total_sale) }}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4 text-muted">
+                                                    No products found
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-soft-primary mb-4 overflow-hidden p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="fw-700 mb-1">Total Sales</h3>
+                                    <p class="text-secondary mb-0">
+                                        Overall sales performance
+                                    </p>
+                                </div>
+
+                                <a href="{{ route('all_orders.index') }}" class="btn btn-soft-primary">
+                                    View Orders
+                                </a>
+                            </div>
+
+                            <div class="row text-center">
+                                <div class="col-md-4 col-12 mb-3 mb-md-0">
+                                    <h2 class="fw-700 text-dark">
+                                        {{ number_format_short($total_sale) }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Total Sales
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-12 mb-3 mb-md-0">
+                                    <h2 class="fw-700 text-primary">
+                                        {{ single_price($sale_this_month) }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        Sales This Month
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-12">
+                                    <h2 class="fw-700 text-success">
+                                        {{ single_price($admin_sale_this_month->total_sale) }}
+                                    </h2>
+                                    <div class="text-secondary">
+                                        In-house Sales
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row text-center mt-4">
+                                <div class="col-md-6 col-12 mb-3 mb-md-0">
+                                    <div class="rounded-2 bg-white p-3 h-100">
+                                        <div class="fs-12 text-primary fw-600 mb-1">POS Sales</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ single_price($pos_sale) }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-12">
+                                    <div class="rounded-2 bg-white p-3 h-100">
+                                        <div class="fs-12 text-success fw-600 mb-1">Normal Sales</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ single_price($normal_sale) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row text-center mt-3">
+                                <div class="col-md-6 col-12 mb-3 mb-md-0">
+                                    <div class="rounded-2 bg-white p-3 h-100">
+                                        <div class="fs-12 text-success fw-600 mb-1">Paid Sales</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ single_price($paid_sale) }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-12">
+                                    <div class="rounded-2 bg-white p-3 h-100">
+                                        <div class="fs-12 text-danger fw-600 mb-1">Unpaid Sales</div>
+                                        <div class="fs-22 fw-700 text-dark">{{ single_price($unpaid_sale) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="fw-700 mb-1">Admin Requests</h3>
+                                    <p class="text-secondary mb-0">
+                                        Latest seller low stock and profile update requests
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row gutters-16">
+                                <div class="col-md-6 col-12 mb-3 mb-md-0">
+                                    <div class="border rounded-2 p-3 h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="fs-14 fw-700 text-dark">Seller Low Stock</div>
+                                            <a href="{{ route('seller.low.stock') }}" class="btn btn-sm btn-soft-warning">
+                                                View All
+                                            </a>
+                                        </div>
+
+                                        @forelse ($latest_low_seller_stock as $request)
+                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                                <div class="mr-3">
+                                                    <div class="fs-13 fw-600 text-dark">
+                                                        {{ $request->product_name ?? translate('Product') }}
+                                                    </div>
+                                                    <div class="fs-12 text-secondary">
+                                                        {{ $request->seller_name ?? translate('Seller') }}
+                                                    </div>
+                                                </div>
+                                                <div class="fs-12 text-muted text-nowrap">
+                                                    Stock: {{ $request->stock }}
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="text-secondary fs-13">
+                                                {{ translate('No low stock products found') }}
+                                            </div>
+                                        @endforelse
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-12">
+                                    <div class="border rounded-2 p-3 h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="fs-14 fw-700 text-dark">Profile Update Requests</div>
+                                            <a href="{{ route('admin.profile.update.requests') }}"
+                                                class="btn btn-sm btn-soft-primary">
+                                                View All
+                                            </a>
+                                        </div>
+
+                                        @forelse ($latest_profile_update_requests as $request)
+                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                                <div class="mr-3">
+                                                    <div class="fs-13 fw-600 text-dark">
+                                                        {{ optional($request->user)->name ?? translate('Seller') }}
+                                                    </div>
+                                                    <div class="fs-12 text-secondary">
+                                                        {{ ucfirst(str_replace('_', ' ', $request->status ?? 'pending')) }}
+                                                    </div>
+                                                </div>
+                                                <div class="fs-12 text-muted text-nowrap">
+                                                    {{ $request->created_at ? $request->created_at->format('d M, Y') : '' }}
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="text-secondary fs-13">
+                                                {{ translate('No profile update requests found') }}
+                                            </div>
+                                        @endforelse
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-12">
+                        <div class="dashboard-box bg-white mb-4 overflow-hidden p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="fw-700 mb-1">Latest Product Reviews</h3>
+                                    <p class="text-secondary mb-0">
+                                        Latest 5 approved product reviews
+                                    </p>
+                                </div>
+                                <a href="{{ route('reviews.index') }}" class="btn btn-soft-info">
+                                    All Reviews
+                                </a>
+                            </div>
 
-                    <!-- Total Sellers -->
-                    <div class="col-sm-6">
-                        <div class="dashboard-box bg-white mb-2rem overflow-hidden" style="height: 470px;">
-                            @if (get_setting('vendor_system_activation') == 1)
-                                <div class="d-flex flex-column justify-content-between h-100">
-                                    <!-- Total Sellers -->
-                                    <div>
-                                        <h1 class="fs-30 fw-600 text-dark mb-1">
-                                            {{ $total_sellers }}
-                                        </h1>
-                                        <h3 class="fs-13 fw-600 text-secondary mb-0">{{ translate('Total Sellers') }}</h3>
-                                    </div>
-                                    <!-- Sales -->
-                                    <div>
-                                        @foreach ($status_wise_sellers as $key => $status_wise_seller)
-                                            <div
-                                                class="d-flex justify-content-between @if ($key == 0) mb-1 @endif">
-                                                <h3 class="fs-13 fw-600 mb-0">
-                                                    @if ($status_wise_seller->verification_status == 1)
-                                                        <span
-                                                            class="badge badge-md badge-dot badge-circle badge-success text-truncate mr-2"></span>
-                                                        {{ translate('Approved Sellers') }}
-                                                    @else
-                                                        <span
-                                                            class="badge badge-md badge-dot badge-circle badge-danger text-truncate mr-2"></span>
-                                                        {{ translate('Pending Seller') }}
-                                                    @endif
-                                                </h3>
-                                                <h3 class="fs-13 fw-600 mb-0">
-                                                    {{ $status_wise_seller->total }}
-                                                </h3>
+                            <div class="border rounded-2 p-3">
+                                @forelse ($latest_product_reviews as $review)
+                                    <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                                        <div class="mr-3">
+                                            <div class="fs-13 fw-600 text-dark">
+                                                {{ optional($review->product)->name ?? translate('Product') }}
                                             </div>
-                                        @endforeach
-                                    </div>
-                                    <!-- Top Sellers -->
-                                    <div>
-                                        <h3 class="fs-13 fw-600 mb-1">
-                                            <span class="badge badge-md badge-dot badge-circle badge-warning mr-2"></span>
-                                            {{ translate('Top Sellers') }}
-                                        </h3>
-                                        <div class="symbol-group">
-                                            @foreach ($top_sellers as $top_seller)
-                                                <div class="symbol size-40px rounded-content overflow-hidden"
-                                                    title="{{ $top_seller->name }}">
-                                                    <img src="{{ uploaded_asset($top_seller->avatar_original) }}"
-                                                        alt="{{ translate('seller') }}" class="h-100 img-fit lazyload"
-                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                                </div>
-                                            @endforeach
+                                            <div class="fs-12 text-secondary">
+                                                {{ optional($review->user)->name ?? translate('Customer') }}
+                                            </div>
                                         </div>
-                                        <hr style="border: 1px dashed #dbdfe9;">
+                                        <div class="text-right">
+                                            <div class="badge badge-inline badge-warning px-2 py-1">
+                                                {{ $review->rating }}/5
+                                            </div>
+                                        </div>
                                     </div>
-                                    <!-- Sales this month -->
-                                    <div class="">
-                                        <a href="{{ route('sellers.index') }}"
-                                            class="btn btn-md btn-soft-success btn-block rounded-2 mb-3">{{ translate('All Sellers') }}</a>
-                                        <a href="{{ route('sellers.index') }}?approved_status=0"
-                                            class="btn btn-md btn-soft-danger btn-block rounded-2">{{ translate('Pending Sellers') }}</a>
-                                    </div>
-                                </div>
-                            @else
-                                <div class="d-flex flex-column align-items-center justify-content-center h-100">
-                                    <div class="h-200px">
-                                        <img src="{{ static_asset('assets/img/multivendor.jpg') }}"
-                                            alt="{{ translate('multivendor') }}" class="h-100 img-fit">
-                                    </div>
-                                    <a href="{{ route('activation.index') }}"
-                                        class="mt-4 fs-13 fw-600 text-info hov-text-primary animate-underline-primary">
-                                        {{ translate('Activate Vendor System') }}
-                                    </a>
-                                </div>
-                            @endif
+                                @empty
+                                    <div class="text-secondary fs-13">{{ translate('No reviews found') }}</div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Orders -->
-            <div class="col-lg-6">
+            {{-- <div class="col-lg-6">
                 <div class="dashboard-box bg-white mb-2rem overflow-hidden">
                     <div class="row gutters-16">
                         <!-- Total Orders -->
@@ -471,10 +1162,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Top Category & Top Brands -->
-            <div class="col-lg-6">
+            {{-- <div class="col-lg-6">
                 <div class="row gutters-16">
                     <!-- Top Category -->
                     <div class="col-sm-6">
@@ -571,10 +1262,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- In-house Store -->
-            <div class="col-lg-6">
+            {{-- <div class="col-lg-6">
                 <div class="dashboard-box bg-white mb-2rem overflow-hidden">
                     <div class="row gutters-16">
                         <!-- In-house Store -->
@@ -622,12 +1313,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             @if (get_setting('vendor_system_activation') == 1)
                 <!-- Top Seller & Products -->
                 <div class="col-lg-6">
-                    <div class="dashboard-box bg-white mb-2rem overflow-hidden p-2rem" style="height: 474px;">
+                    {{-- <div class="dashboard-box bg-white mb-2rem overflow-hidden p-2rem" style="height: 474px;">
                         <!-- Header -->
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
@@ -670,8 +1361,8 @@
                         <div id="top-sellers-products-section">
 
                         </div>
-                    </div>
-                    @if (get_setting('vendor_system_activation') == 1)
+                    </div> --}}
+                    {{-- @if (get_setting('vendor_system_activation') == 1)
                         <div class="col-lg-12">
                             <div class="dashboard-box bg-white mb-2rem overflow-hidden p-4">
 
@@ -771,7 +1462,7 @@
 
                             </div>
                         </div>
-                    @endif
+                    @endif --}}
                 </div>
             @endif
         </div>
@@ -890,5 +1581,56 @@
             $(".top_brands_product_table").removeClass("show");
             $("#top_brands_product_table_" + brand_id).addClass("show");
         }
+        $(document).on('change changed.bs.select', '#sellerDistrictFilter, #sellerBlockFilter', function() {
+            let district = $('#sellerDistrictFilter').val();
+            let block = $('#sellerBlockFilter').val();
+            let visible = 0;
+
+            $('#sellerBlockFilter option').each(function() {
+                let blockDistrict = $(this).data('district');
+
+                if (!district || !$(this).val() || blockDistrict == district) {
+                    $(this).prop('disabled', false).removeClass('d-none');
+                } else {
+                    $(this).prop('disabled', true).addClass('d-none');
+                }
+            });
+
+            if (district) {
+                let selectedBlockDistrict = $('#sellerBlockFilter option:selected').data('district');
+                if (selectedBlockDistrict && selectedBlockDistrict != district) {
+                    $('#sellerBlockFilter').val('');
+                    block = '';
+                }
+            }
+
+            $('#sellerBlockFilter').selectpicker('refresh');
+
+            $('#sellerTable tr[data-district]').each(function() {
+                let rowDistrict = $(this).data('district');
+                let rowBlock = $(this).data('block');
+                let show = true;
+
+                if (district && rowDistrict != district) {
+                    show = false;
+                }
+
+                if (block && rowBlock != block) {
+                    show = false;
+                }
+
+                $(this).toggle(show);
+
+                if (show) {
+                    visible++;
+                }
+            });
+
+            $('#noSellerRow').toggle(visible === 0);
+        });
+
+        $(document).ready(function() {
+            $('#sellerDistrictFilter').trigger('change');
+        });
     </script>
 @endsection

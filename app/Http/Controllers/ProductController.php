@@ -817,6 +817,9 @@ class ProductController extends Controller
 
     public function assignmentHistoryIndex(Request $request)
     {
+        $district_id = $request->district_id ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
         $query = Shop::join('users', 'users.id', '=', 'shops.user_id')
             ->select(
                 'users.id as seller_id',
@@ -824,7 +827,13 @@ class ProductController extends Controller
                 'shops.shop_id'
             );
 
+        // if ($request->search) {
+        //     $query->where('users.name', 'like', '%' . $request->search . '%')
+        //         ->orWhere('shops.shop_id', 'like', '%' . $request->search . '%');
+        // }
+
         if ($request->search) {
+<<<<<<< Updated upstream
             $query->where(function ($q) use ($request) {
                 $q->where('users.name', 'like', '%' . $request->search . '%')
                     ->orWhere('shops.shop_id', 'like', '%' . $request->search . '%');
@@ -834,6 +843,51 @@ class ProductController extends Controller
         $sellers = $query->paginate(10)->withQueryString();
 
         return view('backend.assignment_history.index', compact('sellers'));
+=======
+
+            $query->where(function ($q) use ($request) {
+
+                $q->where(
+                    'users.name',
+                    'like',
+                    '%' . $request->search . '%'
+                )
+                    ->orWhere(
+                        'shops.shop_id',
+                        'like',
+                        '%' . $request->search . '%'
+                    );
+            });
+        }
+        if ($district_id != null) {
+            $query->where(
+                'users.district',
+                $district_id
+            );
+        }
+
+        if ($block_id != null) {
+            $query->where(
+                'users.block',
+                $block_id
+            );
+        }
+
+        if ($sub_district_id != null) {
+            $query->where(
+                'users.sub_district',
+                $sub_district_id
+            );
+        }
+
+        $sellers = $query->get();
+        return view('backend.assignment_history.index', compact(
+            'sellers',
+            'district_id',
+            'block_id',
+            'sub_district_id'
+        ));
+>>>>>>> Stashed changes
     }
     public function showAssignmentHistory($seller_id)
     {
@@ -917,6 +971,9 @@ class ProductController extends Controller
 
     public function lowSellerStock(Request $request)
     {
+        $district_id = $request->district_id ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
         $query = SellerProduct::join('users', 'users.id', '=', 'seller_products.seller_id')
             ->join('products', 'products.id', '=', 'seller_products.product_id')
             ->join('shops', 'shops.user_id', '=', 'seller_products.seller_id')
@@ -938,6 +995,26 @@ class ProductController extends Controller
 
         if ($request->product_id) {
             $query->where('products.id', $request->product_id);
+        }
+        if ($district_id != null) {
+            $query->where(
+                'users.district',
+                $district_id
+            );
+        }
+
+        if ($block_id != null) {
+            $query->where(
+                'users.block',
+                $block_id
+            );
+        }
+
+        if ($sub_district_id != null) {
+            $query->where(
+                'users.sub_district',
+                $sub_district_id
+            );
         }
 
         $lowStocks = $query->orderBy('seller_products.stock', 'asc')->get();
@@ -961,9 +1038,18 @@ class ProductController extends Controller
         $sellers = User::where('user_type', 'seller')->pluck('name', 'id');
         $products = Product::pluck('name', 'id');
 
-        return view('backend.stock.index', compact('lowStocks', 'sellers', 'products', 'totalRemaining'));
+        return view('backend.stock.index', compact(
+            'lowStocks',
+            'sellers',
+            'products',
+            'totalRemaining',
+            'district_id',
+            'block_id',
+            'sub_district_id'
+        ));
     }
 
+<<<<<<< Updated upstream
     public function OutOfStockRequests()
     {
         $requests = OutOfStockRequest::with(['user', 'product'])
@@ -971,5 +1057,94 @@ class ProductController extends Controller
             ->paginate();
 
         return view('backend.out_of_stock.out_of_stock', compact('requests'));
+=======
+    // public function OutOfStockRequests(){
+    //     $requests = OutOfStockRequest::with(['user','product'])
+    //     ->latest()
+    //     ->paginate();
+
+    //     return view('backend.out_of_stock.out_of_stock',compact('requests'));
+    // }
+
+    public function OutOfStockRequests(Request $request)
+    {
+        $district_id = $request->district_id ?? null;
+        $block_id = $request->block_id ?? null;
+        $sub_district_id = $request->sub_district_id ?? null;
+
+        // $requests = OutOfStockRequest::with(['user', 'product']);
+        $requests = OutOfStockRequest::with(['user', 'product'])
+    ->whereHas('user');
+
+        if (
+            $district_id != null ||
+            $block_id != null ||
+            $sub_district_id != null
+        ) {
+
+            // Get matching sellers
+            $seller_query = User::where('user_type', 'seller');
+
+            if ($district_id != null) {
+                $seller_query->where(
+                    'district',
+                    $district_id
+                );
+            }
+
+            if ($block_id != null) {
+                $seller_query->where(
+                    'block',
+                    $block_id
+                );
+            }
+
+            if ($sub_district_id != null) {
+                $seller_query->where(
+                    'sub_district',
+                    $sub_district_id
+                );
+            }
+
+            $seller_ids = $seller_query
+                ->pluck('id')
+                ->toArray();
+
+            // Find matching request ids
+            $request_ids = OutOfStockRequest::all()
+                ->filter(function ($req) use ($seller_ids) {
+
+                    $failed_sellers = $req->seller_ids ?? [];
+
+                    return count(
+                        array_intersect(
+                            $failed_sellers,
+                            $seller_ids
+                        )
+                    ) > 0;
+                })
+                ->pluck('id')
+                ->toArray();
+
+            $requests = $requests->whereIn(
+                'id',
+                $request_ids
+            );
+        }
+
+        $requests = $requests
+            ->latest()
+            ->paginate(15);
+
+        return view(
+            'backend.out_of_stock.out_of_stock',
+            compact(
+                'requests',
+                'district_id',
+                'block_id',
+                'sub_district_id'
+            )
+        );
+>>>>>>> Stashed changes
     }
 }
