@@ -132,7 +132,7 @@
                                     <div
                                         class="d-block mw-100 overflow-hidden h-180px h-sm-200px h-md-250px h-lg-300px h-xl-370px">
 
-                                   
+
                                         <picture>
 
                                             <!-- 📱 Mobile -->
@@ -330,10 +330,14 @@
 
     </div>
 
+    {{-- Coming Soon --}}
+    @include('frontend.megamart.partials.comming_soon');
+
+
     <!-- Featured Products -->
     <div id="section_featured">
 
-    </div>
+    </div>   
 
 
     @if (addon_is_activated('preorder'))

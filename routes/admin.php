@@ -149,6 +149,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/products/seller/{id}/edit', 'seller_product_edit')->name('products.seller.edit');
         Route::post('/products/update/{product}', 'update')->name('products.update');
         Route::post('/products/todays_deal', 'updateTodaysDeal')->name('products.todays_deal');
+
+        Route::post('/products/coming_soon', 'updateComingSoon')->name('products.coming_soon');
+
         Route::post('/products/featured', 'updateFeatured')->name('products.featured');
         Route::post('/products/published', 'updatePublished')->name('products.published');
         Route::post('/products/approved', 'updateProductApproval')->name('products.approved');

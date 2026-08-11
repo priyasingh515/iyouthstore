@@ -138,6 +138,7 @@ Route::controller(HomeController::class)->group(function () {
 
     Route::post('/home/section/featured', 'load_featured_section')->name('home.section.featured');
     Route::post('/home/section/todays-deal', 'load_todays_deal_section')->name('home.section.todays_deal');
+    Route::post('/home/section/coming-soon', 'load_coming_soon_section')->name('home.section.coming_soon');
     Route::post('/home/section/best-selling', 'load_best_selling_section')->name('home.section.best_selling');
     Route::post('/home/section/newest-products', 'load_newest_product_section')->name('home.section.newest_products');
     Route::post('/home/section/home-categories', 'load_home_categories_section')->name('home.section.home_categories');

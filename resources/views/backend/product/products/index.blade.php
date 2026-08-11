@@ -106,6 +106,7 @@
                         <th data-breakpoints="sm">{{translate('Info')}}</th>
                         <th data-breakpoints="md">{{translate('Total Stock')}}</th>
                         <th data-breakpoints="lg">{{translate('Todays Deal')}}</th>
+                        <th data-breakpoints="lg">{{translate('Coming Soon')}}</th>
                         <th data-breakpoints="lg">{{translate('Published')}}</th>
                         @if(get_setting('product_approve_by_admin') == 1 && $type == 'Seller')
                             <th data-breakpoints="lg">{{translate('Approved')}}</th>
@@ -177,6 +178,19 @@
                                 <span class="slider round"></span>
                             </label>
                         </td>
+
+<td>
+    <label class="aiz-switch aiz-switch-success mb-0">
+        <input
+            onchange="update_coming_soon(this)"
+            value="{{ $product->id }}"
+            type="checkbox"
+            @if($product->coming_soon == 1) checked @endif
+        >
+        <span class="slider round"></span>
+    </label>
+</td>
+
                         <td>
                             <label class="aiz-switch aiz-switch-success mb-0">
                                 <input onchange="update_published(this)" value="{{ $product->id }}" type="checkbox" <?php if ($product->published == 1) echo "checked"; ?> >
@@ -384,6 +398,32 @@
                 }
             });
         }
+
+        function update_coming_soon(el) {
+    if (el.checked) {
+        var coming_soon = 1;
+    } else {
+        var coming_soon = 0;
+    }
+
+    $.post('{{ route('products.coming_soon') }}', {
+        _token: '{{ csrf_token() }}',
+        id: el.value,
+        coming_soon: coming_soon
+    }, function(data) {
+        if (data == 1) {
+            AIZ.plugins.notify(
+                'success',
+                '{{ translate('Coming Soon status updated successfully') }}'
+            );
+        } else {
+            AIZ.plugins.notify(
+                'danger',
+                '{{ translate('Something went wrong') }}'
+            );
+        }
+    });
+}
 
     </script>
 @endsection

@@ -41,6 +41,15 @@ class PurchaseController extends Controller
         return view('seller.buy_product.index', compact('products', 'categories'));
     }
 
+    public function comming_soon()
+    {
+        $coming_soon_products = Product::with('thumbnail')
+            ->where('coming_soon', 1)
+            ->orderBy('id', 'desc')
+            ->get();
+        return view('seller.buy_product.comming_soon',compact('coming_soon_products'));
+    }
+
 
     // public function sellerAddToCart(Request $request)
     // {

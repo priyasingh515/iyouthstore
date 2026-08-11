@@ -301,6 +301,13 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
+        // Coming Soon checkbox:
+        // checked = 1
+         // unchecked = 0
+          $request->merge([
+            'coming_soon' => $request->has('coming_soon') ? 1 : 0,
+            ]);
+
         $product = $this->productService->store($request->except([
             '_token',
             'sku',
@@ -439,6 +446,12 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product)
     {
+        // Coming Soon checkbox:
+         // checked = 1
+         // unchecked = 0
+         $request->merge([
+             'coming_soon' => $request->has('coming_soon') ? 1 : 0,
+             ]);
 
         //Product
         $product = $this->productService->update($request->except([
@@ -628,6 +641,18 @@ class ProductController extends Controller
         Cache::forget('todays_deal_products');
         return 1;
     }
+
+    public function updateComingSoon(Request $request)
+{
+    $product = Product::findOrFail($request->id);
+
+    $product->coming_soon = $request->status;
+    $product->save();
+
+    Cache::forget('coming_soon_products');
+
+    return 1;
+}
 
     public function updatePublished(Request $request)
     {

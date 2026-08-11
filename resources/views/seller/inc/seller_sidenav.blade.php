@@ -235,6 +235,12 @@
                                 <span class="aiz-side-nav-text">{{ translate('My Purchases') }}</span>
                             </a>
                         </li>
+                        <li class="aiz-side-nav-item">
+                            <a href="{{ route('seller.comming_soon') }}"
+                                class="aiz-side-nav-link {{ areActiveRoutes(['seller.comming_soon']) }}">
+                                <span class="aiz-side-nav-text">{{ translate('Comming Soon') }}</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

@@ -346,6 +346,22 @@
                                                 class="text-muted">{{ translate('If you enable this, this product will be granted as a todays deal product.') }}</small>
                                         </div>
                                     </div>
+                                    {{-- Comming soon --}}
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-from-label">
+                                            {{ translate('Coming Soon') }}
+                                        </label>
+                                        <div class="col-md-9">
+                                            <label class="aiz-switch aiz-switch-success mb-0 d-block">
+                                                <input type="checkbox" name="coming_soon" value="1"
+                                                    {{ $product->coming_soon == 1 ? 'checked' : '' }}>
+                                                <span></span>
+                                            </label>
+                                            <small class="text-muted">
+                                                {{ translate('If you enable this, this product will be marked as coming soon.') }}
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Flash Deal -->
@@ -756,8 +772,8 @@
 
                                     <!-- seller selling price -->
                                     <div class="form-group row">
-                                        <label class="col-md-3 col-from-label">{{ translate('Seller Selling Price') }} <span
-                                                class="text-danger">*</span></label>
+                                        <label class="col-md-3 col-from-label">{{ translate('Seller Selling Price') }}
+                                            <span class="text-danger">*</span></label>
                                         <div class="col-md-6">
                                             <input type="text" placeholder="{{ translate('Seller selling price') }}"
                                                 name="seller_selling_price"
@@ -1426,19 +1442,19 @@
                 success: function(data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                        <div class="form-group row">\
-                            <div class="col-md-3">\
-                                <input type="hidden" name="choice_no[]" value="' + i + '">\
-                                <input type="text" class="form-control" name="choice[]" value="' + name +
+                            <div class="form-group row">\
+                                <div class="col-md-3">\
+                                    <input type="hidden" name="choice_no[]" value="' + i + '">\
+                                    <input type="text" class="form-control" name="choice[]" value="' + name +
                         '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                            </div>\
-                            <div class="col-md-8">\
-                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' +
+                                </div>\
+                                <div class="col-md-8">\
+                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' +
                         i + '[]" data-selected-text-format="count" multiple>\
-                                    ' + obj + '\
-                                </select>\
-                            </div>\
-                        </div>');
+                                        ' + obj + '\
+                                    </select>\
+                                </div>\
+                            </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });

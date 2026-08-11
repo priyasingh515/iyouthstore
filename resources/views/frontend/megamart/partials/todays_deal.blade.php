@@ -11,15 +11,15 @@
                 @if ($todays_deal_banner != null || $todays_deal_banner_small != null)
                     <div class="col-xl-5">
                         <div class="overflow-hidden h-100 d-none d-md-block">
-                            <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}" 
-                                data-src="{{ uploaded_asset($todays_deal_banner) }}" 
-                                alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition" 
+                            <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
+                                data-src="{{ uploaded_asset($todays_deal_banner) }}"
+                                alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition"
                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                         </div>
                         <div class="overflow-hidden h-100 d-md-none">
-                            <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}" 
-                                data-src="{{ $todays_deal_banner_small != null ? uploaded_asset($todays_deal_banner_small) : uploaded_asset($todays_deal_banner) }}" 
-                                alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition" 
+                            <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
+                                data-src="{{ $todays_deal_banner_small != null ? uploaded_asset($todays_deal_banner_small) : uploaded_asset($todays_deal_banner) }}"
+                                alt="{{ env('APP_NAME') }} promo" class="lazyload img-fit h-100 has-transition"
                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                         </div>
                     </div>

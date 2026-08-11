@@ -141,6 +141,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
 
     //Buy Products
 
+    Route::get('comming-soon', [PurchaseController::class, 'comming_soon'])->name('comming_soon');
+
     Route::get('/buy/products', [PurchaseController::class, 'index'])->name('buy.products');
     Route::post('/cart/add', [PurchaseController::class, 'sellerAddToCart'])
         ->name('cart.add');

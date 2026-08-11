@@ -50,14 +50,16 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // $route = route(get_setting('customer_registration_verify') === '1' ? 'registration.verification' : 'user.registration'); 
+        // $route = route(get_setting('customer_registration_verify') === '1' ? 'registration.verification' : 'user.registration');
         // dd( $route );
         $lang = get_system_language() ? get_system_language()->code : null;
         $featured_categories = Cache::rememberForever('featured_categories', function () {
             return Category::with('bannerImage')->where('featured', 1)->get();
         });
 
-        return view('frontend.' . get_setting('homepage_select') . '.index', compact('featured_categories', 'lang'));
+        $coming_soon_products = Product::where('coming_soon', 1)->orderBy('id', 'desc')->get();
+
+        return view('frontend.' . get_setting('homepage_select') . '.index', compact('featured_categories', 'lang', 'coming_soon_products'));
     }
 
     function calculateDistance($lat1, $lon1, $lat2, $lon2)
@@ -80,71 +82,86 @@ class HomeController extends Controller
 
 
 
-public function store(Request $request)
-{
-    $request->validate([
-        'latitude'  => 'required|numeric',
-        'longitude' => 'required|numeric',
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'latitude'  => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
 
-    $userLat = $request->latitude;
-    $userLng = $request->longitude;
+        $userLat = $request->latitude;
+        $userLng = $request->longitude;
 
-    $isWithinRadius = false;
-    $nearestShop = null;
-    $nearestDistance = null;
-
-
-    $shops = Shop::whereNotNull('latitude')
-                ->whereNotNull('longitude')
-                ->get();
-
-    foreach ($shops as $shop) {
-
-        
-        $distance = $this->calculateDistance(
-            $userLat,
-            $userLng,
-            $shop->latitude,
-            $shop->longitude
-        );
+        $isWithinRadius = false;
+        $nearestShop = null;
+        $nearestDistance = null;
 
 
-        if ($nearestDistance === null || $distance < $nearestDistance) {
-            $nearestDistance = $distance;
-            $nearestShop = $shop;
+        $shops = Shop::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get();
+
+        foreach ($shops as $shop) {
+
+
+            $distance = $this->calculateDistance(
+                $userLat,
+                $userLng,
+                $shop->latitude,
+                $shop->longitude
+            );
+
+
+            if ($nearestDistance === null || $distance < $nearestDistance) {
+                $nearestDistance = $distance;
+                $nearestShop = $shop;
+            }
+
+
+            if ($distance <= 10) {
+                $isWithinRadius = true;
+            }
         }
 
+        session([
+            'user_latitude'    => $userLat,
+            'user_longitude'   => $userLng,
+            'is_within_radius' => $isWithinRadius
+        ]);
 
-        if ($distance <= 10) {
-            $isWithinRadius = true;
-        }
+        return response()->json([
+            'status' => 'Location stored successfully',
+            'is_within_radius' => $isWithinRadius,
+            'nearest_distance_km' => round($nearestDistance, 2),
+            'nearest_shop' => $nearestShop ? [
+                'id' => $nearestShop->id,
+                'name' => $nearestShop->name,
+                'latitude' => $nearestShop->latitude,
+                'longitude' => $nearestShop->longitude,
+            ] : null
+        ]);
     }
-    
-    session([
-        'user_latitude'    => $userLat,
-        'user_longitude'   => $userLng,
-        'is_within_radius' => $isWithinRadius
-    ]);
-
-    return response()->json([
-        'status' => 'Location stored successfully',
-        'is_within_radius' => $isWithinRadius,
-        'nearest_distance_km' => round($nearestDistance, 2),
-        'nearest_shop' => $nearestShop ? [
-            'id' => $nearestShop->id,
-            'name' => $nearestShop->name,
-            'latitude' => $nearestShop->latitude,
-            'longitude' => $nearestShop->longitude,
-        ] : null
-    ]);
-}
 
     public function load_todays_deal_section()
     {
         $todays_deal_products = filter_products(Product::where('todays_deal', '1'))->orderBy('id', 'desc')->get();
+        // Coming Soon Products
+        // $coming_soon_products = filter_products(Product::where('coming_soon', '1'))->orderBy('id', 'desc')->get();
+
         return view('frontend.' . get_setting('homepage_select') . '.partials.todays_deal', compact('todays_deal_products'));
     }
+
+    public function load_coming_soon_section()
+{
+    $coming_soon_products = Product::where('coming_soon', 1)
+        ->orderBy('id', 'desc')
+        ->get();
+
+    return view(
+        'frontend.' . get_setting('homepage_select') . '.partials.coming_soon',
+        compact('coming_soon_products')
+    );
+}
 
     public function load_newest_product_section()
     {
@@ -926,6 +943,9 @@ public function store(Request $request)
         $todays_deal_products = Cache::rememberForever('todays_deal_products', function () {
             return filter_products(Product::with('thumbnail')->where('todays_deal', '1'))->get();
         });
+
+        // Coming Soon Products
+        // $coming_soon_products = filter_products(Product::with('thumbnail')->where('coming_soon', 1))->get();
 
         return view("frontend.todays_deal", compact('todays_deal_products'));
     }

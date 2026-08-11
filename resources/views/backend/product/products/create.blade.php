@@ -327,7 +327,28 @@
                                                 class="text-muted">{{ translate('If you enable this, this product will be granted as a todays deal product.') }}</small>
                                         </div>
                                     </div>
-                                </div>
+                                    
+<!-- Coming Soon -->
+<div class="form-group row">
+    <label class="col-md-3 col-from-label">
+        {{ translate('Coming Soon') }}
+    </label>
+
+    <div class="col-md-9">
+        <label class="aiz-switch aiz-switch-success mb-0 d-block">
+            <input type="checkbox"
+                   name="coming_soon"
+                   value="1"
+                   {{ old('coming_soon', $product->coming_soon ?? 0) == 1 ? 'checked' : '' }}>
+            <span></span>
+        </label>
+
+        <small class="text-muted">
+            {{ translate('If you enable this, this product will be marked as coming soon.') }}
+        </small>
+    </div>
+</div>
+
 
                                 <!-- Flash Deal -->
                                 <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -843,7 +864,7 @@
                                     <!--        </label>-->
                                     <!--    </div>-->
                                     <!--</div>-->
-                                    
+
                                          <input type="hidden" name="stock_visibility_state" value="hide">
                                 </div>
                             </div>
